@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/storage/user_session.storage.dart';
+import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/theme/theme.dart';
@@ -27,19 +28,29 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<LoginRepository>(
           create: (context) => LoginRepositoryFirebase(),
         ),
+        RepositoryProvider<LogoutRepository>(
+          create: (_) => LogoutLocalRepository(LocalStorage()),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider<RegisterBloc>(
             create:
-                (context) =>
-                    RegisterBloc(registerRepository: context.read<RegisterRepository>()),
+                (context) => RegisterBloc(
+                  registerRepository: context.read<RegisterRepository>(),
+                ),
           ),
           BlocProvider<LoginBloc>(
             create:
                 (context) => LoginBloc(
                   loginRepository: context.read<LoginRepository>(),
                   localStorage: LocalStorage(),
+                ),
+          ),
+          BlocProvider<LogoutBloc>(
+            create:
+                (context) => LogoutBloc(
+                  logoutRepository: context.read<LogoutRepository>(),
                 ),
           ),
         ],

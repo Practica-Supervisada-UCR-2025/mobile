@@ -16,6 +16,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({required this.loginRepository, required this.localStorage})
     : super(LoginInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
+    on<LoginReset>(_onLoginReset);
+  }
+
+  void _onLoginReset(LoginReset event, Emitter<LoginState> emit) {
+    emit(LoginInitial());
   }
 
   // Event handler for LoginSubmitted event
