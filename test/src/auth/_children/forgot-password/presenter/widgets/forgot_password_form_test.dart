@@ -37,12 +37,9 @@ void main() {
   }
 
   Future<void> _submitAndHandleDialog(WidgetTester tester) async {
-    await tester.tap(find.byType(PrimaryButton));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pumpAndSettle();
-  }
+  await tester.tap(find.byType(PrimaryButton));
+  await tester.pump();
+}
 
   group('ForgotPasswordForm UI Tests', () {
     testWidgets('Validación: campo vacío muestra error', (tester) async {
@@ -106,17 +103,13 @@ void main() {
           ForgotPasswordSuccess('Correo enviado exitosamente'),
         ]),
         initialState: ForgotPasswordInitial(),
-      );
+    );
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Mail sent'), findsOneWidget);
       expect(find.text('Correo enviado exitosamente'), findsOneWidget);
-
-      await tester.pump(const Duration(seconds: 3));
-      await tester.pumpAndSettle();
     });
 
     testWidgets('Muestra dialog de error si ForgotPasswordFailure', (tester) async {
@@ -131,13 +124,9 @@ void main() {
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Error'), findsOneWidget);
       expect(find.text('Hubo un error'), findsOneWidget);
-
-      await tester.pump(const Duration(seconds: 3));
-      await tester.pumpAndSettle();
     });
   });
 }
