@@ -42,7 +42,6 @@ void main() {
       Paths.search,
       Paths.create,
       Paths.notifications,
-      Paths.profile,
     ];
 
     for (final path in paths) {
