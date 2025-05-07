@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import '../../src/profile/domain/domain.dart';
 import 'paths.dart';
 import 'router_utils.dart';
 import '../../core/globals/main_scaffold.dart';
@@ -24,7 +25,7 @@ final List<RouteBase> appRoutes = [
   ),
   GoRoute(
     path: Paths.register,
-    builder: (context, state) => const RegisterPage(), 
+    builder: (context, state) => const RegisterPage(),
   ),
   GoRoute(
     path: Paths.settings,
@@ -55,6 +56,13 @@ final List<RouteBase> appRoutes = [
       GoRoute(
         path: Paths.profile,
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: Paths.editProfile,
+        builder: (context, state) {
+          final user = state.extra as User;
+          return ProfileEditPage(user: user);
+        },
       ),
     ],
   ),
