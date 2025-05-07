@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile/core/globals/widgets/secondary_button.dart';
 import 'package:mobile/src/profile/domain/models/user.dart';
 import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
+import 'package:mobile/src/profile/presenter/widgets/edit_profile_fields.dart';
 
 class ProfileEditPage extends StatefulWidget {
   final User user;
@@ -97,168 +97,131 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
-        actions: [
-          BlocConsumer<ProfileBloc, ProfileState>(
-            listener: (context, state) {
-              if (state is ProfileUpdateSuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Profile updated successfully')),
-                );
-                Navigator.of(context).pop();
-              } else if (state is ProfileUpdateFailure) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Update failed: ${state.error}')),
-                );
-              }
-            },
-            builder: (context, state) {
-              final isLoading = state is ProfileUpdating;
-              return Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: TextButton(
-                  onPressed: _isFormDirty && !isLoading ? _saveChanges : null,
-                  child:
-                      isLoading
-                          ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                          : const Text('Save'),
-                ),
-              );
-            },
-          ),
-        ],
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
       ),
-      body: BlocBuilder<ProfileBloc, ProfileState>(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: BlocConsumer<ProfileBloc, ProfileState>(
+        listener: (context, state) {
+          if (state is ProfileUpdateSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(Icons.check_circle_outline, color: Colors.white),
+                    SizedBox(width: 8),
+                    Expanded(child: Text('Profile updated successfully')),
+                  ],
+                ),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.all(16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+            Navigator.of(context).pop();
+          } else if (state is ProfileUpdateFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.white),
+                    SizedBox(width: 8),
+                    Expanded(child: Text('Update failed: ${state.error}')),
+                  ],
+                ),
+                backgroundColor: Theme.of(context).colorScheme.error,
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.all(16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          }
+        },
         builder: (context, state) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Profile Image Section
-                  Center(
-                    child: Stack(
+          final isLoading = state is ProfileUpdating;
+
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Profile Image Section
+                    Stack(
                       children: [
                         CircleAvatar(
                           radius: 50,
                           backgroundColor:
-                              Theme.of(context).colorScheme.onPrimary,
+                              Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(),
                           backgroundImage:
                               widget.user.image != null
                                   ? NetworkImage(widget.user.image!)
                                   : null,
-                          child:
-                              widget.user.image == null
-                                  ? Text(
-                                    widget.user.firstName[0] +
-                                        widget.user.lastName[0],
-                                    style: TextStyle(
-                                      fontSize: 30,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  )
-                                  : null,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            radius: 18,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            child: IconButton(
-                              icon: const Icon(Icons.camera_alt, size: 18),
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              onPressed: () {
-                                // TODO: Implement image upload
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Image upload not implemented yet',
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 24),
 
-                  // Form Fields
-                  TextFormField(
-                    controller: _firstNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'First Name',
-                      border: OutlineInputBorder(),
+                    const SizedBox(height: 32),
+
+                    // Usa el widget de campos de perfil extraído
+                    EditProfileFields(
+                      firstNameController: _firstNameController,
+                      lastNameController: _lastNameController,
+                      usernameController: _usernameController,
+                      emailController: _emailController,
+                      formKey: _formKey,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your first name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
 
-                  TextFormField(
-                    controller: _lastNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Last Name',
-                      border: OutlineInputBorder(),
+                    const SizedBox(height: 32),
+
+                    // Save Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed:
+                            _isFormDirty && !isLoading ? _saveChanges : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child:
+                            isLoading
+                                ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                )
+                                : Text(
+                                  'Save Changes',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                      ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your last name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Username',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a username';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!value.contains('@') || !value.contains('.')) {
-                        return 'Please enter a valid email address';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // TODO: Save Button
-                ],
+                  ],
+                ),
               ),
             ),
           );
