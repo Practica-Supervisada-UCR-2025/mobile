@@ -10,3 +10,12 @@ sealed class ProfileEvent extends Equatable {
 class ProfileLoad extends ProfileEvent {
   const ProfileLoad();
 }
+
+class ProfileUpdate extends ProfileEvent {
+  final Map<String, dynamic> updates;
+
+  const ProfileUpdate({required this.updates});
+
+  @override
+  List<Object> get props => [updates];
+}
