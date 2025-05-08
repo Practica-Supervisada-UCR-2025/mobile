@@ -20,7 +20,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     emit(ProfileLoading());
     try {
-      // TODO: Remove hardcoded user ID and use the one from LocalStorage
+      // todo: Remove hardcoded user ID and use the one from LocalStorage
       // final user = await profileRepository.getCurrentUser(LocalStorage().accessToken);
       final user = await profileRepository.getCurrentUser("1");
       emit(ProfileSuccess(user: user));
@@ -44,6 +44,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           event.updates,
         );
         emit(ProfileUpdateSuccess(user: updatedUser));
+
+        // Emit a new ProfileSuccess state with the updated user
+        // to ensure that the UI reflects the changes
+        // made to the user profile
+        emit(ProfileSuccess(user: updatedUser));
       } catch (e) {
         emit(
           ProfileUpdateFailure(error: e.toString(), user: currentState.user),
