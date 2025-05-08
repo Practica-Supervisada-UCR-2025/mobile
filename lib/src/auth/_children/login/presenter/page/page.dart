@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage>
               opacity: _fadeAnimation!,
               child: Stack(
                 children: [
-                  if (state is! LoginLoading)
+                  if (state is! LoginSuccess)
                     LoginForm(
                       emailController: _emailController,
                       passwordController: _passwordController,
