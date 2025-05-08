@@ -74,7 +74,7 @@ void initState() {
                           const SizedBox(width: 16),
                           CircleAvatar(
                             radius: 35,
-                            // backgroundImage: NetworkImage(user.image),
+                            backgroundImage: NetworkImage(user.image),
                             backgroundColor: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ],

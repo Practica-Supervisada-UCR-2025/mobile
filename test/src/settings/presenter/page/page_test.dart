@@ -63,7 +63,7 @@ void main() {
       await tester.pumpWidget(makeTestableWidget(const SettingsScreen()));
       
       final appBar = tester.widget<AppBar>(find.byType(AppBar));
-      expect(appBar.backgroundColor, ThemeData().colorScheme.background);
+      expect(appBar.backgroundColor, ThemeData().colorScheme.surface);
     });
 
     testWidgets('el AppBar tiene borde inferior negro claro', (tester) async {

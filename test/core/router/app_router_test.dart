@@ -10,8 +10,6 @@ import 'package:mobile/core/router/app_routes.dart';
 import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/core/router/router_utils.dart';
 import 'package:mobile/src/auth/auth.dart';
-import 'package:mobile/src/auth/_children/login/presenter/presenter.dart';
-import 'package:mobile/src/home/presenter/presenter.dart';
 
 // Mock classes
 class MockLoginBloc extends Mock implements LoginBloc {}

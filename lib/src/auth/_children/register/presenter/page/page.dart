@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile/src/auth/_children/login/presenter/page/page.dart'; // Importante para regresar al Login
+// Importante para regresar al Login
 import 'package:mobile/src/auth/auth.dart';
 
 class RegisterPage extends StatefulWidget {
