@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/src/create/create.dart';
 
 void main() {
@@ -46,17 +47,35 @@ void main() {
     });
 
     testWidgets('Cancel button exists and can be tapped', (tester) async {
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const Scaffold(body: Text('Home')),
+            routes: [
+              GoRoute(
+                path: 'create',
+                builder: (context, state) => const CreatePage(),
+              ),
+            ],
+          ),
+        ],
+      );
+
       await tester.pumpWidget(
-        const MaterialApp(
-          home: CreatePage(),
+        MaterialApp.router(
+          routerConfig: router,
         ),
       );
+
+      router.push('/create');
+      await tester.pumpAndSettle();
 
       final cancelButton = find.text('Cancel');
       expect(cancelButton, findsOneWidget);
 
       await tester.tap(cancelButton);
-      await tester.pumpAndSettle(); // No hay navegación ahora, pero se puede extender
+      await tester.pumpAndSettle();
     });
 
     testWidgets('Post button exists', (tester) async {
