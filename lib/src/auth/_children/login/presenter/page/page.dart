@@ -13,7 +13,6 @@ class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false;
   late AnimationController _animationController;
   Animation<double>? _fadeAnimation;
 
@@ -33,12 +32,6 @@ class _LoginPageState extends State<LoginPage>
 
     _animationController.forward();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final initialState = context.read<LoginBloc>().state;
-      setState(() {
-        _isLoading = initialState is LoginLoading;
-      });
-    });
   }
 
   @override
@@ -60,15 +53,6 @@ class _LoginPageState extends State<LoginPage>
       body: SafeArea(
         child: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
-            if (state is LoginLoading) {
-              setState(() {
-                _isLoading = true;
-              });
-            } else {
-              setState(() {
-                _isLoading = false;
-              });
-            }
 
             if (state is LoginFailure) {
               ScaffoldMessenger.of(context).showSnackBar(

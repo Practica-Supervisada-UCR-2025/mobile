@@ -24,10 +24,8 @@ class FakeUser implements AuthUserInfo {
       : _username = username,
         _password = password;
 
-  @override
   String get username => _username;
 
-  @override
   String get password => _password;
 
   @override
