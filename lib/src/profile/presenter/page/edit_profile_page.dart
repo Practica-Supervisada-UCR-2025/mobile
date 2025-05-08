@@ -101,6 +101,52 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
+        actions: [
+          // Save button in app bar
+          BlocBuilder<ProfileBloc, ProfileState>(
+            builder: (context, state) {
+              final isLoading = state is ProfileUpdating;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: TextButton.icon(
+                  onPressed: _isFormDirty && !isLoading ? _saveChanges : null,
+                  icon:
+                      isLoading
+                          ? SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color:
+                                  _isFormDirty
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).disabledColor,
+                            ),
+                          )
+                          : Icon(
+                            Icons.check,
+                            size: 20,
+                            color:
+                                _isFormDirty
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).disabledColor,
+                          ),
+                  label: Text(
+                    'Save',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color:
+                          _isFormDirty
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).disabledColor,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: BlocConsumer<ProfileBloc, ProfileState>(
@@ -145,8 +191,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           }
         },
         builder: (context, state) {
-          final isLoading = state is ProfileUpdating;
-
           return SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -163,63 +207,20 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                               Theme.of(
                                 context,
                               ).colorScheme.primary.withValues(),
-                          backgroundImage:
-                              widget.user.image != null
-                                  ? NetworkImage(widget.user.image!)
-                                  : null,
+                          backgroundImage: NetworkImage(widget.user.image),
                         ),
                       ],
                     ),
 
                     const SizedBox(height: 32),
 
-                    // Usa el widget de campos de perfil extraído
+                    // Use the extracted profile fields widget
                     EditProfileFields(
                       firstNameController: _firstNameController,
                       lastNameController: _lastNameController,
                       usernameController: _usernameController,
                       emailController: _emailController,
                       formKey: _formKey,
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // Save Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed:
-                            _isFormDirty && !isLoading ? _saveChanges : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child:
-                            isLoading
-                                ? SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                  ),
-                                )
-                                : Text(
-                                  'Save Changes',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                      ),
                     ),
                   ],
                 ),

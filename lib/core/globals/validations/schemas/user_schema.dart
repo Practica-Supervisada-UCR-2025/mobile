@@ -1,7 +1,6 @@
 import 'package:ez_validator/ez_validator.dart';
 
 class UserValidator {
-
   static String? validateName(String? value) {
     final validator = EzValidator<String>()
         .required('This field is required')

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile/src/auth/auth.dart';
+import 'package:mobile/core/core.dart';
 
 void main() {
   group('UserValidator Schema - Validate email', () {
