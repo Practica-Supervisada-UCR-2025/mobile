@@ -56,13 +56,15 @@ final List<RouteBase> appRoutes = [
       GoRoute(
         path: Paths.profile,
         builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        path: Paths.editProfile,
-        builder: (context, state) {
-          final user = state.extra as User;
-          return ProfileEditPage(user: user);
-        },
+        routes: [
+          GoRoute(
+            path: Paths.editProfile,
+            builder: (context, state) {
+              final user = state.extra as User;
+              return ProfileEditPage(user: user);
+            },
+          ),
+        ],
       ),
     ],
   ),

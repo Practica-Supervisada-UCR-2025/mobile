@@ -117,7 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildModifyButton(User user) {
     return SecondaryButton(
       onPressed: () {
-        context.push(Paths.editProfile, extra: user);
+        context.go('/profile/edit', extra: user);
       },
       isLoading: false,
       text: 'Edit Profile',
