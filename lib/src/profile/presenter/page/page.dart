@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/globals/widgets/secondary_button.dart';
+import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
 
 import '../../domain/domain.dart';
@@ -117,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildModifyButton(User user) {
     return SecondaryButton(
       onPressed: () {
-        context.go('/profile/edit', extra: user);
+        context.push(Paths.editProfile, extra: user);
       },
       isLoading: false,
       text: 'Edit Profile',
