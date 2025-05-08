@@ -32,7 +32,7 @@ final List<RouteBase> appRoutes = [
   ),
   GoRoute(
     path: Paths.create,
-    builder: (context, state) => const CreateScreen(),
+    builder: (context, state) => const CreatePage(),
   ),
   ShellRoute(
     builder: (context, state, child) {
