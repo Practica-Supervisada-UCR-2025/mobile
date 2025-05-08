@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/router/app_routes.dart';
 import 'package:mobile/core/router/paths.dart';
-import 'package:mobile/src/auth/auth.dart';
 
 void main() {
   
@@ -40,7 +39,6 @@ void main() {
     );
     final paths = [
       Paths.search,
-      Paths.create,
       Paths.notifications,
       Paths.profile,
     ];
