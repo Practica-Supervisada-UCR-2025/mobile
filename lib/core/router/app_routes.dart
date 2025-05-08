@@ -4,6 +4,7 @@ import 'router_utils.dart';
 import '../../core/globals/main_scaffold.dart';
 import '../../src/auth/_children/login/presenter/presenter.dart';
 import '../../src/auth/_children/register/presenter/presenter.dart';
+import '../../src/auth/_children/forgot-password/presenter/presenter.dart';
 import '../../src/home/presenter/presenter.dart';
 import '../../src/search/presenter/presenter.dart';
 import '../../src/create/presenter/presenter.dart';
@@ -29,6 +30,10 @@ final List<RouteBase> appRoutes = [
   GoRoute(
     path: Paths.settings,
     builder: (context, state) => const SettingsScreen(),
+  ),
+  GoRoute(
+    path: Paths.forgot_password,
+    builder: (context, state) => const ForgotPasswordPage(),
   ),
   GoRoute(
     path: Paths.create,
