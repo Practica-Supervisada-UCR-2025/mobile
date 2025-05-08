@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/core.dart';
 
 class EditProfileFields extends StatelessWidget {
   final TextEditingController firstNameController;
@@ -45,12 +46,7 @@ class EditProfileFields extends StatelessWidget {
         hintText: 'Enter your first name',
         prefixIcon: Icons.person_outline,
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your first name';
-        }
-        return null;
-      },
+      validator: UserValidator.validateName,
     );
   }
 
@@ -64,12 +60,7 @@ class EditProfileFields extends StatelessWidget {
         hintText: 'Enter your last name',
         prefixIcon: Icons.person_outline,
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your last name';
-        }
-        return null;
-      },
+      validator: UserValidator.validateName,
     );
   }
 
@@ -103,15 +94,7 @@ class EditProfileFields extends StatelessWidget {
         hintText: 'email@example.com',
         prefixIcon: Icons.email_outlined,
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your email';
-        }
-        if (!value.contains('@') || !value.contains('.')) {
-          return 'Please enter a valid email address';
-        }
-        return null;
-      },
+      validator: UserValidator.validateEmail,
     );
   }
 

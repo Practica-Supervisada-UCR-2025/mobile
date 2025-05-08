@@ -114,4 +114,31 @@ void main() {
       expect(result, null);
     });
   });
+
+  group('UserValidator Schema - Validate username', () {
+    test('should return error when username is empty', () {
+      final result = UserValidator.validateUsername('');
+      expect(result, 'This field is required');
+    });
+
+    test('should return error when username is null', () {
+      final result = UserValidator.validateUsername(null);
+      expect(result, 'This field is required');
+    });
+
+    test('should return error when username is too short', () {
+      final result = UserValidator.validateUsername('ab');
+      expect(result, 'The username must be at least 3 characters long');
+    });
+
+    test('should return error when username is too long', () {
+      final result = UserValidator.validateUsername('a' * 26);
+      expect(result, 'The username must be at most 25 characters long');
+    });
+
+    test('should return null when username is valid', () {
+      final result = UserValidator.validateUsername('valid_username');
+      expect(result, null);
+    });
+  });
 }

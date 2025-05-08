@@ -214,7 +214,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
                     const SizedBox(height: 32),
 
-                    // Use the extracted profile fields widget
                     EditProfileFields(
                       firstNameController: _firstNameController,
                       lastNameController: _lastNameController,
