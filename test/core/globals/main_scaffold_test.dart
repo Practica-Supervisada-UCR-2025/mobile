@@ -55,7 +55,7 @@ void main() {
     await pumpMainScaffold(tester, 1);
     await tester.tap(find.byIcon(Icons.add_box_outlined));
     await tester.pumpAndSettle();
-    verify(() => mockRouter.go('/create')).called(1);
+    verify(() => mockRouter.push('/create')).called(1);
 
     await pumpMainScaffold(tester, 2);
     await tester.tap(find.byIcon(Icons.notifications_none));
