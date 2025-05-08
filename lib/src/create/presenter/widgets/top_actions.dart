@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/core/theme/app_colors.dart';
 
 class TopActions extends StatelessWidget {
@@ -9,7 +10,7 @@ class TopActions extends StatelessWidget {
     return Row(
       children: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
           child: Text(
             'Cancel',
             style: TextStyle(
