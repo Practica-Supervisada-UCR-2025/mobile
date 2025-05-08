@@ -10,7 +10,16 @@ class TopActions extends StatelessWidget {
     return Row(
       children: [
         TextButton(
-          onPressed: () => context.pop(),
+          onPressed: () {
+            FocusScope.of(context).unfocus();
+
+            Future.delayed(Duration(milliseconds: 150), () {
+              if (context.mounted) {
+                context.pop();
+              }
+            });
+            
+          },
           child: Text(
             'Cancel',
             style: TextStyle(
