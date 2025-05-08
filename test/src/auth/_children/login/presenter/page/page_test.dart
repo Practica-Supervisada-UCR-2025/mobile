@@ -89,12 +89,12 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
     
-    testWidgets('doesnt show login Form when LoginBloc is loading',
+    testWidgets('doesnt show login Form when LoginBloc is success',
     (WidgetTester tester) async {
       whenListen(
         mockLoginBloc,
-        Stream.fromIterable([LoginLoading()]),
-        initialState: LoginLoading(),
+        Stream.fromIterable([LoginSuccess(user: testUser)]),
+        initialState: LoginSuccess(user: testUser),
       );
 
       await tester.pumpWidget(

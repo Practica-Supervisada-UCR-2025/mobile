@@ -3,14 +3,14 @@ class User {
   final String firstName;
   final String lastName;
   final String email;
-  final String? image;
+  final String image;
 
   User({
     required this.firstName,
     required this.lastName,
     required this.username,
     required this.email,
-    this.image,
+    required this.image,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {

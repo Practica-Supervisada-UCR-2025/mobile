@@ -10,7 +10,7 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           'Settings',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -27,7 +27,7 @@ class SettingsScreen extends StatelessWidget {
           bottom: BorderSide(color: Colors.black12),
         ),
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Padding(

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/globals/widgets/secondary_button.dart';
-import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
-import 'package:mobile/src/profile/profile.dart';
+
+import '../../domain/domain.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -79,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(width: 16),
                         CircleAvatar(
                           radius: 35,
-                          // backgroundImage: NetworkImage(user.image),
+                          backgroundImage: NetworkImage(user.image),
                           backgroundColor:
                               Theme.of(context).colorScheme.onPrimary,
                         ),
@@ -130,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildCreatePostButton() {
     return SecondaryButton(
       onPressed: () {
-        // TODO: Implement create post functionality
+        // todo: Implement create post functionality
       },
       isLoading: false,
       text: 'New Post',

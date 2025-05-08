@@ -11,7 +11,7 @@ void main() {
 
   setUp(() {
     mockRouter = MockGoRouter();
-    when(() => mockRouter.go(any())).thenAnswer((_) async => null);
+    when(() => mockRouter.go(any())).thenAnswer((_) async {});
     when(() => mockRouter.push(any())).thenAnswer((_) async => null);
   });
 
