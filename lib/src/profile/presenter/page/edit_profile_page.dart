@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/src/profile/domain/models/user.dart';
 import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
 import 'package:mobile/src/profile/presenter/widgets/edit_profile_fields.dart';
@@ -122,7 +123,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 ),
               ),
             );
-            Navigator.of(context).pop();
+            context.pop();
           } else if (state is ProfileUpdateFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
