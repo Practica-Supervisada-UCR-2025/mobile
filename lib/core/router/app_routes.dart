@@ -35,6 +35,10 @@ final List<RouteBase> appRoutes = [
     path: Paths.forgot_password,
     builder: (context, state) => const ForgotPasswordPage(),
   ),
+  GoRoute(
+    path: Paths.create,
+    builder: (context, state) => const CreatePage(),
+  ),
   ShellRoute(
     builder: (context, state, child) {
       final index = getIndexFromLocation(state.uri.toString());
@@ -48,10 +52,6 @@ final List<RouteBase> appRoutes = [
       GoRoute(
         path: Paths.search,
         builder: (context, state) => const SearchScreen(),
-      ),
-      GoRoute(
-        path: Paths.create,
-        builder: (context, state) => const CreateScreen(),
       ),
       GoRoute(
         path: Paths.notifications,

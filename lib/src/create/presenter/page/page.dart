@@ -1,22 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/core/theme/app_colors.dart';
+import 'package:mobile/src/create/create.dart';
 
-class CreateScreen extends StatelessWidget {
-  const CreateScreen({super.key});
+class CreatePage extends StatefulWidget {
+  const CreatePage({super.key});
+
+  @override
+  State<CreatePage> createState() => _CreatePageState();
+}
+
+class _CreatePageState extends State<CreatePage> {
+  final _textController = TextEditingController();
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: const Center(
-        child: Text(
-          'Create screen',
-          style: TextStyle(
-            fontSize: 20,
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w500,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        elevation: 0,
+        title: const TopActions(),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: PostTextField(textController: _textController),
           ),
-        ),
+          const BottomBar(),
+        ],
       ),
     );
   }
