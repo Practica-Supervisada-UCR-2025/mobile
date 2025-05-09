@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile/src/profile/domain/models/user.dart';
 import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
 import 'package:mobile/src/profile/presenter/widgets/edit_profile_fields.dart';
@@ -21,6 +24,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   late TextEditingController _emailController;
   final _formKey = GlobalKey<FormState>();
   bool _isFormDirty = false;
+
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -43,19 +49,108 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     for (final controller in controllers) {
       controller.addListener(() {
-        final isDirty =
-            _firstNameController.text != widget.user.firstName ||
-            _lastNameController.text != widget.user.lastName ||
-            _usernameController.text != widget.user.username ||
-            _emailController.text != widget.user.email;
-
-        if (isDirty != _isFormDirty) {
-          setState(() {
-            _isFormDirty = isDirty;
-          });
-        }
+        _checkFormDirty();
       });
     }
+  }
+
+  void _checkFormDirty() {
+    final isDirty =
+        _firstNameController.text != widget.user.firstName ||
+        _lastNameController.text != widget.user.lastName ||
+        _usernameController.text != widget.user.username ||
+        _emailController.text != widget.user.email ||
+        _selectedImage != null;
+
+    if (isDirty != _isFormDirty) {
+      setState(() {
+        _isFormDirty = isDirty;
+      });
+    }
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (image != null) {
+      setState(() {
+        _selectedImage = File(image.path);
+        _isFormDirty = true;
+      });
+    }
+  }
+
+  Future<void> _takePhoto() async {
+    final XFile? photo = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 80,
+    );
+
+    if (photo != null) {
+      setState(() {
+        _selectedImage = File(photo.path);
+        _isFormDirty = true;
+      });
+    }
+  }
+
+  void _showImageSourceOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder:
+          (context) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Select Image Source',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Gallery'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _pickImageFromGallery();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Camera'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _takePhoto();
+                    },
+                  ),
+                  if (_selectedImage != null || widget.user.image.isNotEmpty)
+                    ListTile(
+                      leading: const Icon(Icons.delete, color: Colors.red),
+                      title: const Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      onTap: () {
+                        context.pop();
+                        setState(() {
+                          _selectedImage = null;
+                          _isFormDirty = true;
+                        });
+                      },
+                    ),
+                ],
+              ),
+            ),
+          ),
+    );
   }
 
   @override
@@ -85,6 +180,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
       if (_emailController.text != widget.user.email) {
         updates['email'] = _emailController.text;
+      }
+
+      if (_selectedImage != null) {
+        print('Image Changed: ${_selectedImage!.path}');
+        // todo: Implement image upload logic
+        // updates['image'] = _selectedImage;
       }
 
       if (updates.isNotEmpty) {
@@ -198,16 +299,48 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Profile Image Section
+                    // Profile Image Section with edit functionality
                     Stack(
+                      alignment: Alignment.bottomRight,
                       children: [
+                        // Imagen de perfil
                         CircleAvatar(
                           radius: 50,
-                          backgroundColor:
-                              Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(),
-                          backgroundImage: NetworkImage(widget.user.image),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.2),
+                          backgroundImage:
+                              _selectedImage != null
+                                  ? FileImage(_selectedImage!) as ImageProvider
+                                  : widget.user.image.isNotEmpty
+                                  ? NetworkImage(widget.user.image)
+                                  : null,
+                          child:
+                              widget.user.image.isEmpty &&
+                                      _selectedImage == null
+                                  ? Icon(
+                                    Icons.person,
+                                    size: 50,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  )
+                                  : null,
+                        ),
+                        // Botón para editar la imagen
+                        GestureDetector(
+                          onTap: _showImageSourceOptions,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ],
                     ),
