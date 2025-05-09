@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:mobile/core/storage/user_session.storage.dart';
 import 'package:mobile/src/auth/auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MockRegisterBloc extends MockBloc<RegisterEvent, RegisterState>
     implements RegisterBloc {}

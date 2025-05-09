@@ -40,7 +40,6 @@ void main() {
     final paths = [
       Paths.search,
       Paths.notifications,
-      Paths.profile,
     ];
 
     for (final path in paths) {

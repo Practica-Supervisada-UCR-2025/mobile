@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/src/auth/auth.dart';
@@ -63,7 +62,7 @@ void main() {
       await tester.pumpWidget(makeTestableWidget(const SettingsScreen()));
       
       final appBar = tester.widget<AppBar>(find.byType(AppBar));
-      expect(appBar.backgroundColor, ThemeData().colorScheme.background);
+      expect(appBar.backgroundColor, ThemeData().colorScheme.surface);
     });
 
     testWidgets('el AppBar tiene borde inferior negro claro', (tester) async {
