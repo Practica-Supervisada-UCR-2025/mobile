@@ -39,7 +39,8 @@ class TopActions extends StatelessWidget {
                 // Action to post the content
               } : null,
               style: TextButton.styleFrom(
-                backgroundColor: isEnabled ? AppColors.primary : const Color.fromARGB(255, 58, 83, 131),
+                backgroundColor: isEnabled ? AppColors.primary 
+                : AppColors.getDisabledPostButtonColor(Theme.of(context).brightness),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
