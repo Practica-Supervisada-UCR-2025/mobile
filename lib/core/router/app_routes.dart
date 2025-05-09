@@ -5,6 +5,7 @@ import 'router_utils.dart';
 import '../../core/globals/main_scaffold.dart';
 import '../../src/auth/_children/login/presenter/presenter.dart';
 import '../../src/auth/_children/register/presenter/presenter.dart';
+import '../../src/auth/_children/forgot-password/presenter/presenter.dart';
 import '../../src/home/presenter/presenter.dart';
 import '../../src/search/presenter/presenter.dart';
 import '../../src/create/presenter/presenter.dart';
@@ -38,6 +39,11 @@ final List<RouteBase> appRoutes = [
       return ProfileEditPage(user: user);
     },
   ),
+  GoRoute(
+    path: Paths.forgot_password,
+    builder: (context, state) => const ForgotPasswordPage(),
+  ),
+  GoRoute(path: Paths.create, builder: (context, state) => const CreatePage()),
   ShellRoute(
     builder: (context, state, child) {
       final index = getIndexFromLocation(state.uri.toString());
@@ -51,10 +57,6 @@ final List<RouteBase> appRoutes = [
       GoRoute(
         path: Paths.search,
         builder: (context, state) => const SearchScreen(),
-      ),
-      GoRoute(
-        path: Paths.create,
-        builder: (context, state) => const CreateScreen(),
       ),
       GoRoute(
         path: Paths.notifications,
