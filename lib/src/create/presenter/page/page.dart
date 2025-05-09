@@ -27,6 +27,7 @@ class _CreatePageState extends State<CreatePage> {
           automaticallyImplyLeading: false,
           backgroundColor: Theme.of(context).colorScheme.surface,
           elevation: 0,
+          scrolledUnderElevation: 0,
           title: const TopActions(),
         ),
         body: Column(
