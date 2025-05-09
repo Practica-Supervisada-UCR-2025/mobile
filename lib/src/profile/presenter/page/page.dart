@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/globals/widgets/secondary_button.dart';
 import 'package:mobile/core/router/paths.dart';
-import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
-
-import '../../domain/domain.dart';
+import 'package:mobile/src/profile/profile.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
