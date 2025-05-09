@@ -74,12 +74,7 @@ class EditProfileFields extends StatelessWidget {
         hintText: 'Enter your username',
         prefixIcon: Icons.alternate_email,
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a username';
-        }
-        return null;
-      },
+      validator: UserValidator.validateUsername,
     );
   }
 
