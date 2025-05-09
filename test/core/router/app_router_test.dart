@@ -73,13 +73,16 @@ void main() {
       routes: appRoutes,
       redirect: (context, state) {
         final loginState = mockLoginBloc.state;
-        final isLogin = state.uri.path == Paths.login;
+        final isAuthenticated = loginState is LoginSuccess;
+        final publicRoutes = [Paths.login, Paths.forgot_password];
+        final isPublic = publicRoutes.contains(state.uri.toString());
 
-        if (loginState is LoginSuccess) {
-          return isLogin ? Paths.home : null;
-        } else {
-          return isLogin ? null : Paths.login;
+        if (!isAuthenticated && !isPublic) {
+          return Paths.login;
+        } else if (isAuthenticated && isPublic) {
+          return Paths.home;
         }
+        return null;
       },
       refreshListenable: mockNotifier,
     );

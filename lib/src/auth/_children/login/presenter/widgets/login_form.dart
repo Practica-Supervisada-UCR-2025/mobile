@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mobile/core/router/router.dart';
 import 'package:mobile/core/globals/globals.dart';
 import 'package:mobile/src/auth/auth.dart';
+
 
 class LoginForm extends StatefulWidget {
   final TextEditingController emailController;
@@ -80,13 +83,7 @@ class LoginFormState extends State<LoginForm> {
       child: Align(
         alignment: Alignment.centerRight,
         child: TextButton(
-          onPressed: () {
-            Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const ForgotPasswordPage(),
-            ),
-          );
-          },
+          onPressed: () => context.push(Paths.forgot_password),
           style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
             minimumSize: const Size(10, 10),

@@ -21,7 +21,7 @@ class MainScaffold extends StatelessWidget {
         context.go(Paths.search);
         break;
       case 2:
-        context.go(Paths.create);
+        context.push(Paths.create);
         break;
       case 3:
         context.go(Paths.notifications);

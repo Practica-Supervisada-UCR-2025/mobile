@@ -39,7 +39,6 @@ void main() {
     );
     final paths = [
       Paths.search,
-      Paths.create,
       Paths.notifications,
     ];
 
