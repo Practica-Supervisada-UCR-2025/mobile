@@ -3,12 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mobile/src/profile/domain/models/models.dart';
-import 'package:mockito/mockito.dart';
 import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
 import 'package:mobile/src/profile/presenter/page/page.dart';
 import 'package:mobile/core/globals/widgets/secondary_button.dart';
 import 'package:network_image_mock/network_image_mock.dart';
-// Modelo ficticio de usuario
+
 final testUser = User(
   firstName: 'John',
   lastName: 'Doe',

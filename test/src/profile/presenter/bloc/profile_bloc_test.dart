@@ -16,8 +16,6 @@ import 'profile_bloc_test.mocks.dart';
 
 void main() {
   late MockProfileRepository mockProfileRepository;
-  late MockLocalStorage mockLocalStorage;
-  late MockProfileRepositoryAPI mockProfileRepositoryAPI;
   late ProfileBloc profileBloc;
 
   final testUser = 
@@ -33,8 +31,6 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     mockProfileRepository = MockProfileRepository();
-    mockLocalStorage = MockLocalStorage();
-    mockProfileRepositoryAPI = MockProfileRepositoryAPI();
 
     profileBloc = ProfileBloc(
       profileRepository: mockProfileRepository,
