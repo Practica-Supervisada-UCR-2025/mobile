@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/theme/app_colors.dart';
+import 'package:mobile/src/create/presenter/bloc/bloc.dart';
 
 class TopActions extends StatelessWidget {
   const TopActions({super.key});
@@ -18,7 +20,6 @@ class TopActions extends StatelessWidget {
                 context.pop();
               }
             });
-            
           },
           child: Text(
             'Cancel',
@@ -29,26 +30,32 @@ class TopActions extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        TextButton(
-          onPressed: () {
-            // Action to post the content
+        BlocBuilder<CreatePostBloc, CreatePostState>(
+          builder: (context, state) {
+            final isEnabled = state.isValid;
+
+            return TextButton(
+              onPressed: isEnabled ? () {
+                // Action to post the content
+              } : null,
+              style: TextButton.styleFrom(
+                backgroundColor: isEnabled ? AppColors.primary : const Color.fromARGB(255, 58, 83, 131),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text(
+                'Post',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+              ),
+            );
           },
-          style: TextButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          child: const Text(
-            'Post',
-            style: TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 13,
-            ),
-          ),
-        )
+        ),
       ],
     );
   }
