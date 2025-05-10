@@ -3,7 +3,7 @@ import 'package:mobile/src/home/_children/news/news.dart';
 import 'package:mobile/src/home/_children/posts/posts.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return Column(
       children: [
         Material(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           child: TabBar(
             controller: _tabController,
             labelStyle: Theme.of(context).textTheme.titleMedium,
@@ -37,7 +37,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             unselectedLabelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: Theme.of(context).colorScheme.outline,
             ),
-            indicatorColor: Theme.of(context).colorScheme.primary,
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(
+                width: 2.5,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            indicatorSize: TabBarIndicatorSize.tab,
+            dividerColor: Colors.transparent,
             tabs: const [
               Tab(text: 'News'),
               Tab(text: 'Posts'),
