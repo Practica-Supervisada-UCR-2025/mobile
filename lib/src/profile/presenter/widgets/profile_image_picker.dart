@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile/core/core.dart';
 
 class ProfileImagePicker extends StatelessWidget {
   final String currentImage;
@@ -16,26 +18,38 @@ class ProfileImagePicker extends StatelessWidget {
   });
 
   Future<void> _pickImageFromGallery(BuildContext context) async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
+    bool hasPermission = await PermissionUtils.checkGalleryPermission(
+      context: context,
     );
 
-    if (image != null) {
-      onImageSelected(File(image.path));
+    if (hasPermission) {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+
+      if (image != null) {
+        onImageSelected(File(image.path));
+      }
     }
   }
 
   Future<void> _takePhoto(BuildContext context) async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? photo = await picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 80,
+    bool hasPermission = await PermissionUtils.checkCameraPermission(
+      context: context,
     );
 
-    if (photo != null) {
-      onImageSelected(File(photo.path));
+    if (hasPermission) {
+      final ImagePicker picker = ImagePicker();
+      final XFile? photo = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 80,
+      );
+
+      if (photo != null) {
+        onImageSelected(File(photo.path));
+      }
     }
   }
 
@@ -61,7 +75,7 @@ class ProfileImagePicker extends StatelessWidget {
                     leading: const Icon(Icons.photo_library),
                     title: const Text('Gallery'),
                     onTap: () {
-                      Navigator.of(context).pop();
+                      context.pop();
                       _pickImageFromGallery(context);
                     },
                   ),
@@ -69,7 +83,7 @@ class ProfileImagePicker extends StatelessWidget {
                     leading: const Icon(Icons.camera_alt),
                     title: const Text('Camera'),
                     onTap: () {
-                      Navigator.of(context).pop();
+                      context.pop();
                       _takePhoto(context);
                     },
                   ),
@@ -81,7 +95,7 @@ class ProfileImagePicker extends StatelessWidget {
                         style: TextStyle(color: Colors.red),
                       ),
                       onTap: () {
-                        Navigator.of(context).pop();
+                        context.pop();
                         onImageSelected(null);
                       },
                     ),
