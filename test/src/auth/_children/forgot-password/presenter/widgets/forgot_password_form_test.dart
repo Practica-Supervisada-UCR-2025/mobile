@@ -36,10 +36,13 @@ void main() {
     );
   }
 
-  Future<void> _submitAndHandleDialog(WidgetTester tester) async {
-  await tester.tap(find.byType(PrimaryButton));
-  await tester.pump();
-}
+  Future<void> submitAndHandleDialog(WidgetTester tester) async {
+    await tester.tap(find.byType(PrimaryButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+  }
 
   group('ForgotPasswordForm UI Tests', () {
     testWidgets('Validation: empty field shows error', (tester) async {

@@ -5,6 +5,7 @@ void main() {
   test('Paths constants are correctly defined', () {
     expect(Paths.login, '/auth/login');
     expect(Paths.register, '/auth/register');
+    expect(Paths.forgot_password, '/auth/forgot_password');
     expect(Paths.home, '/home');
     expect(Paths.search, '/search');
     expect(Paths.create, '/create');

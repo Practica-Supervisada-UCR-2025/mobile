@@ -16,12 +16,13 @@ GoRouter createRouter(BuildContext context) {
     refreshListenable: notifier,
     redirect: (context, state) {
       final loginState = loginBloc.state;
-      final isOnLogin = state.uri.toString() == Paths.login;
       final isAuthenticated = loginState is LoginSuccess;
+      final publicRoutes = [Paths.login, Paths.forgot_password];
+      final isPublic = publicRoutes.contains(state.uri.toString());
 
-      if (!isAuthenticated && !isOnLogin) {
+      if (!isAuthenticated && !isPublic) {
         return Paths.login;
-      } else if (isAuthenticated && isOnLogin) {
+      } else if (isAuthenticated && isPublic) {
         return Paths.home;
       }
       return null;
