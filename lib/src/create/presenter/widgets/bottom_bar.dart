@@ -24,6 +24,19 @@ class BottomBar extends StatelessWidget {
               // Action to add an image
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.gif_box_outlined),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (_) => const GifPickerBottomSheet(),
+              );
+            },
+          ),
           const Spacer(),
           BlocBuilder<CreatePostBloc, CreatePostState>(
             builder: (context, state) {
