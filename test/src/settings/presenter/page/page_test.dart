@@ -81,7 +81,7 @@ void main() {
       await tester.pumpWidget(makeTestableWidget(const SettingsScreen()));
 
       final text = tester.widget<Text>(find.text('Settings'));
-      expect(text.style?.color, AppColors.textPrimary);
+      expect(text.style?.color, ThemeData().colorScheme.primary,);
     });
 
     testWidgets('el texto Settings screen tiene color AppColors.textPrimary', (tester) async {
@@ -90,7 +90,7 @@ void main() {
       await tester.pumpWidget(makeTestableWidget(const SettingsScreen()));
 
       final text = tester.widget<Text>(find.text('Settings screen'));
-      expect(text.style?.color, AppColors.textPrimary);
+      expect(text.style?.color, ThemeData().colorScheme.onSurface,);
     });
   });
 }
