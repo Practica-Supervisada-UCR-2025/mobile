@@ -102,7 +102,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       }
 
       if (_selectedImage != null) {
-        print('Image Changed: ${_selectedImage!.path}');
         // todo: Implement image upload logic
         // updates['image'] = _selectedImage;
       }
