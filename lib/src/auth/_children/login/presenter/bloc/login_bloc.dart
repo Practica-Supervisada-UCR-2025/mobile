@@ -10,14 +10,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final LoginRepository loginRepository;
   final LocalStorage localStorage;
   final TokensRepository tokensRepository;
+  final FCMTokenService fcmTokenService;
 
   // Constructor
-  // The LoginBloc takes a LoginRepository as a dependency
-  // and initializes the state to LoginInitial.
   LoginBloc({
     required this.loginRepository,
     required this.localStorage,
     required this.tokensRepository,
+    required this.fcmTokenService,
   }) : super(LoginInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
     on<LoginReset>(_onLoginReset);
@@ -43,11 +43,30 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       localStorage.userEmail = user.email;
       localStorage.accessToken = tokens.accessToken;
 
+      await _setupNotifications();
+
       emit(LoginSuccess(user: user));
     } on AuthException catch (e) {
       emit(LoginFailure(error: e.message));
     } catch (e) {
       emit(LoginFailure(error: 'Unexpected error'));
+    }
+  }
+
+  Future<void> _setupNotifications() async {
+    try {
+      final hasPermission =
+          await fcmTokenService.requestNotificationPermission();
+
+      if (hasPermission) {
+        final fcmToken = await fcmTokenService.createFCMToken();
+
+        if (fcmToken != null) {
+          await fcmTokenService.sendFCMToServer(fcmToken);
+        }
+      }
+    } catch (e) {
+      print('Error setting up notifications: $e');
     }
   }
 }

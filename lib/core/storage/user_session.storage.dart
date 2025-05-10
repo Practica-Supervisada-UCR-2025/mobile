@@ -64,6 +64,10 @@ class LocalStorage {
   // Check if user is logged in
   bool get isLoggedIn => accessToken.isNotEmpty && userId.isNotEmpty;
 
+  // FCM token
+  set fcmToken(String token) => _prefs.setString('fcmToken', token);
+  String get fcmToken => _prefs.getString('fcmToken') ?? '';
+
   // Clear all stored data
   Future<void> clear() async {
     await _prefs.clear();

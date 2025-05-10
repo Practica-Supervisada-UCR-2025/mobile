@@ -1,18 +1,27 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
 import 'package:mobile/src/profile/profile.dart';
-import 'package:mobile/src/auth/_children/_children.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'core/core.dart';
 import 'firebase_options.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // This method will be called when the app is in the background
+  // and a message is received.
+  // You can handle the message here if needed.
+  print('Handling a background message: ${message.messageId}');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await LocalStorage.init();
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(MyApp());
 }
@@ -55,6 +64,7 @@ class MyApp extends StatelessWidget {
                   loginRepository: context.read<LoginRepository>(),
                   localStorage: LocalStorage(),
                   tokensRepository: TokensRepositoryAPI(),
+                  fcmTokenService: FCMTokenServiceImpl(LocalStorage()),
                 ),
           ),
           BlocProvider<LogoutBloc>(
