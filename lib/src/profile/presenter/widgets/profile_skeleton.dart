@@ -53,15 +53,6 @@ class ProfileSkeleton extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Divider(color: Theme.of(context).colorScheme.outline),
-        Expanded(
-          child: Center(
-            child: Shimmer.fromColors(
-              baseColor: color,
-              highlightColor: Theme.of(context).colorScheme.outline,
-              child: _buildPlaceholder(height: 20, width: 100, context: context),
-            ),
-          ),
-        ),
       ],
     );
   }
