@@ -20,7 +20,7 @@ class ProfileSkeleton extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildPlaceholder(height: 24, width: 180, context: context),
+                    _buildPlaceholder(height: 24, width: 180, context: context), 
                     const SizedBox(height: 8),
                     _buildPlaceholder(height: 18, width: 120, context: context),
                     const SizedBox(height: 8),
@@ -40,7 +40,7 @@ class ProfileSkeleton extends StatelessWidget {
             const SizedBox(width: 16),
             Shimmer.fromColors(
               baseColor: color,
-              highlightColor: Colors.grey[100]!,
+              highlightColor: Theme.of(context).colorScheme.outline,
               child: SizedBox(
                 width: 70,
                 height: 70,
@@ -57,7 +57,7 @@ class ProfileSkeleton extends StatelessWidget {
           child: Center(
             child: Shimmer.fromColors(
               baseColor: color,
-              highlightColor: Colors.grey[100]!,
+              highlightColor: Theme.of(context).colorScheme.outline,
               child: _buildPlaceholder(height: 20, width: 100, context: context),
             ),
           ),
