@@ -7,6 +7,7 @@ import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
 import 'package:mobile/src/profile/presenter/page/page.dart';
 import 'package:mobile/core/globals/widgets/secondary_button.dart';
 import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mobile/src/profile/presenter/widgets/widgets.dart';
 
 final testUser = User(
   firstName: 'John',
@@ -40,7 +41,7 @@ void main() {
   }
 
   group('ProfileScreen', () {
-    testWidgets('shows loading indicator when state is ProfileLoading',
+    testWidgets('shows profile skeleton indicator when state is ProfileLoading',
         (WidgetTester tester) async {
       whenListen(
         mockProfileBloc,
@@ -50,7 +51,7 @@ void main() {
 
       await tester.pumpWidget(buildTestableWidget());
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(ProfileSkeleton), findsOneWidget);
     });
 
     testWidgets('shows user data when state is ProfileSuccess',
