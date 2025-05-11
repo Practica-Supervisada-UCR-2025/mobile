@@ -37,11 +37,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     try {
       final user = await loginRepository.login(event.username, event.password);
 
-      // final tokens = await tokensRepository.getTokens(user.authProviderToken);
+      final tokens = await tokensRepository.getTokens(user.authProviderToken);
 
-      // localStorage.userId = user.id;
-      // localStorage.userEmail = user.email;
-      // localStorage.accessToken = tokens.accessToken;
+      localStorage.userId = user.id;
+      localStorage.userEmail = user.email;
+      localStorage.accessToken = tokens.accessToken;
 
       emit(LoginSuccess(user: user));
     } on AuthException catch (e) {
