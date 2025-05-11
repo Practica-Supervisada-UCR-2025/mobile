@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mobile/src/profile/domain/models/models.dart';
@@ -42,6 +44,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         final updatedUser = await profileRepository.updateUserProfile(
           "1",
           event.updates,
+          profilePicture: event.profilePicture,
         );
         emit(ProfileUpdateSuccess(user: updatedUser));
 

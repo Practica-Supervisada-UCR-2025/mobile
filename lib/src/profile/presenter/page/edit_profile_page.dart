@@ -23,6 +23,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   bool _isFormDirty = false;
 
   File? _selectedImage;
+  bool _isRemovingImage = false;
 
   @override
   void initState() {
@@ -56,7 +57,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         _lastNameController.text != widget.user.lastName ||
         _usernameController.text != widget.user.username ||
         _emailController.text != widget.user.email ||
-        _selectedImage != null;
+        _selectedImage != null ||
+        _isRemovingImage;
 
     if (isDirty != _isFormDirty) {
       setState(() {
@@ -68,6 +70,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   void _handleImageChanged(File? image) {
     setState(() {
       _selectedImage = image;
+      _isRemovingImage = image == null && widget.user.image.isNotEmpty;
       _isFormDirty = true;
     });
   }
@@ -101,14 +104,19 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         updates['email'] = _emailController.text;
       }
 
+      File? profilePicture;
       if (_selectedImage != null) {
-        // todo: Implement image upload logic
-        // updates['image'] = _selectedImage;
+        profilePicture = _selectedImage;
+      } else if (_isRemovingImage) {
+        // Handling profile picture removal
+        // This could be handled differently depending on your API
+        // For example, you might set a specific field to null
+        updates['profile_picture'] = null;
       }
 
-      if (updates.isNotEmpty) {
-        context.read<ProfileBloc>().add(ProfileUpdate(updates: updates));
-      }
+      context.read<ProfileBloc>().add(
+        ProfileUpdate(updates: updates, profilePicture: profilePicture),
+      );
     }
   }
 
