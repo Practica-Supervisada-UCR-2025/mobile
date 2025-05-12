@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/src/create/create.dart';
 
 class PostImage extends StatefulWidget {
   final File? image;
@@ -76,17 +78,20 @@ class _PostImageState extends State<PostImage> {
           top: 12,
           right: 28,
           child: GestureDetector(
-            onTap: widget.onRemove,
+            onTap: () {
+              widget.onRemove();
+              context.read<CreatePostBloc>().add(PostImageChanged(null));
+            },
             child: Container(
               decoration: const BoxDecoration(
                 color: Colors.black,
                 shape: BoxShape.circle,
               ),
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 12.0),
               child: const Icon(
                 Icons.close,
                 color: Colors.white,
-                size: 20,
+                size: 15,
               ),
             ),
           ),
