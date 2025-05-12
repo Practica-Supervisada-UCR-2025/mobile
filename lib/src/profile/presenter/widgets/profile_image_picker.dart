@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile/core/core.dart';
@@ -18,7 +19,8 @@ class ProfileImagePicker extends StatelessWidget {
   });
 
   Future<void> _pickImageFromGallery(BuildContext context) async {
-    bool hasPermission = await PermissionUtils.checkGalleryPermission(
+    final permissionsRepo = context.read<PermissionsRepository>();
+    bool hasPermission = await permissionsRepo.checkGalleryPermission(
       context: context,
     );
 
@@ -36,7 +38,8 @@ class ProfileImagePicker extends StatelessWidget {
   }
 
   Future<void> _takePhoto(BuildContext context) async {
-    bool hasPermission = await PermissionUtils.checkCameraPermission(
+    final permissionsRepo = context.read<PermissionsRepository>();
+    bool hasPermission = await permissionsRepo.checkCameraPermission(
       context: context,
     );
 

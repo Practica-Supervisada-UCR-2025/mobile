@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/auth/auth.dart';
-import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
 import 'package:provider/provider.dart';
@@ -33,11 +32,14 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<LogoutRepository>(
           create: (_) => LogoutLocalRepository(LocalStorage()),
         ),
-        ChangeNotifierProvider<RouterRefreshNotifier>(
-          create: (_) => RouterRefreshNotifier(),
+        RepositoryProvider<PermissionsRepository>(
+          create: (_) => PermissionsRepositoryImpl(),
         ),
         RepositoryProvider<ProfileRepository>(
           create: (context) => ProfileRepositoryAPI(),
+        ),
+        ChangeNotifierProvider<RouterRefreshNotifier>(
+          create: (_) => RouterRefreshNotifier(),
         ),
       ],
       child: MultiBlocProvider(

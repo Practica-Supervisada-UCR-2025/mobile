@@ -4,3 +4,4 @@ export 'router/router.dart';
 export 'storage/storage.dart';
 export 'theme/theme.dart';
 export 'utils/utils.dart';
+export 'permissions/permissions.dart';
