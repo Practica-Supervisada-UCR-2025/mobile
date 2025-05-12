@@ -16,7 +16,7 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
   void _onTextChanged(PostTextChanged event, Emitter<CreatePostState> emit) {
     final text = event.text;
     final isOverLimit = text.length > maxLength;
-    final isValid = (text.isNotEmpty && !isOverLimit) || state.image != null;
+    final isValid = !isOverLimit && (text.isNotEmpty || state.image != null);
 
     emit(CreatePostChanged(
       text: text,
@@ -29,7 +29,7 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
   void _onImageChanged(PostImageChanged event, Emitter<CreatePostState> emit) {
     final image = event.image;
      
-    final isValid = image != null || (state.text.isNotEmpty && !state.isOverLimit);
+    final isValid = !state.isOverLimit && (image != null || state.text.isNotEmpty);
     
     emit(CreatePostChanged(
       text: state.text,
