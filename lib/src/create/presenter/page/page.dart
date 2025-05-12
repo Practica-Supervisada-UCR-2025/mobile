@@ -50,27 +50,30 @@ class _CreatePageState extends State<CreatePage> {
           scrolledUnderElevation: 0,
           title: const TopActions(),
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    PostTextField(textController: _textController),
-                    if (_selectedImage != null)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                        child: PostImage(
-                          image: _selectedImage,
-                          onRemove: _removeImage,
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      PostTextField(textController: _textController),
+                      if (_selectedImage != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                          child: PostImage(
+                            image: _selectedImage,
+                            onRemove: _removeImage,
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            BottomBar(onImageSelected: _handleImageSelected),
-          ],
+              BottomBar(onImageSelected: _handleImageSelected),
+            ],
+          ),
         ),
       ),
     );
