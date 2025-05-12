@@ -32,7 +32,7 @@ void main() {
             body: LoginForm(
               emailController: emailController,
               passwordController: passwordController,
-              onLogin: mockLogin,
+              onLogin: mockLogin.call,
             ),
           ),
         ),
@@ -97,7 +97,7 @@ void main() {
             body: LoginForm(
               emailController: emailController,
               passwordController: passwordController,
-              onLogin: mockLogin,
+              onLogin: mockLogin.call,
             ),
           ),
         ),

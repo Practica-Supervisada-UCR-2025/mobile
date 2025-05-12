@@ -10,24 +10,24 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           'Settings',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             fontSize: 20,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         automaticallyImplyLeading: true,
         iconTheme: IconThemeData(
-          color: AppColors.textPrimary,
+          color: Theme.of(context).colorScheme.primary,
         ),
         shape: const Border(
           bottom: BorderSide(color: Colors.black12),
         ),
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Padding(
@@ -35,12 +35,12 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
               children: [
                 const Spacer(flex: 2),
-                const Center(
+                Center(
                   child: Text(
                     'Settings screen',
                     style: TextStyle(
                       fontSize: 20,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
