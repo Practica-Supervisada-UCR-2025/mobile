@@ -33,6 +33,7 @@ class AppTheme {
       error: AppColors.error,
       surface: AppColors.background,
       outline: AppColors.textSecondary,
+      onPrimary: AppColors.buttonBackground,
     ),
   );
 
@@ -64,6 +65,7 @@ class AppTheme {
       error: AppColors.error,
       surface: AppColors.backgroundDark,
       outline: AppColors.textSecondary,
+      onPrimary: AppColors.buttonBackgroundDark,
     ),
   );
 }

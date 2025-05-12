@@ -7,13 +7,13 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: const Center(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: Center(
         child: Text(
           'Search screen',
           style: TextStyle(
             fontSize: 20,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w500,
           ),
         ),

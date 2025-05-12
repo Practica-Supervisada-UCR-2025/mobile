@@ -37,37 +37,29 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
   }
 
   void _showDialog(String title, String message, {bool success = false}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        Future.delayed(const Duration(seconds: 3), () {
-          if (Navigator.of(dialogContext).canPop()) {
-            Navigator.of(dialogContext).pop();
-            if (success) {
-              Navigator.of(context).pop();
-            }
-          }
-        });
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (dialogContext) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: const Text('Accept'),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              if (success) {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: [
-            TextButton(
-              child: const Text('Accept'),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                if (success) {
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   void _onSubmit() {
     final isValid = _formKey.currentState!.validate();

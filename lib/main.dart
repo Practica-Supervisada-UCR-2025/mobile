@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/auth/auth.dart';
+import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
+import 'package:mobile/src/profile/profile.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,6 +36,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),
         ),
+        RepositoryProvider<ProfileRepository>(
+          create: (context) => ProfileRepositoryAPI(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -58,6 +63,12 @@ class MyApp extends StatelessWidget {
                   logoutRepository: context.read<LogoutRepository>(),
                 ),
           ),
+          BlocProvider<ProfileBloc>(
+            create:
+                (context) => ProfileBloc(
+                  profileRepository: context.read<ProfileRepository>(),
+                ),
+          ),
         ],
         child: Builder(
           builder: (context) {
@@ -66,7 +77,7 @@ class MyApp extends StatelessWidget {
               notifier.refresh();
             });
             return MaterialApp.router(
-              title: 'Tu App',
+              title: 'UCR Connect',
               themeMode: ThemeMode.system,
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,

@@ -21,6 +21,10 @@ class AppColors {
 
   static const Color backgroundDark = Color(0xFF1E2533);
 
+  static const Color buttonBackground = Color(0xFFB1C1D8);
+
+  static const Color buttonBackgroundDark = Color(0xFF445473);
+
   static Color getSurfaceColor(Brightness brightness) {
     return brightness == Brightness.dark ? Color(0xFF2D3446) : Colors.white;
   }
@@ -30,4 +34,10 @@ class AppColors {
         ? Color(0xFF353C4F)
         : Color(0xFFF0F2F5);
   }
+
+  static Color getDisabledPostButtonColor(Brightness brightness) {
+  return brightness == Brightness.dark
+      ? const Color(0xFF3A5383)
+      : const Color.fromARGB(255, 168, 194, 252);
+}
 }

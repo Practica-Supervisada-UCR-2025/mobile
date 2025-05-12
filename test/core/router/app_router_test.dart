@@ -10,8 +10,6 @@ import 'package:mobile/core/router/app_routes.dart';
 import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/core/router/router_utils.dart';
 import 'package:mobile/src/auth/auth.dart';
-import 'package:mobile/src/auth/_children/login/presenter/presenter.dart';
-import 'package:mobile/src/home/presenter/presenter.dart';
 
 // Mock classes
 class MockLoginBloc extends Mock implements LoginBloc {}
@@ -26,10 +24,8 @@ class FakeUser implements AuthUserInfo {
       : _username = username,
         _password = password;
 
-  @override
   String get username => _username;
 
-  @override
   String get password => _password;
 
   @override
@@ -77,13 +73,16 @@ void main() {
       routes: appRoutes,
       redirect: (context, state) {
         final loginState = mockLoginBloc.state;
-        final isLogin = state.uri.path == Paths.login;
+        final isAuthenticated = loginState is LoginSuccess;
+        final publicRoutes = [Paths.login, Paths.forgot_password];
+        final isPublic = publicRoutes.contains(state.uri.toString());
 
-        if (loginState is LoginSuccess) {
-          return isLogin ? Paths.home : null;
-        } else {
-          return isLogin ? null : Paths.login;
+        if (!isAuthenticated && !isPublic) {
+          return Paths.login;
+        } else if (isAuthenticated && isPublic) {
+          return Paths.home;
         }
+        return null;
       },
       refreshListenable: mockNotifier,
     );

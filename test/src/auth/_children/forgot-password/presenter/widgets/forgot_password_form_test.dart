@@ -36,7 +36,7 @@ void main() {
     );
   }
 
-  Future<void> _submitAndHandleDialog(WidgetTester tester) async {
+  Future<void> submitAndHandleDialog(WidgetTester tester) async {
     await tester.tap(find.byType(PrimaryButton));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
@@ -45,30 +45,30 @@ void main() {
   }
 
   group('ForgotPasswordForm UI Tests', () {
-    testWidgets('Validación: campo vacío muestra error', (tester) async {
+    testWidgets('Validation: empty field shows error', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
-      await _submitAndHandleDialog(tester);
+      await submitAndHandleDialog(tester);
 
       expect(find.text('This field is required'), findsOneWidget);
     });
 
-    testWidgets('Validación: dominio incorrecto muestra error', (tester) async {
+    testWidgets('Validation: incorrect domain shows error', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.enterText(find.byType(TextFormField), 'test@gmail.com');
-      await _submitAndHandleDialog(tester);
+      await submitAndHandleDialog(tester);
 
       expect(find.text('Invalid email. Must be @ucr.ac.cr domain.'), findsOneWidget);
     });
 
-    testWidgets('NO envía evento si email es de dominio incorrecto', (tester) async {
+    testWidgets('DO NOT send event if email is from wrong domain', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.enterText(find.byType(TextFormField), 'test@gmail.com');
-      await _submitAndHandleDialog(tester);
+      await submitAndHandleDialog(tester);
 
       verifyNever(() => bloc.add(any()));
     });
 
-    testWidgets('Envía evento ForgotPasswordSubmitted si email es válido', (tester) async {
+    testWidgets('Sends ForgotPasswordSubmitted event if email is valid', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.enterText(find.byType(TextFormField), 'test@ucr.ac.cr');
       await tester.tap(find.byType(PrimaryButton));
@@ -79,7 +79,7 @@ void main() {
   });
 
   group('ForgotPasswordForm BlocListener Tests', () {
-    testWidgets('Limpia el campo email si validación falla', (tester) async {
+    testWidgets('Clear the email field if validation fails', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
       final emailField = find.byType(TextFormField);
@@ -90,7 +90,7 @@ void main() {
         'test@gmail.com',
       );
 
-      await _submitAndHandleDialog(tester);
+      await submitAndHandleDialog(tester);
 
       expect(
         (tester.widget(emailField) as TextFormField).controller!.text,
@@ -98,46 +98,83 @@ void main() {
       );
     });
 
-    testWidgets('Muestra dialog de éxito si ForgotPasswordSuccess', (tester) async {
+    testWidgets('Displays success dialog if ForgotPasswordSuccess', (tester) async {
       whenListen(
         bloc,
         Stream.fromIterable([
           ForgotPasswordLoading(),
-          ForgotPasswordSuccess('Correo enviado exitosamente'),
+          ForgotPasswordSuccess('Mail sent successfully'),
         ]),
         initialState: ForgotPasswordInitial(),
-      );
+    );
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Mail sent'), findsOneWidget);
-      expect(find.text('Correo enviado exitosamente'), findsOneWidget);
-
-      await tester.pump(const Duration(seconds: 3));
-      await tester.pumpAndSettle();
+      expect(find.text('Mail sent successfully'), findsOneWidget);
     });
 
-    testWidgets('Muestra dialog de error si ForgotPasswordFailure', (tester) async {
+    testWidgets('Displays error dialog if ForgotPasswordFailure', (tester) async {
       whenListen(
         bloc,
         Stream.fromIterable([
           ForgotPasswordLoading(),
-          ForgotPasswordFailure('Hubo un error'),
+          ForgotPasswordFailure('There was an error'),
         ]),
         initialState: ForgotPasswordInitial(),
       );
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Error'), findsOneWidget);
-      expect(find.text('Hubo un error'), findsOneWidget);
-
-      await tester.pump(const Duration(seconds: 3));
-      await tester.pumpAndSettle();
+      expect(find.text('There was an error'), findsOneWidget);
     });
   });
+
+      testWidgets('Dialog closes correctly on success = false', (tester) async {
+      whenListen(
+        bloc,
+        Stream.fromIterable([
+          ForgotPasswordLoading(),
+          ForgotPasswordFailure('An error occurred'),
+        ]),
+        initialState: ForgotPasswordInitial(),
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pump(); // Rebuild after state change
+
+      // Find and tap the Accept button on the dialog
+      final acceptButton = find.widgetWithText(TextButton, 'Accept');
+      expect(acceptButton, findsOneWidget);
+      await tester.tap(acceptButton);
+      await tester.pump();
+
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+
+    testWidgets('Dialog closes correctly on success = true', (tester) async {
+      whenListen(
+        bloc,
+        Stream.fromIterable([
+          ForgotPasswordLoading(),
+          ForgotPasswordSuccess('Email sent successfully'),
+        ]),
+        initialState: ForgotPasswordInitial(),
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pump(); // Rebuild after state change
+
+      // Find and tap the Accept button on the dialog
+      final acceptButton = find.widgetWithText(TextButton, 'Accept');
+      expect(acceptButton, findsOneWidget);
+      await tester.tap(acceptButton);
+      await tester.pumpAndSettle(); // Ensure both Navigator.pop() complete
+
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+
 }

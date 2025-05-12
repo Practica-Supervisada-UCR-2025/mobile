@@ -7,13 +7,13 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: const Center(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: Center(
         child: Text(
           'Notifications screen',
           style: TextStyle(
             fontSize: 20,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w500,
           ),
         ),
