@@ -36,15 +36,18 @@ void main() {
     );
   }
 
-  Future<void> _submitAndHandleDialog(WidgetTester tester) async {
-  await tester.tap(find.byType(PrimaryButton));
-  await tester.pump();
-}
+  Future<void> submitAndHandleDialog(WidgetTester tester) async {
+    await tester.tap(find.byType(PrimaryButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+  }
 
   group('ForgotPasswordForm UI Tests', () {
     testWidgets('Validation: empty field shows error', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
-      await _submitAndHandleDialog(tester);
+      await submitAndHandleDialog(tester);
 
       expect(find.text('This field is required'), findsOneWidget);
     });
@@ -52,7 +55,7 @@ void main() {
     testWidgets('Validation: incorrect domain shows error', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.enterText(find.byType(TextFormField), 'test@gmail.com');
-      await _submitAndHandleDialog(tester);
+      await submitAndHandleDialog(tester);
 
       expect(find.text('Invalid email. Must be @ucr.ac.cr domain.'), findsOneWidget);
     });
@@ -60,7 +63,7 @@ void main() {
     testWidgets('DO NOT send event if email is from wrong domain', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.enterText(find.byType(TextFormField), 'test@gmail.com');
-      await _submitAndHandleDialog(tester);
+      await submitAndHandleDialog(tester);
 
       verifyNever(() => bloc.add(any()));
     });
@@ -87,7 +90,7 @@ void main() {
         'test@gmail.com',
       );
 
-      await _submitAndHandleDialog(tester);
+      await submitAndHandleDialog(tester);
 
       expect(
         (tester.widget(emailField) as TextFormField).controller!.text,
