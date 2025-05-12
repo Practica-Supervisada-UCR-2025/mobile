@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/src/profile/profile.dart';
 
 class PublicationCard extends StatelessWidget {
-  final Map<String, dynamic> post;
-  final VoidCallback? onDelete;
+  final Publication publication;
 
   const PublicationCard({
     super.key,
-    required this.post,
-    this.onDelete,
+    required this.publication,
   });
 
   @override
   Widget build(BuildContext context) {
-    final createdAt = post['createdAt'] as DateTime;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       child: Card(
@@ -23,11 +20,12 @@ class PublicationCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              /// Header
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.grey,
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(publication.profileImageUrl),
                     radius: 18,
                   ),
                   const SizedBox(width: 8),
@@ -36,11 +34,11 @@ class PublicationCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          post['username'],
+                          publication.username,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          _formatDate(createdAt),
+                          _formatDate(publication.createdAt),
                           style: const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ],
@@ -48,9 +46,7 @@ class PublicationCard extends StatelessWidget {
                   ),
                   PopupMenuButton<String>(
                     onSelected: (value) {
-                      if (value == 'delete' && onDelete != null) {
-                        onDelete!();
-                      }
+                      // No action for now
                     },
                     itemBuilder: (context) => [
                       const PopupMenuItem<String>(
@@ -61,16 +57,20 @@ class PublicationCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(post['text']),
+
               const SizedBox(height: 8),
 
-              // Sample attached if there is one
-              if (post['attachments'].isNotEmpty)
+              /// Content text with "See more"
+              _ExpandableText(content: publication.content),
+
+              const SizedBox(height: 8),
+
+              /// Attachment
+              if (publication.attachment != null && publication.attachment!.isNotEmpty)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    post['attachments'].first,
+                    publication.attachment!,
                     width: double.infinity,
                     height: 200,
                     fit: BoxFit.cover,
@@ -78,15 +78,17 @@ class PublicationCard extends StatelessWidget {
                 ),
 
               const SizedBox(height: 8),
+
+              /// Reactions & Comments
               Row(
-                children: [
-                  const Icon(Icons.favorite_border, size: 20),
-                  const SizedBox(width: 4),
-                  Text('${post['reactions']}'),
-                  const SizedBox(width: 16),
-                  const Icon(Icons.chat_bubble_outline, size: 20),
-                  const SizedBox(width: 4),
-                  Text('${post['comments']}'),
+                children: const [
+                  Icon(Icons.favorite_border, size: 20),
+                  SizedBox(width: 4),
+                  Text('0'),
+                  SizedBox(width: 16),
+                  Icon(Icons.chat_bubble_outline, size: 20),
+                  SizedBox(width: 4),
+                  Text('0'),
                 ],
               ),
             ],
@@ -113,5 +115,42 @@ class PublicationCard extends StatelessWidget {
       return 'just now';
     }
   }
+}
 
+class _ExpandableText extends StatefulWidget {
+  final String content;
+
+  const _ExpandableText({required this.content});
+
+  @override
+  State<_ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<_ExpandableText> {
+  bool _expanded = false;
+  static const int _limit = 250;
+
+  @override
+  Widget build(BuildContext context) {
+    final isLong = widget.content.length > _limit;
+    final displayText = _expanded || !isLong
+        ? widget.content
+        : '${widget.content.substring(0, _limit)}...';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(displayText),
+        if (isLong)
+          TextButton(
+            onPressed: () => setState(() => _expanded = !_expanded),
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
+            child: Text(
+              _expanded ? 'See less' : 'See more',
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+      ],
+    );
+  }
 }

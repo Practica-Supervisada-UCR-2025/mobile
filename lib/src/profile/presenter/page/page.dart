@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/globals/widgets/secondary_button.dart';
-import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
+import 'package:mobile/src/profile/domain/domain.dart';
 import 'package:mobile/src/profile/presenter/presenter.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -83,7 +83,12 @@ void initState() {
                       const SizedBox(height: 20),
                       Divider(color: Theme.of(context).colorScheme.outline),
                       Expanded(
-                        child: PublicationsList(),
+                        child: BlocProvider(
+                          create: (context) => PublicationBloc(
+                            publicationRepository: context.read<PublicationRepository>(),
+                          )..add(LoadPublications()),
+                          child: const PublicationsList(),
+                        ),
                       ),
                     ],
                   );

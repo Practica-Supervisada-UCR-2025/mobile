@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import './widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/src/profile/profile.dart';
 
 class PublicationsList extends StatefulWidget {
   const PublicationsList({super.key});
@@ -10,118 +11,54 @@ class PublicationsList extends StatefulWidget {
 
 class _PublicationsListState extends State<PublicationsList> {
   final ScrollController _scrollController = ScrollController();
-  final int _itemsPerPage = 5;
-  bool _isLoading = false;
-  bool _hasError = false;
-  int _currentPage = 0;
-  List<Map<String, dynamic>> _posts = [];
-
-  // Simulated static data from backend (only 8 posts)
-  final List<Map<String, dynamic>> _allPosts = List.generate(14, (index) {
-    return {
-      'id': index,
-      'username': 'User',
-      'profileImage': null,
-      'createdAt': DateTime.now().subtract(Duration(days: index)),
-      'text': 'This is a static post #$index.',
-      'attachments': [],
-      'reactions': 0,
-      'comments': 0,
-    };
-  });
+  static const int _postLimit = 14;
 
   @override
   void initState() {
     super.initState();
-    _loadMore();
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent &&
-          !_isLoading &&
-          !_hasError &&
-          _posts.length < _allPosts.length) {
-        _loadMore();
-      }
-    });
-  }
-
-  void _loadMore() {
-    setState(() {
-      _isLoading = true;
-      _hasError = false;
-    });
-
-    Future.delayed(const Duration(seconds: 1), () {
-      if (!mounted) return;
-      try {
-        final start = _currentPage * _itemsPerPage;
-        final end = start + _itemsPerPage;
-        final newItems = _allPosts.sublist(
-          start,
-          end > _allPosts.length ? _allPosts.length : end,
-        );
-
-        if (!mounted) return;
-        setState(() {
-          _posts.addAll(newItems);
-          _currentPage++;
-          _isLoading = false;
-        });
-      } catch (e) {
-        if (!mounted) return;
-        setState(() {
-          _hasError = true;
-          _isLoading = false;
-        });
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_posts.isEmpty && !_isLoading && !_hasError) {
-      return const Center(child: Text("You haven't posted anything yet."));
-    }
-
-    final bool isEndReached = _posts.length == _allPosts.length && !_isLoading;
-
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
+    return BlocBuilder<PublicationBloc, PublicationState>(
+      builder: (context, state) {
+        if (state is PublicationLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is PublicationFailure) {
+          return Center(
+            child: Column(
+              children: [
+                const Text('Failed to load posts'),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () => context.read<PublicationBloc>().add(LoadPublications()),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        } else if (state is PublicationSuccess) {
+          final publications = state.publications.take(_postLimit).toList();
+          return ListView.builder(
             controller: _scrollController,
-            itemCount: _posts.length + (isEndReached ? 1 : 0),
-            itemBuilder: (_, index) {
-              if (index < _posts.length) {
-                return PublicationCard(post: _posts[index]);
+            shrinkWrap: false,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: publications.length + 1, // Extra item for the footer
+            itemBuilder: (context, index) {
+              if (index < publications.length) {
+                return PublicationCard(publication: publications[index]);
               } else {
                 return const Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Center(
-                    child: Text("There's nothing else to see."),
-                  ),
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(child: Text('No more posts to show')),
                 );
               }
             },
-          ),
-        ),
-        if (_isLoading)
-          const Padding(
-            padding: EdgeInsets.all(12),
-            child: CircularProgressIndicator(),
-          ),
-        if (_hasError)
-          TextButton(
-            onPressed: _loadMore,
-            child: const Text('Retry loading posts'),
-          ),
-      ],
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 }
