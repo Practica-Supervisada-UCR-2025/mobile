@@ -14,10 +14,12 @@ class CreatePage extends StatefulWidget {
 class _CreatePageState extends State<CreatePage> {
   final _textController = TextEditingController();
   File? _selectedImage;
+  final _bloc = CreatePostBloc();
 
   @override
   void dispose() {
     _textController.dispose();
+    _bloc.close();
     super.dispose();
   }
 
@@ -25,18 +27,20 @@ class _CreatePageState extends State<CreatePage> {
     setState(() {
       _selectedImage = image;
     });
+    _bloc.add(PostImageChanged(image));
   }
 
   void _removeImage() {
     setState(() {
       _selectedImage = null;
     });
+    _bloc.add(PostImageChanged(null));
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CreatePostBloc(),
+    return BlocProvider.value(
+      value: _bloc,
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
