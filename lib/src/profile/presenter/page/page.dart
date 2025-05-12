@@ -29,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: BlocBuilder<ProfileBloc, ProfileState>(
             builder: (context, state) {
               if (state is ProfileLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return const ProfileSkeleton();
               } else if (state is ProfileSuccess) {
                 final user = state.user;
                 return Column(
