@@ -81,14 +81,14 @@ class PublicationCard extends StatelessWidget {
 
               /// Reactions & Comments
               Row(
-                children: const [
-                  Icon(Icons.favorite_border, size: 20),
-                  SizedBox(width: 4),
-                  Text('0'),
-                  SizedBox(width: 16),
-                  Icon(Icons.chat_bubble_outline, size: 20),
-                  SizedBox(width: 4),
-                  Text('0'),
+                children: [
+                  const Icon(Icons.favorite_border, size: 20),
+                  const SizedBox(width: 4),
+                  Text(publication.likes.toString()),
+                  const SizedBox(width: 16),
+                  const Icon(Icons.chat_bubble_outline, size: 20),
+                  const SizedBox(width: 4),
+                  Text(publication.comments.toString()),
                 ],
               ),
             ],

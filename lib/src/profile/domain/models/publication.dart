@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class Publication {
   final int id;
   final String username;
@@ -22,15 +24,15 @@ class Publication {
   factory Publication.fromJson(Map<String, dynamic> json) {
     return Publication(
       id: json['id'],
-      username: 'User #${json['userId']}', // Simulación, ya que DummyJSON no devuelve username
-      profileImageUrl: 'https://i.pravatar.cc/150?u=${json['userId']}', // Avatar aleatorio
+      username: 'User #${json['userId']}', 
+      profileImageUrl: 'https://i.pravatar.cc/150?u=${json['userId']}', 
       content: json['body'],
-      createdAt: DateTime.now().subtract(Duration(days: json['id'])), // Fecha simulada
-      attachment: json['id'] % 2 == 0 // Adjuntos simulados
+      createdAt: DateTime.now().subtract(Duration(days: json['id'])), 
+      attachment: json['id'] % 2 == 0 
           ? 'https://picsum.photos/400/300'
           : null,
-      likes: 0,
-      comments: 0,
+      likes: Random().nextInt(251),
+      comments: Random().nextInt(51),
     );
   }
 }
