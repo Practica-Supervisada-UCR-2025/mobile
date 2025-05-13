@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/src/create/create.dart';
 
 class PostTextField extends StatelessWidget {
   final TextEditingController textController;
@@ -11,8 +13,10 @@ class PostTextField extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: TextField(
         controller: textController,
+        onChanged: (text) {
+          context.read<CreatePostBloc>().add(PostTextChanged(text));
+        },
         maxLines: null,
-        maxLength: 300,
         autofocus: true,
         decoration: const InputDecoration(
           hintText: 'What’s on your mind?',

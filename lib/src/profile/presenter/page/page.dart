@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/globals/widgets/secondary_button.dart';
 import 'package:mobile/src/profile/domain/domain.dart';
 import 'package:mobile/src/profile/presenter/presenter.dart';
-
+import 'package:mobile/src/profile/presenter/widgets/widgets.dart';
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -28,7 +28,7 @@ void initState() {
             child: BlocBuilder<ProfileBloc, ProfileState>(
               builder: (context, state) {
                 if (state is ProfileLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const ProfileSkeleton();
                 } else if (state is ProfileSuccess) {
                   final user = state.user;
                   return Column(
