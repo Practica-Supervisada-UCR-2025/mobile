@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:mobile/core/storage/user_session.storage.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 part 'publication_event.dart';

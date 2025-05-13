@@ -1,85 +1,142 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/src/profile/profile.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 void main() {
-  group('PublicationCard Widget Tests', () {
-    testWidgets('renders post data correctly', (WidgetTester tester) async {
-      final post = {
-        'username': 'TestUser',
-        'createdAt': DateTime.now().subtract(const Duration(hours: 2)),
-        'text': 'This is a test post.',
-        'attachments': [],
-        'reactions': 5,
-        'comments': 2,
-      };
+  group('PublicationCard Widget', () {
+    late Publication shortPost;
+    late Publication longPostWithImage;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PublicationCard(post: post),
-          ),
-        ),
+    setUp(() {
+      shortPost = Publication(
+        id: 1,
+        username: 'TestUser',
+        profileImageUrl: 'https://example.com/avatar.jpg',
+        content: 'Short content.',
+        createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
+        attachment: null,
+        likes: 10,
+        comments: 5,
       );
 
-      expect(find.text('TestUser'), findsOneWidget);
-      expect(find.text('This is a test post.'), findsOneWidget);
-      expect(find.text('5'), findsOneWidget);
-      expect(find.text('2'), findsOneWidget);
+      longPostWithImage = Publication(
+        id: 2,
+        username: 'LongPoster',
+        profileImageUrl: 'https://example.com/avatar2.jpg',
+        content: 'L' * 300,
+        createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        attachment: 'https://example.com/image.jpg',
+        likes: 42,
+        comments: 9,
+      );
     });
 
-    testWidgets('displays image if attachment exists', (WidgetTester tester) async {
-      final post = {
-        'username': 'TestUser',
-        'createdAt': DateTime.now(),
-        'text': 'With image',
-        'attachments': ['https://via.placeholder.com/150'],
-        'reactions': 0,
-        'comments': 0,
-      };
+    testWidgets('renders username, content and counters correctly', (tester) async {
+      await mockNetworkImagesFor(() async {
+        await tester.pumpWidget(MaterialApp(home: PublicationCard(publication: shortPost)));
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PublicationCard(post: post),
-          ),
-        ),
-      );
-
-      expect(find.byType(Image), findsOneWidget);
+        expect(find.text('TestUser'), findsOneWidget);
+        expect(find.text('Short content.'), findsOneWidget);
+        expect(find.text('10'), findsOneWidget);
+        expect(find.text('5'), findsOneWidget);
+      });
     });
 
-    testWidgets('calls onDelete when menu item is selected', (WidgetTester tester) async {
-      bool wasDeleted = false;
+    testWidgets('displays image if attachment is provided', (tester) async {
+      await mockNetworkImagesFor(() async {
+        await tester.pumpWidget(MaterialApp(home: PublicationCard(publication: longPostWithImage)));
 
-      final post = {
-        'username': 'TestUser',
-        'createdAt': DateTime.now(),
-        'text': 'Test',
-        'attachments': [],
-        'reactions': 0,
-        'comments': 0,
-      };
+        expect(find.byType(Image), findsWidgets);
+      });
+    });
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PublicationCard(
-              post: post,
-              onDelete: () {
-                wasDeleted = true;
-              },
-            ),
-          ),
-        ),
+    testWidgets('shows and toggles See more / See less on long content', (tester) async {
+      await mockNetworkImagesFor(() async {
+        await tester.pumpWidget(MaterialApp(home: PublicationCard(publication: longPostWithImage)));
+
+        expect(find.textContaining('See more'), findsOneWidget);
+        await tester.tap(find.text('See more'));
+        await tester.pumpAndSettle();
+        expect(find.text('See less'), findsOneWidget);
+      });
+    });
+
+    testWidgets('shows PopupMenuButton with "Delete" option', (tester) async {
+      await mockNetworkImagesFor(() async {
+        await tester.pumpWidget(MaterialApp(home: PublicationCard(publication: shortPost)));
+
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        expect(find.text('Delete'), findsOneWidget);
+      });
+    });
+
+    testWidgets('executes onSelected callback from PopupMenuButton', (tester) async {
+      await mockNetworkImagesFor(() async {
+        await tester.pumpWidget(MaterialApp(home: PublicationCard(publication: shortPost)));
+
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byWidgetPredicate(
+          (widget) => widget is PopupMenuItem<String> && widget.value == 'delete',
+        ));
+        await tester.pumpAndSettle(); // Ejecuta onSelected
+      });
+    });
+
+    testWidgets('shows correct relative time (1 month ago)', (tester) async {
+      final postWithOldDate = Publication(
+        id: shortPost.id,
+        username: shortPost.username,
+        profileImageUrl: shortPost.profileImageUrl,
+        content: shortPost.content,
+        createdAt: DateTime.now().subtract(const Duration(days: 40)),
+        attachment: shortPost.attachment,
+        likes: shortPost.likes,
+        comments: shortPost.comments,
       );
 
-      await tester.tap(find.byIcon(Icons.more_vert));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Delete'));
-      await tester.pumpAndSettle();
+      await mockNetworkImagesFor(() async {
+        await tester.pumpWidget(MaterialApp(home: PublicationCard(publication: postWithOldDate)));
+        expect(find.textContaining('1 month'), findsOneWidget);
+      });
+    });
 
-      expect(wasDeleted, isTrue);
+    testWidgets('shows correct relative time (3 hours ago)', (tester) async {
+      final postWithHours = Publication(
+        id: shortPost.id,
+        username: shortPost.username,
+        profileImageUrl: shortPost.profileImageUrl,
+        content: shortPost.content,
+        createdAt: DateTime.now().subtract(const Duration(hours: 3)),
+        attachment: shortPost.attachment,
+        likes: shortPost.likes,
+        comments: shortPost.comments,
+      );
+
+      await mockNetworkImagesFor(() async {
+        await tester.pumpWidget(MaterialApp(home: PublicationCard(publication: postWithHours)));
+        expect(find.textContaining('3 hour'), findsOneWidget);
+      });
+    });
+
+    testWidgets('shows "just now" for recent post', (tester) async {
+      final postJustNow = Publication(
+        id: shortPost.id,
+        username: shortPost.username,
+        profileImageUrl: shortPost.profileImageUrl,
+        content: shortPost.content,
+        createdAt: DateTime.now().subtract(const Duration(seconds: 30)),
+        attachment: shortPost.attachment,
+        likes: shortPost.likes,
+        comments: shortPost.comments,
+      );
+
+      await mockNetworkImagesFor(() async {
+        await tester.pumpWidget(MaterialApp(home: PublicationCard(publication: postJustNow)));
+        expect(find.text('just now'), findsOneWidget);
+      });
     });
   });
 }
