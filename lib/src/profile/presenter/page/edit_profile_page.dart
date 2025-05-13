@@ -108,9 +108,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       if (_selectedImage != null) {
         profilePicture = _selectedImage;
       } else if (_isRemovingImage) {
-        // Handling profile picture removal
-        // This could be handled differently depending on your API
-        // For example, you might set a specific field to null
         updates['profile_picture'] = null;
       }
 
