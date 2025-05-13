@@ -24,7 +24,7 @@ class TenorGifService {
 
   Future<List<GifModel>> getTrendingGifs({int limit = 20}) async {
     final response = await http.get(
-      Uri.parse('$_baseUrl/trending?key=$_apiKey&limit=$limit&media_filter=tinygif',),
+      Uri.parse('$_baseUrl/featured?key=$_apiKey&limit=$limit&media_filter=tinygif'),
        headers: {
           'Accept': 'application/json',
         },
