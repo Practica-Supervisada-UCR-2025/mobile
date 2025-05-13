@@ -25,47 +25,10 @@ void main() {
     PermissionHandlerPlatform.instance = mockHandler;
   });
 
-  testWidgets('PermissionSettingsDialog shows and "Cancel" closes it', (
-    WidgetTester tester,
-  ) async {
-    final router = GoRouter(
-      initialLocation: '/',
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) {
-            return Scaffold(
-              body: Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    PermissionSettingsDialog.show(context, 'Camera');
-                  },
-                  child: const Text('Show Dialog'),
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-
-    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
-
-    await tester.tap(find.text('Show Dialog'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Permission Denied'), findsOneWidget);
-    expect(find.text('Go to Settings'), findsOneWidget);
-    expect(find.text('Cancel'), findsOneWidget);
-
-    await tester.tap(find.text('Cancel'));
-    await tester.pumpAndSettle();
-    expect(find.text('Permission Denied'), findsNothing);
-  });
-
-  testWidgets(
-    'PermissionSettingsDialog "Go to Settings" calls openAppSettings',
-    (WidgetTester tester) async {
+  group('Request Permission From Settings Dialog', () {
+    testWidgets('PermissionSettingsDialog shows and "Cancel" closes it', (
+      WidgetTester tester,
+    ) async {
       final router = GoRouter(
         initialLocation: '/',
         routes: [
@@ -76,7 +39,7 @@ void main() {
                 body: Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      PermissionSettingsDialog.show(context, 'Microphone');
+                      PermissionSettingsDialog.show(context, 'Camera');
                     },
                     child: const Text('Show Dialog'),
                   ),
@@ -92,10 +55,49 @@ void main() {
       await tester.tap(find.text('Show Dialog'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Go to Settings'));
-      await tester.pumpAndSettle();
+      expect(find.text('Permission Denied'), findsOneWidget);
+      expect(find.text('Go to Settings'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
 
-      expect(mockHandler.wasCalled, isTrue);
-    },
-  );
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(find.text('Permission Denied'), findsNothing);
+    });
+
+    testWidgets(
+      'PermissionSettingsDialog "Go to Settings" calls openAppSettings',
+      (WidgetTester tester) async {
+        final router = GoRouter(
+          initialLocation: '/',
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) {
+                return Scaffold(
+                  body: Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        PermissionSettingsDialog.show(context, 'Microphone');
+                      },
+                      child: const Text('Show Dialog'),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+        await tester.tap(find.text('Show Dialog'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Go to Settings'));
+        await tester.pumpAndSettle();
+
+        expect(mockHandler.wasCalled, isTrue);
+      },
+    );
+  });
 }
