@@ -23,20 +23,44 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
   }
 
   Future<void> _loadTrending() async {
-    final gifs = await _gifService.getTrendingGifs();
-    setState(() {
-      _gifs = gifs;
-      _loading = false;
-    });
+    try {
+      final gifs = await _gifService.getTrendingGifs();
+      if (mounted) {
+        setState(() {
+          _gifs = gifs;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading trending GIFs: $e');
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
   }
 
   Future<void> _search(String query) async {
+    if (query.trim().isEmpty) return;
+
     setState(() => _loading = true);
-    final gifs = await _gifService.searchGifs(query);
-    setState(() {
-      _gifs = gifs;
-      _loading = false;
-    });
+    try {
+      final gifs = await _gifService.searchGifs(query);
+      if (mounted) {
+        setState(() {
+          _gifs = gifs;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      print("Error searching GIFs for '$query': $e");
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
   }
 
   @override
