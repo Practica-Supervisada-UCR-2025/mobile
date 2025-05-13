@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:mobile/core/storage/user_session.storage.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 part 'publication_event.dart';
@@ -20,6 +21,7 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
     emit(PublicationLoading());
 
     try {
+      //final publications = await publicationRepository.fetchPublications(page, limit);
       final publications = await publicationRepository.fetchPublications(limit: 14);
       emit(PublicationSuccess(publications: publications, hasReachedMax: publications.length < 14));
     } catch (_) {

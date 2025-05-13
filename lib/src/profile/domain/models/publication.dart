@@ -35,4 +35,15 @@ class Publication {
       comments: Random().nextInt(51),
     );
   }
+
+  // factory Publication.fromJson(Map<String, dynamic> json) {
+  //   return Publication(
+  //     id: json['id'],
+  //     username: json['username'] ?? 'Unknown',
+  //     profileImageUrl: json['userProfileImage'] ?? 'https://placekitten.com/200/200',
+  //     content: json['content'] ?? '',
+  //     attachment: json['file_url'],
+  //     createdAt: DateTime.parse(json['created_at']),
+  //   );
+  // }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/src/settings/presenter/widgets/widgets.dart';
 
 class SettingsScreen extends StatelessWidget {

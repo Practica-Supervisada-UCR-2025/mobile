@@ -16,6 +16,12 @@ class _PublicationsListState extends State<PublicationsList> {
   @override
   void initState() {
     super.initState();
+
+    // _scrollController.addListener(() {
+    //   if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent -100) {
+    //     context.read<PublicationBloc>().add(LoadMorePublications());
+    //   }
+    // });
   }
 
   @override
@@ -41,7 +47,7 @@ class _PublicationsListState extends State<PublicationsList> {
           final publications = state.publications.take(_postLimit).toList();
           return ListView.builder(
             controller: _scrollController,
-            shrinkWrap: false,
+            shrinkWrap: true,
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: publications.length + 1, // Extra item for the footer
             itemBuilder: (context, index) {
@@ -52,6 +58,15 @@ class _PublicationsListState extends State<PublicationsList> {
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: Center(child: Text('No more posts to show')),
                 );
+                // return state.hasReachedMax
+                //     ? const Padding(
+                //         padding: EdgeInsets.symmetric(vertical: 16),
+                //         child: Center(child: Text('No more posts to show')),
+                //       )
+                //     : const Padding(
+                //         padding: EdgeInsets.symmetric(vertical: 16),
+                //         child: Center(child: CircularProgressIndicator()),
+                //       );
               }
             },
           );
