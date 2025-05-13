@@ -37,6 +37,8 @@ class FCMTokenServiceImpl implements FCMTokenService {
     try {
       // todo: verify if is this token
       final accessToken = _localStorage.accessToken;
+      print('Access token: $accessToken');
+      print('FCM token: $token');
 
       if (accessToken.isEmpty) {
         throw Exception('Invalid access token');
