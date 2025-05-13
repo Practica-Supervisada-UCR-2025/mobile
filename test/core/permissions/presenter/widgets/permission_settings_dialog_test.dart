@@ -5,7 +5,6 @@ import 'package:mobile/core/core.dart';
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-// Mock para interceptar openAppSettings()
 class MockPermissionHandler extends Fake
     with MockPlatformInterfaceMixin
     implements PermissionHandlerPlatform {
