@@ -137,7 +137,6 @@ class ProfileImagePicker extends StatelessWidget {
                     )
                     : null,
           ),
-          // Icono de cámara mejorado
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(

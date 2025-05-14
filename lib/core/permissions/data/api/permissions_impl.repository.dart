@@ -4,12 +4,14 @@ import 'package:mobile/core/core.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionsRepositoryImpl implements PermissionsRepository {
-  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  final DeviceInfoPlugin deviceInfoPlugin;
+
+  PermissionsRepositoryImpl({DeviceInfoPlugin? deviceInfoPlugin})
+    : deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin();
 
   @override
   Future<bool> checkCameraPermission({BuildContext? context}) async {
     var status = await Permission.camera.status;
-
     // verify if the permission is already granted
     if (status.isGranted) {
       return true;
@@ -35,37 +37,35 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
 
   @override
   Future<bool> checkGalleryPermission({BuildContext? context}) async {
-    try {
-      final androidInfo = await _deviceInfo.androidInfo;
-      final int sdkInt = androidInfo.version.sdkInt;
+    final androidInfo = await deviceInfoPlugin.androidInfo;
+    final sdkInt = androidInfo.version.sdkInt;
 
-      // Check if the device is running Android 13 (API level 33) or higher
-      // and set the permission type accordingly
-      final Permission permissionType =
-          sdkInt >= 33 ? Permission.photos : Permission.storage;
-      final String permissionName = sdkInt >= 33 ? 'gallery' : 'storage';
-
-      var status = await permissionType.status;
-
-      if (status.isGranted) {
-        return true;
-      }
+    if (sdkInt >= 33) {
+      var status = await Permission.photos.status;
+      if (status.isGranted) return true;
 
       if (status.isPermanentlyDenied) {
         if (context != null && context.mounted) {
-          PermissionSettingsDialog.show(context, permissionName);
+          PermissionSettingsDialog.show(context, 'gallery');
         }
         return false;
       }
 
-      if (status.isDenied) {
-        status = await permissionType.request();
-        return status.isGranted;
+      status = await Permission.photos.request();
+      return status.isGranted;
+    } else {
+      var status = await Permission.storage.status;
+      if (status.isGranted) return true;
+
+      if (status.isPermanentlyDenied) {
+        if (context != null && context.mounted) {
+          PermissionSettingsDialog.show(context, 'storage');
+        }
+        return false;
       }
 
-      return false;
-    } catch (e) {
-      return false;
+      status = await Permission.storage.request();
+      return status.isGranted;
     }
   }
 

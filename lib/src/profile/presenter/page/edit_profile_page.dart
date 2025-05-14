@@ -108,9 +108,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       if (_selectedImage != null) {
         profilePicture = _selectedImage;
       } else if (_isRemovingImage) {
-        // Handling profile picture removal
-        // This could be handled differently depending on your API
-        // For example, you might set a specific field to null
         updates['profile_picture'] = null;
       }
 
@@ -136,6 +133,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: TextButton.icon(
+                  key: const Key('save_button'),
                   onPressed: _isFormDirty && !isLoading ? _saveChanges : null,
                   icon:
                       isLoading
