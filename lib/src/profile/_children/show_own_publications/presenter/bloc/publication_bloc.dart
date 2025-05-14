@@ -7,7 +7,7 @@ part 'publication_state.dart';
 
 /// Change this line to control the number of visible posts:
 /// - Use 0 to see the message “You haven't posted anything yet.”
-/// - Use 1, 2, 3... to limit how many are displayed
+/// - Use 1, 2, 3...9 to limit how many are displayed
 /// - Use -1 to apply no limit (normal mode).
 int kPublicationLimitOverride = -1;
 
