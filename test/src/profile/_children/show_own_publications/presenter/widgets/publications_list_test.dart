@@ -72,15 +72,16 @@ void main() {
     verify(() => bloc.add(LoadPublications())).called(1);
   });
 
-  testWidgets('renders list of PublicationCard and footer in PublicationSuccess', (tester) async {
-    when(() => bloc.state).thenReturn(
-      PublicationSuccess(publications: testPublications, hasReachedMax: false),
-    );
+  testWidgets('renders list of PublicationCard and footer in PublicationSuccess with hasReachedMax true', (tester) async {
+  when(() => bloc.state).thenReturn(
+    PublicationSuccess(publications: testPublications, hasReachedMax: true),
+  );
 
-    await tester.pumpWidget(makeTestable(const PublicationsList()));
-    expect(find.byType(PublicationCard), findsNWidgets(testPublications.length));
-    expect(find.text('No more posts to show'), findsOneWidget);
-  });
+  await tester.pumpWidget(makeTestable(const PublicationsList()));
+  expect(find.byType(PublicationCard), findsNWidgets(testPublications.length));
+  expect(find.text('No more posts to show.'), findsOneWidget);
+});
+
 
   testWidgets('renders empty SizedBox for default state', (tester) async {
     when(() => bloc.state).thenReturn(PublicationInitial());

@@ -28,7 +28,9 @@ class Publication {
       profileImageUrl: 'https://i.pravatar.cc/150?u=${json['userId']}', 
       content: json['body'],
       createdAt: DateTime.now().subtract(Duration(days: json['id'])), 
-      attachment: json['id'] % 2 == 0 
+      attachment: json['id'] % 3 == 0
+        ? 'https://media.giphy.com/media/Ju7l5y9osyymQ/giphy.gif'
+        : json['id'] % 2 == 0
           ? 'https://picsum.photos/400/300'
           : null,
       likes: Random().nextInt(251),

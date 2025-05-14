@@ -11,17 +11,11 @@ class PublicationsList extends StatefulWidget {
 
 class _PublicationsListState extends State<PublicationsList> {
   final ScrollController _scrollController = ScrollController();
-  static const int _postLimit = 14;
+  static const int _postLimit = 14; //Modify this to control how many posts are viewed
 
   @override
   void initState() {
     super.initState();
-
-    // _scrollController.addListener(() {
-    //   if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent -100) {
-    //     context.read<PublicationBloc>().add(LoadMorePublications());
-    //   }
-    // });
   }
 
   @override
@@ -44,29 +38,31 @@ class _PublicationsListState extends State<PublicationsList> {
             ),
           );
         } else if (state is PublicationSuccess) {
-          final publications = state.publications.take(_postLimit).toList();
+          final allPublications = state.publications;
+          final limitedPublications = allPublications.take(_postLimit).toList();
+
+          if (limitedPublications.isEmpty) {
+            return const Center(
+              child: Text(
+                "You haven’t posted anything yet.",
+                style: TextStyle(fontSize: 16),
+              ),
+            );
+          }
+
           return ListView.builder(
             controller: _scrollController,
             shrinkWrap: true,
             physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: publications.length + 1, // Extra item for the footer
+            itemCount: limitedPublications.length + 1,
             itemBuilder: (context, index) {
-              if (index < publications.length) {
-                return PublicationCard(publication: publications[index]);
+              if (index < limitedPublications.length) {
+                return PublicationCard(publication: limitedPublications[index]);
               } else {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(child: Text('No more posts to show')),
+                  child: Center(child: Text('No more posts to show.')),
                 );
-                // return state.hasReachedMax
-                //     ? const Padding(
-                //         padding: EdgeInsets.symmetric(vertical: 16),
-                //         child: Center(child: Text('No more posts to show')),
-                //       )
-                //     : const Padding(
-                //         padding: EdgeInsets.symmetric(vertical: 16),
-                //         child: Center(child: CircularProgressIndicator()),
-                //       );
               }
             },
           );
