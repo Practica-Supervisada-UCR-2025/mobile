@@ -4,6 +4,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/src/create/create.dart';
 
+class CreatePageController {
+  final CreatePostBloc bloc;
+  File? selectedImage;
+  final Function(File?) onImageChanged;
+  
+  CreatePageController({
+    required this.bloc,
+    required this.onImageChanged,
+  });
+  
+  void handleImageSelected(File? image) {
+    selectedImage = image;
+    bloc.add(PostImageChanged(image));
+    onImageChanged(image);
+  }
+  
+  void removeImage() {
+    selectedImage = null;
+    bloc.add(const PostImageChanged(null));
+    onImageChanged(null);
+  }
+}
+
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
 
@@ -15,26 +38,26 @@ class _CreatePageState extends State<CreatePage> {
   final _textController = TextEditingController();
   File? _selectedImage;
   final _bloc = CreatePostBloc();
+  late final CreatePageController _controller;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = CreatePageController(
+      bloc: _bloc,
+      onImageChanged: (image) {
+        setState(() {
+          _selectedImage = image;
+        });
+      },
+    );
+  }
 
   @override
   void dispose() {
     _textController.dispose();
     _bloc.close();
     super.dispose();
-  }
-
-  void _handleImageSelected(File? image) {
-    setState(() {
-      _selectedImage = image;
-    });
-    _bloc.add(PostImageChanged(image));
-  }
-
-  void _removeImage() {
-    setState(() {
-      _selectedImage = null;
-    });
-    _bloc.add(PostImageChanged(null));
   }
 
   @override
@@ -64,14 +87,14 @@ class _CreatePageState extends State<CreatePage> {
                           padding: const EdgeInsets.symmetric(horizontal: 2.0),
                           child: PostImage(
                             image: _selectedImage,
-                            onRemove: _removeImage,
+                            onRemove: _controller.removeImage,
                           ),
                         ),
                     ],
                   ),
                 ),
               ),
-              BottomBar(onImageSelected: _handleImageSelected),
+              BottomBar(onImageSelected: _controller.handleImageSelected),
             ],
           ),
         ),
