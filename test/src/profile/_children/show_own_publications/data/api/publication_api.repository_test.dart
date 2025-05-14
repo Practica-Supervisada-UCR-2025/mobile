@@ -27,12 +27,15 @@ void main() {
       };
 
       final mockClient = MockClient((request) async {
-        expect(request.url.toString(), contains('https://dummyjson.com/posts?limit=14'));
+        expect(
+          request.url.toString(),
+          contains('https://dummyjson.com/posts?limit=10&skip=0'),
+        );
         return http.Response(jsonEncode(mockResponse), 200);
       });
 
       final repo = PublicationRepositoryAPI(client: mockClient);
-      final publications = await repo.fetchPublications();
+      final publications = await repo.fetchPublications(skip: 0, limit: 10);
 
       expect(publications, isA<List<Publication>>());
       expect(publications.length, 2);
@@ -47,19 +50,21 @@ void main() {
       final repo = PublicationRepositoryAPI(client: mockClient);
 
       expect(
-        () async => await repo.fetchPublications(),
+        () async => await repo.fetchPublications(skip: 0, limit: 10),
         throwsA(isA<Exception>()),
       );
     });
 
-    test('respects limit parameter', () async {
+    test('respects limit and skip parameters', () async {
       final mockClient = MockClient((request) async {
-        expect(request.url.toString(), contains('limit=5'));
+        final url = request.url.toString();
+        expect(url, contains('limit=5'));
+        expect(url, contains('skip=15'));
         return http.Response(jsonEncode({'posts': []}), 200);
       });
 
       final repo = PublicationRepositoryAPI(client: mockClient);
-      await repo.fetchPublications(limit: 5);
+      await repo.fetchPublications(skip: 15, limit: 5);
     });
   });
 }

@@ -11,11 +11,29 @@ class PublicationsList extends StatefulWidget {
 
 class _PublicationsListState extends State<PublicationsList> {
   final ScrollController _scrollController = ScrollController();
-  static const int _postLimit = 14; //Modify this to control how many posts are viewed
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final thresholdReached = _scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300;
+
+    final state = context.read<PublicationBloc>().state;
+    if (thresholdReached && state is PublicationSuccess && !state.hasReachedMax) {
+      context.read<PublicationBloc>().add(LoadMorePublications());
+    }
   }
 
   @override
@@ -38,10 +56,9 @@ class _PublicationsListState extends State<PublicationsList> {
             ),
           );
         } else if (state is PublicationSuccess) {
-          final allPublications = state.publications;
-          final limitedPublications = allPublications.take(_postLimit).toList();
+          final publications = state.publications;
 
-          if (limitedPublications.isEmpty) {
+          if (publications.isEmpty) {
             return const Center(
               child: Text(
                 "You haven’t posted anything yet.",
@@ -54,15 +71,20 @@ class _PublicationsListState extends State<PublicationsList> {
             controller: _scrollController,
             shrinkWrap: true,
             physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: limitedPublications.length + 1,
+            itemCount: publications.length + 1,
             itemBuilder: (context, index) {
-              if (index < limitedPublications.length) {
-                return PublicationCard(publication: limitedPublications[index]);
+              if (index < publications.length) {
+                return PublicationCard(publication: publications[index]);
               } else {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(child: Text('No more posts to show.')),
-                );
+                return state.hasReachedMax
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(child: Text('No more posts to show.')),
+                      )
+                    : const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
               }
             },
           );
