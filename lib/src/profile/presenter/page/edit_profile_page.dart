@@ -133,6 +133,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: TextButton.icon(
+                  key: const Key('save_button'),
                   onPressed: _isFormDirty && !isLoading ? _saveChanges : null,
                   icon:
                       isLoading
