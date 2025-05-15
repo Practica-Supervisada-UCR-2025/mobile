@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mobile/core/core.dart';
 
 class ProfileImagePicker extends StatelessWidget {
@@ -17,44 +15,6 @@ class ProfileImagePicker extends StatelessWidget {
     this.selectedImage,
     required this.onImageSelected,
   });
-
-  Future<void> _pickImageFromGallery(BuildContext context) async {
-    final permissionsRepo = context.read<PermissionsRepository>();
-    bool hasPermission = await permissionsRepo.checkGalleryPermission(
-      context: context,
-    );
-
-    if (hasPermission) {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-
-      if (image != null) {
-        onImageSelected(File(image.path));
-      }
-    }
-  }
-
-  Future<void> _takePhoto(BuildContext context) async {
-    final permissionsRepo = context.read<PermissionsRepository>();
-    bool hasPermission = await permissionsRepo.checkCameraPermission(
-      context: context,
-    );
-
-    if (hasPermission) {
-      final ImagePicker picker = ImagePicker();
-      final XFile? photo = await picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 80,
-      );
-
-      if (photo != null) {
-        onImageSelected(File(photo.path));
-      }
-    }
-  }
 
   void _showImageSourceOptions(BuildContext context) {
     showModalBottomSheet(
@@ -77,17 +37,28 @@ class ProfileImagePicker extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.photo_library),
                     title: const Text('Gallery'),
-                    onTap: () {
+                    onTap: () async {
                       context.pop();
-                      _pickImageFromGallery(context);
+                      final image =
+                          await MediaPickerService.pickImageFromGallery(
+                            context: context,
+                          );
+                      if (image != null) {
+                        onImageSelected(image);
+                      }
                     },
                   ),
                   ListTile(
                     leading: const Icon(Icons.camera_alt),
                     title: const Text('Camera'),
-                    onTap: () {
+                    onTap: () async {
                       context.pop();
-                      _takePhoto(context);
+                      final photo = await MediaPickerService.takePhoto(
+                        context: context,
+                      );
+                      if (photo != null) {
+                        onImageSelected(photo);
+                      }
                     },
                   ),
                   if (selectedImage != null || currentImage.isNotEmpty)

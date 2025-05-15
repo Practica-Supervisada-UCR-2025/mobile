@@ -15,16 +15,16 @@ class PermissionSettingsDialog {
           ),
           actions: <Widget>[
             TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                context.pop();
+              },
+            ),
+            TextButton(
               child: const Text('Go to Settings'),
               onPressed: () {
                 context.pop();
                 openAppSettings();
-              },
-            ),
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                context.pop();
               },
             ),
           ],
