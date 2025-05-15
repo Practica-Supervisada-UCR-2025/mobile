@@ -9,6 +9,9 @@ class MediaPickerService {
   static Future<File?> pickImageFromGallery({
     required BuildContext context,
     int imageQuality = 80,
+    void Function(String message)? onInvalidFile,
+    required List<String> allowedExtensions,
+    required int maxSizeInBytes,
   }) async {
     final permissionsRepo = context.read<PermissionsRepository>();
     bool hasPermission = await permissionsRepo.checkGalleryPermission(
@@ -23,7 +26,16 @@ class MediaPickerService {
       );
 
       if (image != null) {
-        return File(image.path);
+        final isValid = await validateFile(
+          file: image,
+          onInvalidFile: onInvalidFile ?? (_) {},
+          allowedExtensions: allowedExtensions,
+          maxSizeInBytes: maxSizeInBytes,
+        );
+
+        if (isValid) {
+          return File(image.path);
+        }
       }
     }
 
@@ -32,25 +44,64 @@ class MediaPickerService {
 
   static Future<File?> takePhoto({
     required BuildContext context,
+    required void Function(String errorMessage) onInvalidFile,
     int imageQuality = 80,
+    required List<String> allowedExtensions,
+    required int maxSizeInBytes,
   }) async {
     final permissionsRepo = context.read<PermissionsRepository>();
-    bool hasPermission = await permissionsRepo.checkCameraPermission(
+    final hasPermission = await permissionsRepo.checkCameraPermission(
       context: context,
     );
 
     if (hasPermission) {
       final ImagePicker picker = ImagePicker();
-      final XFile? photo = await picker.pickImage(
+      final XFile? image = await picker.pickImage(
         source: ImageSource.camera,
         imageQuality: imageQuality,
       );
 
-      if (photo != null) {
-        return File(photo.path);
+      if (image != null) {
+        final isValid = await validateFile(
+          file: image,
+          onInvalidFile: onInvalidFile,
+          allowedExtensions: allowedExtensions,
+          maxSizeInBytes: maxSizeInBytes,
+        );
+
+        if (isValid) {
+          return File(image.path);
+        }
       }
     }
-
     return null;
+  }
+
+  static Future<bool> validateFile({
+    required XFile file,
+    required void Function(String message) onInvalidFile,
+    required List<String> allowedExtensions,
+    required int maxSizeInBytes,
+  }) async {
+    final String extension = file.path.split('.').last.toLowerCase();
+
+    if (!allowedExtensions.contains(extension)) {
+      onInvalidFile(
+        'File type not allowed. Use ${allowedExtensions.join(', ')}.',
+      );
+      return false;
+    }
+
+    final File fileObj = File(file.path);
+    final int fileSize = await fileObj.length();
+
+    if (fileSize > maxSizeInBytes) {
+      onInvalidFile(
+        'File exceeds the ${maxSizeInBytes ~/ (1024 * 1024)}MB limit.',
+      );
+      return false;
+    }
+
+    return true;
   }
 }

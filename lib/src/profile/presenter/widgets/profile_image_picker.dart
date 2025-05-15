@@ -42,7 +42,15 @@ class ProfileImagePicker extends StatelessWidget {
                       final image =
                           await MediaPickerService.pickImageFromGallery(
                             context: context,
+                            onInvalidFile: (error) {
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(SnackBar(content: Text(error)));
+                            },
+                            allowedExtensions: IMAGES_ALLOWED,
+                            maxSizeInBytes: MAX_IMAGE_SIZE,
                           );
+
                       if (image != null) {
                         onImageSelected(image);
                       }
@@ -55,7 +63,15 @@ class ProfileImagePicker extends StatelessWidget {
                       context.pop();
                       final photo = await MediaPickerService.takePhoto(
                         context: context,
+                        onInvalidFile: (error) {
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(error)));
+                        },
+                        allowedExtensions: IMAGES_ALLOWED,
+                        maxSizeInBytes: MAX_IMAGE_SIZE,
                       );
+
                       if (photo != null) {
                         onImageSelected(photo);
                       }
