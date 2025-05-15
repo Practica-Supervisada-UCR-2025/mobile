@@ -9,22 +9,40 @@ class PostTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: TextField(
-        controller: textController,
-        onChanged: (text) {
-          context.read<CreatePostBloc>().add(PostTextChanged(text));
-        },
-        maxLines: null,
-        autofocus: true,
-        decoration: const InputDecoration(
-          hintText: 'What’s on your mind?',
-          border: InputBorder.none,
-          counterText: '',
-        ),
-        style: Theme.of(context).textTheme.bodyLarge,
-      ),
+    return BlocBuilder<CreatePostBloc, CreatePostState>(
+      builder: (context, state) {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: textController,
+                onChanged: (text) {
+                  context.read<CreatePostBloc>().add(PostTextChanged(text));
+                },
+                maxLines: null,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'What’s on your mind?',
+                  border: InputBorder.none,
+                  counterText: '',
+                ),
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 12),
+              if (state.selectedGif != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    state.selectedGif!.tinyGifUrl,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
