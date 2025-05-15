@@ -2,6 +2,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/src/create/create.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
 import 'package:mobile/src/shared/services/tenor_gif_service.dart';
 
@@ -153,7 +155,8 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
                     final gif = _gifs[index];
                     return GestureDetector(
                       onTap: () {
-                        Navigator.pop(context, gif);
+                        context.read<CreatePostBloc>().add(GifSelected(gif));
+                        Navigator.pop(context);
                       },
                       child: Image.network(
                         gif.tinyGifUrl,
