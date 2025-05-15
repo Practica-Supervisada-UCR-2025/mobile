@@ -33,7 +33,10 @@ class BottomBar extends StatelessWidget {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
-                builder: (_) => const GifPickerBottomSheet(),
+                builder: (_) => BlocProvider.value(
+                  value: context.read<CreatePostBloc>(),
+                  child: const GifPickerBottomSheet(),
+                ),
               );
             },
           ),
