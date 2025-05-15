@@ -15,3 +15,9 @@ class PostTextChanged extends CreatePostEvent {
   @override
   List<Object> get props => [text];
 }
+
+class GifSelected extends CreatePostEvent {
+  final GifModel gif;
+  GifSelected(this.gif);
+}
+
