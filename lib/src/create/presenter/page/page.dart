@@ -51,6 +51,9 @@ class _CreatePageState extends State<CreatePage> {
         });
       },
     );
+    
+    _textController.addListener(() {
+    });
   }
 
   @override
@@ -82,10 +85,12 @@ class _CreatePageState extends State<CreatePage> {
                   child: Column(
                     children: [
                       PostTextField(textController: _textController),
+                      
                       if (_selectedImage != null)
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 2.0),
                           child: PostImage(
+                            key: ValueKey<String>(_selectedImage?.path ?? ''),
                             image: _selectedImage,
                             onRemove: _controller.removeImage,
                           ),
@@ -94,7 +99,12 @@ class _CreatePageState extends State<CreatePage> {
                   ),
                 ),
               ),
-              BottomBar(onImageSelected: _controller.handleImageSelected),
+              BlocSelector<CreatePostBloc, CreatePostState, int>(
+                selector: (state) => state.text.length,
+                builder: (context, textLength) {
+                  return BottomBar(onImageSelected: _controller.handleImageSelected);
+                },
+              ),
             ],
           ),
         ),
