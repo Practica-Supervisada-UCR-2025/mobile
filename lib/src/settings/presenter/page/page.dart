@@ -19,12 +19,8 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
         automaticallyImplyLeading: true,
-        iconTheme: IconThemeData(
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        shape: const Border(
-          bottom: BorderSide(color: Colors.black12),
-        ),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
+        shape: const Border(bottom: BorderSide(color: Colors.black12)),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: LayoutBuilder(

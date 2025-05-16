@@ -32,11 +32,14 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<LogoutRepository>(
           create: (_) => LogoutLocalRepository(LocalStorage()),
         ),
-        ChangeNotifierProvider<RouterRefreshNotifier>(
-          create: (_) => RouterRefreshNotifier(),
+        RepositoryProvider<PermissionsRepository>(
+          create: (_) => PermissionsRepositoryImpl(),
         ),
         RepositoryProvider<ProfileRepository>(
           create: (context) => ProfileRepositoryAPI(),
+        ),
+        ChangeNotifierProvider<RouterRefreshNotifier>(
+          create: (_) => RouterRefreshNotifier(),
         ),
         RepositoryProvider<PublicationRepository>(
           create: (context) => PublicationRepositoryAPI(),

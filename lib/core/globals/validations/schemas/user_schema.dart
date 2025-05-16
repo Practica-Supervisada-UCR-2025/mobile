@@ -1,7 +1,6 @@
 import 'package:ez_validator/ez_validator.dart';
 
 class UserValidator {
-
   static String? validateName(String? value) {
     final validator = EzValidator<String>()
         .required('This field is required')
@@ -52,6 +51,22 @@ class UserValidator {
 
     if (value != null && !RegExp(r'[0-9]').hasMatch(value)) {
       return 'The password must contain at least one number';
+    }
+
+    return null;
+  }
+
+  static String? validateUsername(String? value) {
+    final validator = EzValidator<String>()
+        .required('This field is required')
+        .minLength(3, 'The username must be at least 3 characters long')
+        .maxLength(25, 'The username must be at most 25 characters long')
+        .validate(value);
+
+    if (validator != null) return validator;
+
+    if (value != null && !RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+      return 'The username can only contain letters, numbers, and underscores';
     }
 
     return null;

@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import '../../src/profile/domain/domain.dart';
 import 'paths.dart';
 import 'router_utils.dart';
 import '../../core/globals/main_scaffold.dart';
@@ -25,20 +26,24 @@ final List<RouteBase> appRoutes = [
   ),
   GoRoute(
     path: Paths.register,
-    builder: (context, state) => const RegisterPage(), 
+    builder: (context, state) => const RegisterPage(),
   ),
   GoRoute(
     path: Paths.settings,
     builder: (context, state) => const SettingsScreen(),
   ),
   GoRoute(
+    path: Paths.editProfile,
+    builder: (context, state) {
+      final user = state.extra as User;
+      return ProfileEditPage(user: user);
+    },
+  ),
+  GoRoute(
     path: Paths.forgot_password,
     builder: (context, state) => const ForgotPasswordPage(),
   ),
-  GoRoute(
-    path: Paths.create,
-    builder: (context, state) => const CreatePage(),
-  ),
+  GoRoute(path: Paths.create, builder: (context, state) => const CreatePage()),
   ShellRoute(
     builder: (context, state, child) {
       final index = getIndexFromLocation(state.uri.toString());
