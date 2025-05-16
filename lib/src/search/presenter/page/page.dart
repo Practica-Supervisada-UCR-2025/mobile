@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/core/theme/app_colors.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});

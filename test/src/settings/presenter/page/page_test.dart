@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/settings/presenter/page/page.dart';
 import 'package:mobile/src/settings/presenter/widgets/logout_button.dart';

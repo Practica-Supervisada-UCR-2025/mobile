@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/globals/widgets/secondary_button.dart';
-import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
-import 'package:mobile/src/profile/presenter/widgets/widgets.dart';
+import 'package:mobile/src/profile/profile.dart';
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -82,12 +81,7 @@ void initState() {
                       const SizedBox(height: 20),
                       Divider(color: Theme.of(context).colorScheme.outline),
                       Expanded(
-                        child: Center(
-                          child: Text(
-                            'No posts yet',
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                        ),
+                        child: ShowOwnPublicationsPage(),
                       ),
                     ],
                   );
