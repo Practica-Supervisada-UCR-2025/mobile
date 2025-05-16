@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/create/create.dart';
 
@@ -11,78 +10,37 @@ class BottomBar extends StatelessWidget {
 
   const BottomBar({super.key, required this.onImageSelected});
 
-  Future<bool> _validateFile(XFile file, ScaffoldMessengerState scaffoldMessenger) async {
-    final String extension = file.path.split('.').last.toLowerCase();
-    final List<String> allowedExtensions = ['png', 'jpeg', 'jpg', 'webp', 'gif'];
-    
-    if (!allowedExtensions.contains(extension)) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('File type not allowed. Use .png, .jpeg, .jpg, .webp or .gif.'),
-        ),
-      );
-      return false;
-    }
-    
-    final File fileObj = File(file.path);
-    final int fileSize = await fileObj.length();
-    const int maxSize = 5 * 1024 * 1024;
-    
-    if (fileSize > maxSize) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('File exceeds the 5MB limit.'),
-        ),
-      );
-      return false;
-    }
-    
-    return true;
-  }
-
   Future<void> _pickImageFromGallery(BuildContext context) async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
-    final permissionsRepo = context.read<PermissionsRepository>();
-    bool hasPermission = await permissionsRepo.checkGalleryPermission(
+    final image = await MediaPickerService.pickImageFromGallery(
       context: context,
+      onInvalidFile: (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error)),
+        );
+      },
+      allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
+      maxSizeInBytes: MAX_IMAGE_SIZE,
     );
 
-    if (hasPermission) {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-
-      if (image != null) {
-        if (await _validateFile(image, scaffoldMessenger)) {
-          onImageSelected(File(image.path));
-        }
-      }
+    if (image != null) {
+      onImageSelected(image);
     }
   }
 
   Future<void> _takePhoto(BuildContext context) async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
-    final permissionsRepo = context.read<PermissionsRepository>();
-    bool hasPermission = await permissionsRepo.checkCameraPermission(
+    final photo = await MediaPickerService.takePhoto(
       context: context,
+      onInvalidFile: (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error)),
+        );
+      },
+      allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
+      maxSizeInBytes: MAX_IMAGE_SIZE,
     );
 
-    if (hasPermission) {
-      final ImagePicker picker = ImagePicker();
-      final XFile? photo = await picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 80,
-      );
-
-      if (photo != null) {
-        if (await _validateFile(photo, scaffoldMessenger)) {
-          onImageSelected(File(photo.path));
-        }
-      }
+    if (photo != null) {
+      onImageSelected(photo);
     }
   }
   
