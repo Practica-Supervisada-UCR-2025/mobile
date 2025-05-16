@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/src/create/create.dart';
@@ -16,61 +14,56 @@ class PostImage extends StatefulWidget {
 }
 
 class _PostImageState extends State<PostImage> {
-  double? _aspectRatio;
+  bool _isGif = false;
 
   @override
   void initState() {
     super.initState();
-    _calculateAspectRatio();
+    _checkIfGif();
   }
 
   @override
   void didUpdateWidget(PostImage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.image != oldWidget.image && widget.image != null) {
-      _calculateAspectRatio();
+      _checkIfGif();
     }
   }
 
-  Future<void> _calculateAspectRatio() async {
-    if (widget.image != null) {
-      final imageFile = FileImage(widget.image!);
-      final completer = Completer<ImageInfo>();
-      imageFile.resolve(const ImageConfiguration()).addListener(
-        ImageStreamListener((ImageInfo info, bool _) {
-          completer.complete(info);
-        }),
-      );
-
-      final imageInfo = await completer.future;
-      final width = imageInfo.image.width.toDouble();
-      final height = imageInfo.image.height.toDouble();
-
+  void _checkIfGif() {
+    final file = widget.image;
+    if (file != null) {
       setState(() {
-        _aspectRatio = width / height;
+        _isGif = file.path.toLowerCase().endsWith('.gif');
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.image == null || _aspectRatio == null) {
-      return const SizedBox();
-    }
+    if (widget.image == null) return const SizedBox();
 
     return Stack(
+      key: widget.image != null ? ValueKey<String>(widget.image!.path) : null,
       alignment: Alignment.topRight,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
-            child: AspectRatio(
-              aspectRatio: _aspectRatio!,
-              child: Image.file(
-                widget.image!,
-                fit: BoxFit.cover,
-              ),
+            child: SizedBox(
+              height: 300,
+              width: double.infinity,
+              child: _isGif
+                  ? GifImageViewer(
+                      key: ValueKey<String>(widget.image!.path),
+                      imageFile: widget.image!,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.file(
+                      widget.image!,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
         ),
