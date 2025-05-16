@@ -4,13 +4,14 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i5;
+import 'dart:io' as _i6;
 
 import 'package:http/http.dart' as _i3;
-import 'package:mobile/core/storage/user_session.storage.dart' as _i6;
+import 'package:mobile/core/storage/user_session.storage.dart' as _i7;
 import 'package:mobile/src/profile/domain/models/user.dart' as _i2;
 import 'package:mobile/src/profile/profile.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i7;
+import 'package:mockito/src/dummies.dart' as _i8;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -53,12 +54,37 @@ class MockProfileRepository extends _i1.Mock implements _i4.ProfileRepository {
             ),
           )
           as _i5.Future<_i2.User>);
+
+  @override
+  _i5.Future<_i2.User> updateUserProfile(
+    String? token,
+    Map<String, dynamic>? updates, {
+    _i6.File? profilePicture,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #updateUserProfile,
+              [token, updates],
+              {#profilePicture: profilePicture},
+            ),
+            returnValue: _i5.Future<_i2.User>.value(
+              _FakeUser_0(
+                this,
+                Invocation.method(
+                  #updateUserProfile,
+                  [token, updates],
+                  {#profilePicture: profilePicture},
+                ),
+              ),
+            ),
+          )
+          as _i5.Future<_i2.User>);
 }
 
 /// A class which mocks [LocalStorage].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
+class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   MockLocalStorage() {
     _i1.throwOnMissingStub(this);
   }
@@ -67,7 +93,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get accessToken =>
       (super.noSuchMethod(
             Invocation.getter(#accessToken),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#accessToken),
             ),
@@ -78,7 +104,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get refreshToken =>
       (super.noSuchMethod(
             Invocation.getter(#refreshToken),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#refreshToken),
             ),
@@ -89,7 +115,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get userId =>
       (super.noSuchMethod(
             Invocation.getter(#userId),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#userId),
             ),
@@ -100,7 +126,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get username =>
       (super.noSuchMethod(
             Invocation.getter(#username),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#username),
             ),
@@ -111,7 +137,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get userEmail =>
       (super.noSuchMethod(
             Invocation.getter(#userEmail),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#userEmail),
             ),
@@ -186,6 +212,31 @@ class MockProfileRepositoryAPI extends _i1.Mock
             Invocation.method(#getCurrentUser, [token]),
             returnValue: _i5.Future<_i2.User>.value(
               _FakeUser_0(this, Invocation.method(#getCurrentUser, [token])),
+            ),
+          )
+          as _i5.Future<_i2.User>);
+
+  @override
+  _i5.Future<_i2.User> updateUserProfile(
+    String? token,
+    Map<String, dynamic>? updates, {
+    _i6.File? profilePicture,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #updateUserProfile,
+              [token, updates],
+              {#profilePicture: profilePicture},
+            ),
+            returnValue: _i5.Future<_i2.User>.value(
+              _FakeUser_0(
+                this,
+                Invocation.method(
+                  #updateUserProfile,
+                  [token, updates],
+                  {#profilePicture: profilePicture},
+                ),
+              ),
             ),
           )
           as _i5.Future<_i2.User>);
