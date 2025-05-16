@@ -87,12 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 20),
                     Divider(color: Theme.of(context).colorScheme.outline),
                     Expanded(
-                      child: Center(
-                        child: Text(
-                          'No posts yet',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      ),
+                      child: ShowOwnPublicationsPage(),
                     ),
                   ],
                 );
