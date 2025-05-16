@@ -41,6 +41,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),
         ),
+        RepositoryProvider<PublicationRepository>(
+          create: (context) => PublicationRepositoryAPI(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -70,6 +73,12 @@ class MyApp extends StatelessWidget {
                 (context) => ProfileBloc(
                   profileRepository: context.read<ProfileRepository>(),
                 ),
+          ),
+          BlocProvider<PublicationBloc>(
+            create:
+                (context) => PublicationBloc(
+                  publicationRepository: context.read<PublicationRepository>(),
+                )..add(LoadPublications()),
           ),
         ],
         child: Builder(
