@@ -80,7 +80,7 @@ class BottomBar extends StatelessWidget {
             const Spacer(),
             BlocBuilder<CreatePostBloc, CreatePostState>(
               builder: (context, state) {
-                final textLength = state.text.length;
+                final textLength = state.text.runes.length;
                 final isOverLimit = textLength > 300;
 
                 return Text(

@@ -15,7 +15,7 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
   }
   void _onTextChanged(PostTextChanged event, Emitter<CreatePostState> emit) {
     final text = event.text;
-    final isOverLimit = text.length > maxLength;
+    final isOverLimit = text.runes.length > maxLength;
     final isValid = !isOverLimit && (text.isNotEmpty || state.image != null);
 
     emit(CreatePostChanged(
