@@ -8,7 +8,12 @@ import 'package:mobile/src/shared/models/gif_model.dart';
 import 'package:mobile/src/shared/services/tenor_gif_service.dart';
 
 class GifPickerBottomSheet extends StatefulWidget {
-  const GifPickerBottomSheet({super.key});
+  final TenorGifService? gifService;
+
+  const GifPickerBottomSheet({
+    super.key,
+    this.gifService,
+  });
 
   @override
   State<GifPickerBottomSheet> createState() => _GifPickerBottomSheetState();
@@ -16,7 +21,7 @@ class GifPickerBottomSheet extends StatefulWidget {
 
 class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
   final _searchController = TextEditingController();
-  final _gifService = TenorGifService();
+  // final _gifService = TenorGifService();
   final ScrollController _scrollController = ScrollController();
 
   List<GifModel> _gifs = [];
@@ -25,11 +30,13 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
   int _currentPage = 0;
   String? _currentQuery;
   String? _nextTrendingPos;
+  late final TenorGifService _gifService;
 
 
   @override
   void initState() {
     super.initState();
+    _gifService = widget.gifService ?? TenorGifService();
     _loadTrending();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100 && !_isLoadingMore) {
@@ -136,6 +143,11 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
                 border: OutlineInputBorder(),
               ),
               onSubmitted: _search,
+              onChanged: (value) { // Agregar onChanged
+                if (value.trim().isEmpty) {
+                  _loadTrending();
+                }
+              },
             ),
             const SizedBox(height: 16),
             if (_loading)
