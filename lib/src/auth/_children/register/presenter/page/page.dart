@@ -101,7 +101,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                   opacity: _fadeAnimation!,
                   child: Stack(
                    children: [
-                      if (state is! RegisterLoading)
+                      if (state is! RegisterLoading && state is! RegisterSuccess)
                         RegisterForm(
                           nameController: _nameController,
                           emailController: _emailController,
