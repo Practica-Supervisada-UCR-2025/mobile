@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
+import 'package:mobile/src/shared/models/gif_model.dart';
 import 'package:mobile/src/create/presenter/bloc/create_post_bloc.dart';
 
 void main() {
@@ -82,6 +83,20 @@ void main() {
             .having((state) => state.text, 'text', 'A' * 300)
             .having((state) => state.isOverLimit, 'isOverLimit', false)
             .having((state) => state.isValid, 'isValid', true),
+      ],
+    );
+
+    blocTest<CreatePostBloc, CreatePostState>(
+      'should emit new state with selectedGif when GifSelected is added',
+      build: () => createPostBloc,
+      act: (bloc) {
+        final gif = GifModel(id: '123', tinyGifUrl: 'https://media.tenor.com/sample.gif');
+        bloc.add(GifSelected(gif));
+      },
+      expect: () => [
+        isA<CreatePostChanged>()
+            .having((state) => state.selectedGif?.id, 'selectedGif.id', '123')
+            .having((state) => state.selectedGif?.tinyGifUrl, 'selectedGif.url', 'https://media.tenor.com/sample.gif'),
       ],
     );
   });
