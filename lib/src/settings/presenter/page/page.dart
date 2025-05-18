@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/src/settings/presenter/widgets/widgets.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -20,12 +19,8 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
         automaticallyImplyLeading: true,
-        iconTheme: IconThemeData(
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        shape: const Border(
-          bottom: BorderSide(color: Colors.black12),
-        ),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
+        shape: const Border(bottom: BorderSide(color: Colors.black12)),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: LayoutBuilder(

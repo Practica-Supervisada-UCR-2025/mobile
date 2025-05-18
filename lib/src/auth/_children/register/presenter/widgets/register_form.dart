@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/globals/globals.dart';
-import 'package:mobile/src/auth/auth.dart';
 
 class RegisterForm extends StatefulWidget {
   final TextEditingController nameController;
@@ -47,16 +46,16 @@ class RegisterFormState extends State<RegisterForm> {
                   'Create Account',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Sign up to get started',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                 ),
                 const SizedBox(height: 40),
                 _buildNameField(),
@@ -131,14 +130,13 @@ class RegisterFormState extends State<RegisterForm> {
   InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(
-        icon,
-        color: Theme.of(context).colorScheme.outline,
-      ),
+      prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.outline),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(
-          color: Theme.of(context).colorScheme.onSurface.withAlpha((0.3 * 255).round()),
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withAlpha((0.3 * 255).round()),
           width: 1.0,
         ),
       ),
