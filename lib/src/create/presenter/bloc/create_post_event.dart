@@ -20,4 +20,6 @@ class GifSelected extends CreatePostEvent {
   final GifModel gif;
   GifSelected(this.gif);
 }
+class GifRemoved extends CreatePostEvent {}
+
 
