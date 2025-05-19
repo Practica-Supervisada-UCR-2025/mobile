@@ -8,7 +8,6 @@ import 'package:mobile/core/core.dart';
 class MediaPickerService {
   static Future<File?> pickImageFromGallery({
     required BuildContext context,
-    int imageQuality = 80,
     void Function(String message)? onInvalidFile,
     required List<String> allowedExtensions,
     required int maxSizeInBytes,
@@ -22,7 +21,7 @@ class MediaPickerService {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(
         source: ImageSource.gallery,
-        imageQuality: imageQuality,
+        imageQuality: null,
       );
 
       if (image != null) {

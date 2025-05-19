@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
@@ -25,18 +27,32 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
     on<GifRemoved>((event, emit) {
       emit(state.copyWith(selectedGif: null));
     });
+    on<PostImageChanged>(_onImageChanged);
   }
-
   void _onTextChanged(PostTextChanged event, Emitter<CreatePostState> emit) {
     final text = event.text;
-    final isOverLimit = text.length > maxLength;
-    final isValid = text.isNotEmpty && !isOverLimit;
+    final isOverLimit = text.runes.length > maxLength;
+    final isValid = !isOverLimit && (text.isNotEmpty || state.image != null);
 
     emit(CreatePostChanged(
       text: text,
+      image: state.image,
       isOverLimit: isOverLimit,
       isValid: isValid,
       selectedGif: state.selectedGif,
+    ));
+  }
+
+  void _onImageChanged(PostImageChanged event, Emitter<CreatePostState> emit) {
+    final image = event.image;
+     
+    final isValid = !state.isOverLimit && (image != null || state.text.isNotEmpty);
+    
+    emit(CreatePostChanged(
+      text: state.text,
+      image: image,
+      isOverLimit: state.isOverLimit,
+      isValid: isValid,
     ));
   }
 }

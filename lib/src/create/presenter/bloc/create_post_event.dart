@@ -4,7 +4,7 @@ sealed class CreatePostEvent extends Equatable {
   const CreatePostEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class PostTextChanged extends CreatePostEvent {
@@ -23,3 +23,11 @@ class GifSelected extends CreatePostEvent {
 class GifRemoved extends CreatePostEvent {}
 
 
+class PostImageChanged extends CreatePostEvent {
+  final File? image;
+
+  const PostImageChanged(this.image);
+
+  @override
+  List<Object?> get props => [image];
+}

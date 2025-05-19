@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/profile/profile.dart';
+import 'src/create/create.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,6 +75,9 @@ class MyApp extends StatelessWidget {
                 (context) => ProfileBloc(
                   profileRepository: context.read<ProfileRepository>(),
                 ),
+          ),
+          BlocProvider<CreatePostBloc>(
+            create: (context) => CreatePostBloc(),
           ),
           BlocProvider<PublicationBloc>(
             create:

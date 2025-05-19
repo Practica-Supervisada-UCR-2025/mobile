@@ -35,7 +35,7 @@ dependencies:
 
   flutter_dotenv: ^5.1.0
 
-  flutter_bloc: ^9.1.0
+  flutter_bloc: ^9.1.1
   ez_validator: ^0.3.6
   equatable: ^2.0.7
 
