@@ -60,7 +60,7 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
         });
       }
     } catch (e) {
-      print('Error loading trending GIFs: $e');
+      debugPrint('Error loading trending GIFs: $e');
       if (mounted) {
         setState(() {
           _loading = false;
@@ -86,7 +86,7 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
         });
       }
     } catch (e) {
-      print("Error searching GIFs for '\$query': \$e");
+      debugPrint('Error searching GIFs: $e');
       if (mounted) {
         setState(() {
           _loading = false;
@@ -119,7 +119,7 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
         });
       }
     } catch (e) {
-      print('Error loading more GIFs: $e');
+      debugPrint('Error loading more GIFs: $e');
     } finally {
       _isLoadingMore = false;
     }
