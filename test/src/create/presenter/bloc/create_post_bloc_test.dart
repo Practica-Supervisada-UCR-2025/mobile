@@ -99,5 +99,78 @@ void main() {
             .having((state) => state.selectedGif?.tinyGifUrl, 'selectedGif.url', 'https://media.tenor.com/sample.gif'),
       ],
     );
+
+    test('CreatePostChanged.copyWith returns new instance with updated values', () {
+      final original = CreatePostChanged(
+        text: 'Hello',
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+      );
+
+      final updated = original.copyWith(
+        text: 'Updated text',
+        isOverLimit: true,
+        isValid: false,
+        selectedGif: GifModel(id: '1', tinyGifUrl: 'url'),
+      );
+
+      expect(updated.text, 'Updated text');
+      expect(updated.isOverLimit, true);
+      expect(updated.isValid, false);
+      expect(updated.selectedGif?.id, '1');
+    });
+
+    test('CreatePostInitial.copyWith returns CreatePostChanged with overridden values', () {
+      final initial = const CreatePostInitial();
+
+      final newState = initial.copyWith(
+        text: 'Copied',
+        isOverLimit: true,
+        isValid: false,
+        selectedGif: GifModel(id: '42', tinyGifUrl: 'https://tenor.com/gif42.gif'),
+      );
+
+      expect(newState, isA<CreatePostChanged>());
+      expect(newState.text, 'Copied');
+      expect(newState.isOverLimit, true);
+      expect(newState.isValid, false);
+      expect(newState.selectedGif?.id, '42');
+    });
+
+    test('CreatePostChanged.copyWith without arguments returns identical state', () {
+      final gif = GifModel(id: 'abc', tinyGifUrl: 'https://tenor.com/abc.gif');
+
+      final original = CreatePostChanged(
+        text: 'unchanged',
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: gif,
+      );
+
+      final copied = original.copyWith(); // sin argumentos
+
+      expect(copied, equals(original));
+      expect(identical(copied, original), isFalse, reason: 'copyWith should return a new instance');
+    });
+
+    test('CreatePostChanged props and equality', () {
+      final gif = GifModel(id: '1', tinyGifUrl: 'url');
+      final state1 = CreatePostChanged(
+        text: 'text',
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: gif,
+      );
+      final state2 = CreatePostChanged(
+        text: 'text',
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: gif,
+      );
+
+      expect(state1.props, ['text', false, true, gif]);
+      expect(state1, equals(state2));
+    });
   });
 }
