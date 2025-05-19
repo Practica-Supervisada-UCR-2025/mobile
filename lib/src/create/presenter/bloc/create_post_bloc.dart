@@ -11,7 +11,19 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
   CreatePostBloc() : super(const CreatePostInitial()) {
     on<PostTextChanged>(_onTextChanged);
     on<GifSelected>((event, emit) {
-      emit(state.copyWith(selectedGif: event.gif));
+      final gif = event.gif;
+
+      // Validar que el tamaño no sea mayor a 5MB (5 * 1024 * 1024 bytes)
+      if (gif.sizeBytes != null && gif.sizeBytes! > 5 * 1024 * 1024) {
+        // No emitir un nuevo estado si el tamaño es inválido
+        // log('GIF muy grande: ${gif.sizeBytes} bytes', name: 'CreatePostBloc');
+        return;
+      }
+
+      emit(state.copyWith(selectedGif: gif));
+    });
+    on<GifRemoved>((event, emit) {
+      emit(state.copyWith(selectedGif: null));
     });
   }
 
