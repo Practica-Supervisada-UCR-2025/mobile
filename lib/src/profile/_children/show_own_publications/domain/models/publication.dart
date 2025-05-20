@@ -1,5 +1,3 @@
-import 'dart:math';
-
 class Publication {
   final int id;
   final String username;
@@ -20,32 +18,4 @@ class Publication {
     required this.likes,
     required this.comments,
   });
-
-  factory Publication.fromJson(Map<String, dynamic> json) {
-    return Publication(
-      id: json['id'],
-      username: 'User #${json['userId']}', 
-      profileImageUrl: 'https://i.pravatar.cc/150?u=${json['userId']}', 
-      content: json['body'],
-      createdAt: DateTime.now().subtract(Duration(days: json['id'])), 
-      attachment: json['id'] % 3 == 0
-        ? 'https://media.giphy.com/media/Ju7l5y9osyymQ/giphy.gif'
-        : json['id'] % 2 == 0
-          ? 'https://picsum.photos/400/300'
-          : null,
-      likes: Random().nextInt(251),
-      comments: Random().nextInt(51),
-    );
-  }
-
-  // factory Publication.fromJson(Map<String, dynamic> json) {
-  //   return Publication(
-  //     id: json['id'],
-  //     username: json['username'] ?? 'Unknown',
-  //     profileImageUrl: json['userProfileImage'] ?? 'https://placekitten.com/200/200',
-  //     content: json['content'] ?? '',
-  //     attachment: json['file_url'],
-  //     createdAt: DateTime.parse(json['created_at']),
-  //   );
-  // }
 }

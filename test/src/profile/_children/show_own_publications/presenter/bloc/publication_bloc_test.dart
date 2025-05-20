@@ -3,219 +3,168 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-// Import the bloc, events, states, model and override variable
-import 'package:mobile/src/profile/profile.dart';
-import 'package:mobile/src/profile/_children/show_own_publications/presenter/bloc/publication_bloc.dart' as bloc_file;
 
+// Import your BLoC, events, states, repository interface and models
+import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
+
+/// A mock PublicationRepository so we can control its output in tests.
 class MockPublicationRepository extends Mock implements PublicationRepository {}
 
 void main() {
   late PublicationBloc bloc;
   late PublicationRepository repository;
 
-  // A small fake list of 3 items (< limit = 10)
-  final fakePublications = List.generate(
-    3,
-    (i) => Publication(
-      id: i + 1,
-      username: 'User #$i',
-      profileImageUrl: 'https://example.com/avatar$i.png',
-      content: 'Post content $i',
-      createdAt: DateTime.now(),
-      attachment: i.isEven ? 'https://example.com/image$i.jpg' : null,
-      likes: 10 + i,
-      comments: 5 + i,
-    ),
+  // Two sample publications to use in the tests
+  final samplePub1 = Publication(
+    id: 1,
+    username: 'user1',
+    profileImageUrl: 'https://img.example/1.png',
+    content: 'First post',
+    createdAt: DateTime.now(),
+    attachment: null,
+    likes: 0,
+    comments: 0,
+  );
+  final samplePub2 = Publication(
+    id: 2,
+    username: 'user2',
+    profileImageUrl: 'https://img.example/2.png',
+    content: 'Second post',
+    createdAt: DateTime.now(),
+    attachment: 'https://img.example/file2.jpg',
+    likes: 0,
+    comments: 0,
   );
 
   setUp(() {
     repository = MockPublicationRepository();
     bloc = PublicationBloc(publicationRepository: repository);
-    // reset the override to -1 (no limit)
-    bloc_file.kPublicationLimitOverride = -1;
   });
 
-  tearDown(() => bloc.close());
+  tearDown(() {
+    bloc.close();
+  });
 
-  group('PublicationBloc estándar (override = -1)', () {
+  group('Carga inicial de publicaciones', () {
     blocTest<PublicationBloc, PublicationState>(
-      'LoadPublications → fewer than limit emits Loading then Success(hasReachedMax: true)',
+      'emite [Loading, Success] cuando fetchPublications devuelve una sola página',
       build: () {
-        when(() => repository.fetchPublications(skip: any(named: 'skip'), limit: any(named: 'limit')))
-          .thenAnswer((_) async => fakePublications);
-        return bloc;
-      },
-      act: (b) => b.add(LoadPublications()),
-      expect: () => [
-        PublicationLoading(),
-        isA<PublicationSuccess>()
-          .having((s) => s.publications, 'publications', fakePublications)
-          .having((s) => s.hasReachedMax, 'hasReachedMax', isTrue),
-      ],
-      verify: (_) {
-        verify(() => repository.fetchPublications(skip: 0, limit: 10)).called(1);
-      },
-    );
-
-    blocTest<PublicationBloc, PublicationState>(
-      'LoadPublications → exactly limit emits Loading then Success(hasReachedMax: false)',
-      build: () {
-        final ten = List.generate(
-          10,
-          (i) => Publication(
-            id: i,
-            username: 'U$i',
-            profileImageUrl: 'https://example.com/a$i.png',
-            content: 'P$i',
-            createdAt: DateTime.now(),
-            attachment: null,
-            likes: i,
-            comments: i,
+        when(() => repository.fetchPublications(page: 1, limit: 10)).thenAnswer(
+          (_) async => PublicationResponse(
+            publications: [samplePub1, samplePub2],
+            totalPosts: 2,
+            totalPages: 1,
+            currentPage: 1,
           ),
         );
-        when(() => repository.fetchPublications(skip: any(named: 'skip'), limit: any(named: 'limit')))
-          .thenAnswer((_) async => ten);
         return bloc;
       },
       act: (b) => b.add(LoadPublications()),
       expect: () => [
         PublicationLoading(),
-        isA<PublicationSuccess>()
-          .having((s) => s.publications.length, 'length', 10)
-          .having((s) => s.hasReachedMax, 'hasReachedMax', isFalse),
+        PublicationSuccess(
+          publications: [samplePub1, samplePub2],
+          totalPosts: 2,
+          totalPages: 1,
+          currentPage: 1,
+        ),
       ],
       verify: (_) {
-        verify(() => repository.fetchPublications(skip: 0, limit: 10)).called(1);
+        verify(() => repository.fetchPublications(page: 1, limit: 10)).called(1);
       },
     );
 
     blocTest<PublicationBloc, PublicationState>(
-      'LoadPublications → exception emits Loading then Failure',
+      'emite [Loading, Failure] cuando fetchPublications lanza excepción',
       build: () {
-        when(() => repository.fetchPublications(skip: any(named: 'skip'), limit: any(named: 'limit')))
-          .thenThrow(Exception('oops'));
+        when(() => repository.fetchPublications(page: 1, limit: 10))
+            .thenThrow(Exception('Server error'));
         return bloc;
       },
       act: (b) => b.add(LoadPublications()),
-      expect: () => [PublicationLoading(), PublicationFailure()],
-    );
-
-    blocTest<PublicationBloc, PublicationState>(
-      'LoadMorePublications when not in Success state does nothing',
-      build: () => bloc,
-      act: (b) => b.add(LoadMorePublications()),
-      expect: () => [],
-    );
-
-    blocTest<PublicationBloc, PublicationState>(
-      'LoadMorePublications → adds more and then hasReachedMax=true when fewer returned than limit',
-      seed: () => PublicationSuccess(publications: fakePublications, hasReachedMax: false),
-      build: () {
-        when(() => repository.fetchPublications(skip: any(named: 'skip'), limit: any(named: 'limit')))
-          .thenAnswer((_) async => fakePublications);
-        return bloc;
-      },
-      act: (b) => b.add(LoadMorePublications()),
       expect: () => [
-        isA<PublicationSuccess>()
-          .having((s) => s.publications.length, 'total', fakePublications.length * 2)
-          .having((s) => s.hasReachedMax, 'hasReachedMax', isTrue),
+        PublicationLoading(),
+        PublicationFailure(),
       ],
     );
+  });
+
+  group('Paginación de publicaciones', () {
+    blocTest<PublicationBloc, PublicationState>(
+      'no emite nada cuando LoadMorePublications y estado no es Success',
+      build: () => bloc,
+      act: (b) => b.add(LoadMorePublications()),
+      expect: () => <PublicationState>[],
+    );
 
     blocTest<PublicationBloc, PublicationState>(
-      'LoadMorePublications → adds more and hasReachedMax=false when exactly limit returned',
-      seed: () => PublicationSuccess(publications: const [], hasReachedMax: false),
+      'no emite nada cuando ya reachedMax == true',
+      build: () => bloc,
+      seed: () => PublicationSuccess(
+        publications: [samplePub1],
+        totalPosts: 1,
+        totalPages: 1,
+        currentPage: 1,
+      ),
+      act: (b) => b.add(LoadMorePublications()),
+      expect: () => <PublicationState>[],
+    );
+
+    blocTest<PublicationBloc, PublicationState>(
+      'emite nueva lista con página siguiente y Success',
       build: () {
-        final tenNew = List.generate(
-          10,
-          (i) => Publication(
-            id: 100 + i,
-            username: 'New$i',
-            profileImageUrl: 'https://example.com/n$i.png',
-            content: 'C$i',
-            createdAt: DateTime.now(),
-            attachment: null,
-            likes: 0,
-            comments: 0,
+        when(() => repository.fetchPublications(page: 2, limit: 10))
+            .thenAnswer(
+          (_) async => PublicationResponse(
+            publications: [samplePub2],
+            totalPosts: 2,
+            totalPages: 2,
+            currentPage: 2,
           ),
         );
-        when(() => repository.fetchPublications(skip: any(named: 'skip'), limit: any(named: 'limit')))
-          .thenAnswer((_) async => tenNew);
         return bloc;
       },
+      seed: () => PublicationSuccess(
+        publications: [samplePub1],
+        totalPosts: 2,
+        totalPages: 2,
+        currentPage: 1,
+      ),
       act: (b) => b.add(LoadMorePublications()),
       expect: () => [
-        isA<PublicationSuccess>()
-          .having((s) => s.publications.length, 'new total', 10)
-          .having((s) => s.hasReachedMax, 'hasReachedMax', isFalse),
+        PublicationSuccess(
+          publications: [samplePub1, samplePub2],
+          totalPosts: 2,
+          totalPages: 2,
+          currentPage: 2,
+        ),
       ],
       verify: (_) {
-        verify(() => repository.fetchPublications(skip: 0, limit: 10)).called(1);
+        verify(() => repository.fetchPublications(page: 2, limit: 10)).called(1);
       },
     );
 
     blocTest<PublicationBloc, PublicationState>(
-      'LoadMorePublications when hasReachedMax=true does nothing',
-      seed: () => PublicationSuccess(publications: fakePublications, hasReachedMax: true),
-      build: () => bloc,
-      act: (b) => b.add(LoadMorePublications()),
-      expect: () => [],
-    );
-
-    blocTest<PublicationBloc, PublicationState>(
-      'LoadMorePublications → exception emits Failure',
-      seed: () => PublicationSuccess(publications: fakePublications, hasReachedMax: false),
+      'emite Failure en LoadMorePublications cuando fetch lanza excepción',
       build: () {
-        when(() => repository.fetchPublications(skip: any(named: 'skip'), limit: any(named: 'limit')))
-          .thenThrow(Exception('bad'));
+        when(() => repository.fetchPublications(page: 2, limit: 10))
+            .thenThrow(Exception('Network error'));
         return bloc;
       },
-      act: (b) => b.add(LoadMorePublications()),
-      expect: () => [PublicationFailure()],
-    );
-  });
-
-  group('PublicationBloc con override > -1', () {
-    setUp(() {
-      // Force the take(...) branch
-      bloc_file.kPublicationLimitOverride = 1;
-    });
-
-    blocTest<PublicationBloc, PublicationState>(
-      'LoadPublications → takes only 1 then hasReachedMax=true',
-      build: () {
-        when(() => repository.fetchPublications(skip: any(named: 'skip'), limit: any(named: 'limit')))
-          .thenAnswer((_) async => fakePublications);
-        return bloc;
-      },
-      act: (b) => b.add(LoadPublications()),
-      expect: () => [
-        PublicationLoading(),
-        isA<PublicationSuccess>()
-          .having((s) => s.publications.length, 'length', 1)
-          .having((s) => s.hasReachedMax, 'hasReachedMax', isTrue),
-      ],
-    );
-
-    blocTest<PublicationBloc, PublicationState>(
-      'LoadMorePublications → takes only 1 more then hasReachedMax=true',
-      seed: () => PublicationSuccess(publications: fakePublications, hasReachedMax: false),
-      build: () {
-        when(() => repository.fetchPublications(skip: any(named: 'skip'), limit: any(named: 'limit')))
-          .thenAnswer((_) async => fakePublications);
-        return bloc;
-      },
+      seed: () => PublicationSuccess(
+        publications: [samplePub1],
+        totalPosts: 2,
+        totalPages: 2,
+        currentPage: 1,
+      ),
       act: (b) => b.add(LoadMorePublications()),
       expect: () => [
-        isA<PublicationSuccess>()
-          .having((s) => s.publications.length, 'length', fakePublications.length + 1)
-          .having((s) => s.hasReachedMax, 'hasReachedMax', isTrue),
+        PublicationFailure(),
       ],
     );
   });
 
-  group('PublicationEvent Equatable', () {
+  group('Eventos equatables', () {
     test('LoadPublications equality', () {
       expect(LoadPublications(), equals(LoadPublications()));
     });
