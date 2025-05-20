@@ -7,7 +7,7 @@ import 'dart:async' as _i5;
 import 'dart:io' as _i6;
 
 import 'package:http/http.dart' as _i3;
-import 'package:mobile/core/storage/user_session.storage.dart' as _i7;
+import 'package:mobile/core/core.dart' as _i7;
 import 'package:mobile/src/profile/domain/models/user.dart' as _i2;
 import 'package:mobile/src/profile/profile.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;

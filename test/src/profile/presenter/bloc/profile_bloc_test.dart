@@ -14,6 +14,8 @@ import 'profile_bloc_test.mocks.dart';
 void main() {
   late MockProfileRepository mockProfileRepository;
   late ProfileBloc profileBloc;
+  late MockLocalStorage mockLocalStorage;
+  const testToken = 'mocked_token';
 
   final testUser = User(
     firstName: "user",
@@ -23,6 +25,7 @@ void main() {
     image: "https://dummyjson.com/icon/emilys/128",
   );
 
+  
   final updatedUser = User(
     firstName: "updated",
     lastName: "user",
@@ -35,8 +38,14 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     mockProfileRepository = MockProfileRepository();
-
+    
     profileBloc = ProfileBloc(profileRepository: mockProfileRepository);
+
+    mockLocalStorage = MockLocalStorage();
+    LocalStorage.init();
+    when(mockLocalStorage.accessToken).thenReturn('1');
+    when(mockLocalStorage.userId).thenReturn('1');
+    
   });
 
   // after each test, reset the mock
@@ -52,32 +61,26 @@ void main() {
     blocTest<ProfileBloc, ProfileState>(
       'should emit [ProfileLoading, ProfileSuccess] when a fetch is successful',
       build: () {
-        when(
-          mockProfileRepository.getCurrentUser('1'),
-        ).thenAnswer((_) async => testUser);
+        when(mockProfileRepository.getCurrentUser(any))
+            .thenAnswer((_) async => testUser);
 
         return profileBloc;
       },
       act: (bloc) => bloc.add(const ProfileLoad()),
-      expect:
-          () => [
-            isA<ProfileLoading>(),
-            isA<ProfileSuccess>().having(
-              (state) => state.user,
-              'user',
-              testUser,
-            ),
-          ],
+      expect: () => [
+        isA<ProfileLoading>(),
+        isA<ProfileSuccess>().having((state) => state.user, 'user', testUser),
+      ],
       verify: (_) {
-        verify(mockProfileRepository.getCurrentUser('1')).called(1);
-      },
-    );
+        verify(mockProfileRepository.getCurrentUser(any)).called(1);
+  },
+);
 
     blocTest<ProfileBloc, ProfileState>(
       'should emit [ProfileLoading, ProfileError] when a fetch fails',
       build: () {
         when(
-          mockProfileRepository.getCurrentUser('1'),
+          mockProfileRepository.getCurrentUser(any),
         ).thenThrow(Exception('Failed to load user'));
 
         return profileBloc;
@@ -85,7 +88,7 @@ void main() {
       act: (bloc) => bloc.add(const ProfileLoad()),
       expect: () => [isA<ProfileLoading>(), isA<ProfileFailure>()],
       verify: (_) {
-        verify(mockProfileRepository.getCurrentUser('1')).called(1);
+        verify(mockProfileRepository.getCurrentUser(any)).called(1);
       },
     );
   });
