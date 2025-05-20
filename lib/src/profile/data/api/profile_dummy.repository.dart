@@ -19,7 +19,7 @@ class ProfileRepositoryAPI implements ProfileRepository {
         },
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final data = json.decode(response.body);
         return User.fromJson(data);
       } else {
