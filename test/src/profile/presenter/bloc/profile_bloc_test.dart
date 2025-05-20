@@ -15,7 +15,6 @@ void main() {
   late MockProfileRepository mockProfileRepository;
   late ProfileBloc profileBloc;
   late MockLocalStorage mockLocalStorage;
-  const testToken = 'mocked_token';
 
   final testUser = User(
     firstName: "user",
