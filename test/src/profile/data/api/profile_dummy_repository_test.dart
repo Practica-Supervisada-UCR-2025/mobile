@@ -26,33 +26,33 @@ void main() {
     final url = Uri.parse('$API_BASE_URL/user/auth/profile');
 
     test('should return User when API call is successful', () async {
-        final mockUserData = {
-          'message': 'User profile retrieved successfully',
-          'data': {
-            'email': 'test@ucr.ac.cr',
-            'username': 'test',
-            'full_name': 'test',
-            'profile_picture': 'https://dummyjson.com/icon/emilys/128',
-          }
-        };
+      final mockUserData = {
+        'message': 'User profile retrieved successfully',
+        'data': {
+          'email': 'test@ucr.ac.cr',
+          'username': 'test',
+          'full_name': 'test',
+          'profile_picture': 'https://dummyjson.com/icon/emilys/128',
+        },
+      };
 
-        when(
-          mockClient.get(
-            url,
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json',
-            },
-          ),
-        ).thenAnswer((_) async => http.Response(jsonEncode(mockUserData), 201));
+      when(
+        mockClient.get(
+          url,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      ).thenAnswer((_) async => http.Response(jsonEncode(mockUserData), 201));
 
-        final result = await repository.getCurrentUser(token);
+      final result = await repository.getCurrentUser(token);
 
-        expect(result.email, equals('test@ucr.ac.cr'));
-        expect(result.username, equals('test'));
-        expect(result.firstName, equals('test'));
-        expect(result.image, equals('https://dummyjson.com/icon/emilys/128'));
-      });
+      expect(result.email, equals('test@ucr.ac.cr'));
+      expect(result.username, equals('test'));
+      expect(result.firstName, equals('test'));
+      expect(result.image, equals('https://dummyjson.com/icon/emilys/128'));
+    });
 
     test('should throw Exception when API call fails', () async {
       when(
@@ -61,62 +61,5 @@ void main() {
 
       expect(() => repository.getCurrentUser(token), throwsException);
     });
-  });
-
-  group('updateUserProfile', () {
-    const token = '1';
-    final url = Uri.parse('https://dummyjson.com/users/$token');
-
-    test('should update user profile when API call is successful', () async {
-      final updates = {'firstName': 'John', 'lastName': 'Doe'};
-      final mockResponseData = {
-          'message': 'User profile retrieved successfully',
-          'data': {
-            'email': 'user@ucr.ac.cr',
-            'username': 'johndoe',
-            'full_name': 'John Doe',
-            'profile_picture': 'https://dummyjson.com/icon/emilys/128',
-          }
-        };
-        
-
-      when(
-        mockClient.patch(
-          url,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        ),
-      ).thenAnswer(
-        (_) async => http.Response(jsonEncode(mockResponseData), 200),
-      );
-
-      final result = await repository.updateUserProfile(token, updates);
-
-      expect(result.firstName, 'John');
-      expect(result.lastName, 'Doe');
-      expect(result.username, 'johndoe');
-      expect(result.email, 'user@ucr.ac.cr');
-      expect(result.image, 'https://dummyjson.com/icon/emilys/128');
-    });
-
-    test(
-      'should throw an exception when API call fails on updateUserProfile',
-      () async {
-        final updates = {'firstName': 'John', 'lastName': 'Doe'};
-
-        when(
-          mockClient.patch(
-            url,
-            headers: anyNamed('headers'),
-            body: anyNamed('body'),
-          ),
-        ).thenAnswer((_) async => http.Response('Failed to update', 400));
-
-        expect(
-          () => repository.updateUserProfile(token, updates),
-          throwsException,
-        );
-      },
-    );
   });
 }

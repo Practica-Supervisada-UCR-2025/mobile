@@ -24,7 +24,6 @@ void main() {
     image: "https://dummyjson.com/icon/emilys/128",
   );
 
-  
   final updatedUser = User(
     firstName: "updated",
     lastName: "user",
@@ -37,14 +36,13 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     mockProfileRepository = MockProfileRepository();
-    
+
     profileBloc = ProfileBloc(profileRepository: mockProfileRepository);
 
     mockLocalStorage = MockLocalStorage();
     LocalStorage.init();
     when(mockLocalStorage.accessToken).thenReturn('1');
     when(mockLocalStorage.userId).thenReturn('1');
-    
   });
 
   // after each test, reset the mock
@@ -60,20 +58,26 @@ void main() {
     blocTest<ProfileBloc, ProfileState>(
       'should emit [ProfileLoading, ProfileSuccess] when a fetch is successful',
       build: () {
-        when(mockProfileRepository.getCurrentUser(any))
-            .thenAnswer((_) async => testUser);
+        when(
+          mockProfileRepository.getCurrentUser(any),
+        ).thenAnswer((_) async => testUser);
 
         return profileBloc;
       },
       act: (bloc) => bloc.add(const ProfileLoad()),
-      expect: () => [
-        isA<ProfileLoading>(),
-        isA<ProfileSuccess>().having((state) => state.user, 'user', testUser),
-      ],
+      expect:
+          () => [
+            isA<ProfileLoading>(),
+            isA<ProfileSuccess>().having(
+              (state) => state.user,
+              'user',
+              testUser,
+            ),
+          ],
       verify: (_) {
         verify(mockProfileRepository.getCurrentUser(any)).called(1);
-  },
-);
+      },
+    );
 
     blocTest<ProfileBloc, ProfileState>(
       'should emit [ProfileLoading, ProfileError] when a fetch fails',
@@ -101,7 +105,7 @@ void main() {
     }
 
     blocTest<ProfileBloc, ProfileState>(
-      'should emit [ProfileUpdating, ProfileUpdateSuccess, ProfileSuccess] when update is successful',
+      'should emit [ProfileUpdating, ProfileUpdateSuccess, ProfileSuccess] when update succeeds',
       build: () {
         profileBloc = prepareSuccessState();
 
@@ -109,7 +113,7 @@ void main() {
 
         when(
           mockProfileRepository.updateUserProfile(
-            "1",
+            LocalStorage().accessToken,
             userUpdates,
             profilePicture: null,
           ),
@@ -137,13 +141,13 @@ void main() {
             ),
             isA<ProfileSuccess>().having(
               (state) => state.user,
-              'final state user',
+              'updated user in success state',
               updatedUser,
             ),
           ],
       verify: (_) {
         verify(
-          mockProfileRepository.updateUserProfile("1", {
+          mockProfileRepository.updateUserProfile(LocalStorage().accessToken, {
             'firstName': 'updated',
             'lastName': 'user',
           }, profilePicture: null),
@@ -160,7 +164,7 @@ void main() {
 
         when(
           mockProfileRepository.updateUserProfile(
-            "1",
+            LocalStorage().accessToken,
             userUpdates,
             profilePicture: null,
           ),
@@ -195,7 +199,7 @@ void main() {
           ],
       verify: (_) {
         verify(
-          mockProfileRepository.updateUserProfile("1", {
+          mockProfileRepository.updateUserProfile(LocalStorage().accessToken, {
             'firstName': 'updated',
             'lastName': 'user',
           }, profilePicture: null),
