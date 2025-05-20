@@ -88,20 +88,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     if (_formKey.currentState?.validate() ?? false) {
       final updates = <String, dynamic>{};
 
-      if (_firstNameController.text != widget.user.firstName) {
-        updates['firstName'] = _firstNameController.text;
-      }
-
-      if (_lastNameController.text != widget.user.lastName) {
-        updates['lastName'] = _lastNameController.text;
+      if (_lastNameController.text != widget.user.lastName ||
+          _firstNameController.text != widget.user.firstName) {
+        updates['full_name'] =
+            '${_firstNameController.text} ${_lastNameController.text}';
       }
 
       if (_usernameController.text != widget.user.username) {
         updates['username'] = _usernameController.text;
-      }
-
-      if (_emailController.text != widget.user.email) {
-        updates['email'] = _emailController.text;
       }
 
       File? profilePicture;

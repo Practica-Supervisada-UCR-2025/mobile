@@ -47,7 +47,7 @@ class ProfileRepositoryAPI implements ProfileRepository {
     }
 
     final response = await client.patch(
-      Uri.parse('https://dummyjson.com/users/$token'),
+      Uri.parse('$API_BASE_URL/user/auth/profile'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -77,7 +77,7 @@ class ProfileRepositoryAPI implements ProfileRepository {
     // Create multipart request
     final request = http.MultipartRequest(
       'PATCH',
-      Uri.parse('https://dummyjson.com/users/$token'),
+      Uri.parse('$API_BASE_URL/user/auth/profile'),
     );
 
     // Set headers
@@ -107,22 +107,8 @@ class ProfileRepositoryAPI implements ProfileRepository {
     final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 200) {
-      //final data = json.decode(response.body);
-
-      // todo: delete this when endpoint is available: start
-      final Map<String, dynamic> data =
-          json.decode(response.body) as Map<String, dynamic>;
-
-      final modifiedData = {
-        ...data,
-        'image': 'https://cdn2.thecatapi.com/images/0XYvRd7oD.jpg',
-      };
-
-      return User.fromJson(modifiedData);
-      // end of todo
-
-      // todo: uncomment this when endpoint is available
-      // return User.fromJson(data);
+      final data = json.decode(response.body);
+      return User.fromJson(data);
     } else {
       throw Exception('Failed to update user profile: ${response.body}');
     }
