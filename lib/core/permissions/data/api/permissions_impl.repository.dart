@@ -5,20 +5,19 @@ import 'package:permission_handler/permission_handler.dart';
 
 class PermissionsRepositoryImpl implements PermissionsRepository {
   final DeviceInfoPlugin deviceInfoPlugin;
+  final PermissionService permissionService;
 
-  PermissionsRepositoryImpl({DeviceInfoPlugin? deviceInfoPlugin})
-    : deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin();
+  PermissionsRepositoryImpl({
+    DeviceInfoPlugin? deviceInfoPlugin,
+    required this.permissionService,
+  }) : deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin();
 
   @override
   Future<bool> checkCameraPermission({BuildContext? context}) async {
-    var status = await Permission.camera.status;
-    // verify if the permission is already granted
-    if (status.isGranted) {
-      return true;
-    }
+    var status = await permissionService.getCameraStatus();
 
-    // If the permission is permanently denied, then we can show a custom dialog
-    // to inform the user that they need to go to settings to enable it
+    if (status.isGranted) return true;
+
     if (status.isPermanentlyDenied) {
       if (context != null && context.mounted) {
         PermissionSettingsDialog.show(context, 'camera');
@@ -26,13 +25,8 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
       return false;
     }
 
-    // If the permission is denied but not permanently, just request it
-    if (status.isDenied) {
-      status = await Permission.camera.request();
-      return status.isGranted;
-    }
-
-    return false;
+    status = await permissionService.requestCamera();
+    return status.isGranted;
   }
 
   @override
@@ -41,7 +35,8 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
     final sdkInt = androidInfo.version.sdkInt;
 
     if (sdkInt >= 33) {
-      var status = await Permission.photos.status;
+      var status = await permissionService.getPhotosStatus();
+
       if (status.isGranted) return true;
 
       if (status.isPermanentlyDenied) {
@@ -51,10 +46,11 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
         return false;
       }
 
-      status = await Permission.photos.request();
+      status = await permissionService.requestPhotos();
       return status.isGranted;
     } else {
-      var status = await Permission.storage.status;
+      var status = await permissionService.getStorageStatus();
+
       if (status.isGranted) return true;
 
       if (status.isPermanentlyDenied) {
@@ -64,13 +60,13 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
         return false;
       }
 
-      status = await Permission.storage.request();
+      status = await permissionService.requestStorage();
       return status.isGranted;
     }
   }
 
   @override
   Future<void> openSettings() async {
-    await openAppSettings();
+    await permissionService.openSettings();
   }
 }
