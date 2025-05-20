@@ -23,7 +23,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     emit(ProfileLoading());
     try {
-      final user = await profileRepository.getCurrentUser(LocalStorage().accessToken);
+      final user = await profileRepository.getCurrentUser(
+        LocalStorage().accessToken,
+      );
       emit(ProfileSuccess(user: user));
     } catch (e) {
       emit(ProfileFailure(error: e.toString()));
@@ -41,7 +43,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(ProfileUpdating(user: currentState.user));
       try {
         final updatedUser = await profileRepository.updateUserProfile(
-          "1",
+          LocalStorage().accessToken,
           event.updates,
           profilePicture: event.profilePicture,
         );
