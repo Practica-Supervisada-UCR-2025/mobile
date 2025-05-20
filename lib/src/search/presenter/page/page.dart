@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/core/theme/app_colors.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -8,12 +7,12 @@ class SearchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: const Center(
+      body: Center(
         child: Text(
           'Search screen',
           style: TextStyle(
             fontSize: 20,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w500,
           ),
         ),

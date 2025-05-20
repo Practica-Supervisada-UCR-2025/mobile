@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/src/settings/presenter/widgets/widgets.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -16,16 +15,12 @@ class SettingsScreen extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             fontSize: 20,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         automaticallyImplyLeading: true,
-        iconTheme: IconThemeData(
-          color: AppColors.textPrimary,
-        ),
-        shape: const Border(
-          bottom: BorderSide(color: Colors.black12),
-        ),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
+        shape: const Border(bottom: BorderSide(color: Colors.black12)),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: LayoutBuilder(
@@ -35,12 +30,12 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
               children: [
                 const Spacer(flex: 2),
-                const Center(
+                Center(
                   child: Text(
                     'Settings screen',
                     style: TextStyle(
                       fontSize: 20,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

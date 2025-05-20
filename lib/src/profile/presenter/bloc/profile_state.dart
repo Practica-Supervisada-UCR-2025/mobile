@@ -25,3 +25,31 @@ final class ProfileFailure extends ProfileState {
   @override
   List<Object> get props => [error];
 }
+
+final class ProfileUpdating extends ProfileState {
+  final User user;
+
+  const ProfileUpdating({required this.user});
+
+  @override
+  List<Object> get props => [user];
+}
+
+final class ProfileUpdateSuccess extends ProfileState {
+  final User user;
+
+  const ProfileUpdateSuccess({required this.user});
+
+  @override
+  List<Object> get props => [user];
+}
+
+final class ProfileUpdateFailure extends ProfileState {
+  final String error;
+  final User user;
+
+  const ProfileUpdateFailure({required this.error, required this.user});
+
+  @override
+  List<Object> get props => [error, user];
+}

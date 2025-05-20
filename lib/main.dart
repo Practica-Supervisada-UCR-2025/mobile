@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/auth/auth.dart';
-import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
 import 'package:mobile/src/profile/profile.dart';
+import 'src/create/create.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,11 +33,17 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<LogoutRepository>(
           create: (_) => LogoutLocalRepository(LocalStorage()),
         ),
-        ChangeNotifierProvider<RouterRefreshNotifier>(
-          create: (_) => RouterRefreshNotifier(),
+        RepositoryProvider<PermissionsRepository>(
+          create: (_) => PermissionsRepositoryImpl(),
         ),
         RepositoryProvider<ProfileRepository>(
           create: (context) => ProfileRepositoryAPI(),
+        ),
+        ChangeNotifierProvider<RouterRefreshNotifier>(
+          create: (_) => RouterRefreshNotifier(),
+        ),
+        RepositoryProvider<PublicationRepository>(
+          create: (context) => PublicationRepositoryAPI(),
         ),
       ],
       child: MultiBlocProvider(
@@ -68,6 +74,15 @@ class MyApp extends StatelessWidget {
                 (context) => ProfileBloc(
                   profileRepository: context.read<ProfileRepository>(),
                 ),
+          ),
+          BlocProvider<CreatePostBloc>(
+            create: (context) => CreatePostBloc(),
+          ),
+          BlocProvider<PublicationBloc>(
+            create:
+                (context) => PublicationBloc(
+                  publicationRepository: context.read<PublicationRepository>(),
+                )..add(LoadPublications()),
           ),
         ],
         child: Builder(
