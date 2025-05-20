@@ -8,7 +8,7 @@ import 'package:mobile/src/profile/_children/show_own_publications/show_own_publ
 
 void main() {
   testWidgets(
-    'ShowOwnPublicationsPage construye el BlocProvider y muestra PublicationsList',
+    'ShowOwnPublicationsPage builds the BlocProvider and displays PublicationsList',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(home: ShowOwnPublicationsPage()),
@@ -19,9 +19,9 @@ void main() {
   );
 
   testWidgets(
-    'Cuando PublicationsList falla y se pulsa Retry, reaparece el mensaje de error',
+    'When PublicationsList fails and Retry is pressed, the error message reappears',
     (WidgetTester tester) async {
-      // Creamos un BLoC con repositorio que siempre falla
+      // Create a BLoC with a repository that always fails
       final failureBloc = PublicationBloc(
         publicationRepository: _FakeFailureRepository(),
       );
@@ -35,28 +35,28 @@ void main() {
         ),
       );
 
-      // Disparamos la carga inicial y esperamos al estado Failure
+      // We trigger the initial load and wait for the Failure state
       failureBloc.add(LoadPublications());
       await tester.pumpAndSettle();
 
-      // Debe verse el mensaje de fallo y el botón Retry
+      // The failure message and the Retry button should be visible
       expect(find.text('Failed to load posts'), findsOneWidget);
       expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
 
-      // Pulsamos Retry
+      // We press Retry
       await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
 
-      // Esperamos a que termine de procesar el nuevo fallo
+      // Wait for the new failure to be processed
       await tester.pumpAndSettle();
 
-      // De nuevo debe verse el mensaje de fallo y el botón Retry
+      // The failure message and the Retry button should be visible again
       expect(find.text('Failed to load posts'), findsOneWidget);
       expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
     },
   );
 }
 
-/// Repositorio falso que siempre lanza excepción para forzar la ruta de error.
+/// Fake repository that always throws an exception to force the error path.
 class _FakeFailureRepository implements PublicationRepository {
   @override
   Future<PublicationResponse> fetchPublications({

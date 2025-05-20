@@ -45,9 +45,9 @@ void main() {
     bloc.close();
   });
 
-  group('Carga inicial de publicaciones', () {
+  group('Initial load of publications', () {
     blocTest<PublicationBloc, PublicationState>(
-      'emite [Loading, Success] cuando fetchPublications devuelve una sola página',
+      'emits [Loading, Success] when fetchPublications returns a single page',
       build: () {
         when(() => repository.fetchPublications(page: 1, limit: 10)).thenAnswer(
           (_) async => PublicationResponse(
@@ -75,7 +75,7 @@ void main() {
     );
 
     blocTest<PublicationBloc, PublicationState>(
-      'emite [Loading, Failure] cuando fetchPublications lanza excepción',
+      'emits [Loading, Failure] when fetchPublications throws exception',
       build: () {
         when(() => repository.fetchPublications(page: 1, limit: 10))
             .thenThrow(Exception('Server error'));
@@ -89,16 +89,16 @@ void main() {
     );
   });
 
-  group('Paginación de publicaciones', () {
+  group('Pagination of publications', () {
     blocTest<PublicationBloc, PublicationState>(
-      'no emite nada cuando LoadMorePublications y estado no es Success',
+      'does not emit anything when LoadMorePublications and state is not Success',
       build: () => bloc,
       act: (b) => b.add(LoadMorePublications()),
       expect: () => <PublicationState>[],
     );
 
     blocTest<PublicationBloc, PublicationState>(
-      'no emite nada cuando ya reachedMax == true',
+      'does not emit anything when already reachedMax == true',
       build: () => bloc,
       seed: () => PublicationSuccess(
         publications: [samplePub1],
@@ -111,7 +111,7 @@ void main() {
     );
 
     blocTest<PublicationBloc, PublicationState>(
-      'emite nueva lista con página siguiente y Success',
+      'emits new list with next page and Success',
       build: () {
         when(() => repository.fetchPublications(page: 2, limit: 10))
             .thenAnswer(
@@ -145,7 +145,7 @@ void main() {
     );
 
     blocTest<PublicationBloc, PublicationState>(
-      'emite Failure en LoadMorePublications cuando fetch lanza excepción',
+      'emits Failure on LoadMorePublications when fetch throws exception',
       build: () {
         when(() => repository.fetchPublications(page: 2, limit: 10))
             .thenThrow(Exception('Network error'));
@@ -164,7 +164,7 @@ void main() {
     );
   });
 
-  group('Eventos equatables', () {
+  group('Equatable events', () {
     test('LoadPublications equality', () {
       expect(LoadPublications(), equals(LoadPublications()));
     });

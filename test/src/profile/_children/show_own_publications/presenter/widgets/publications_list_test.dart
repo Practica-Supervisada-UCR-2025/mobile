@@ -1,5 +1,3 @@
-// test/publications_list_test.dart
-
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -57,7 +55,7 @@ void main() {
     );
   }
 
-  testWidgets('muestra spinner de carga cuando el estado es PublicationLoading',
+  testWidgets('shows loading spinner when status is PublicationLoading',
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
       final state = PublicationLoading();
@@ -68,7 +66,7 @@ void main() {
   });
 
   testWidgets(
-      'muestra mensaje de error y botón Retry cuando el estado es PublicationFailure',
+      'shows error message and Retry button when status is PublicationFailure',
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
       final state = PublicationFailure();
@@ -78,7 +76,7 @@ void main() {
       expect(find.text('Failed to load posts'), findsOneWidget);
       expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
 
-      // Al pulsar Retry debe dispararse LoadPublications
+      // When tapping Retry, LoadPublications should be triggered
       await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
       await tester.pump();
       verify(() => mockBloc.add(LoadPublications())).called(1);
@@ -86,7 +84,7 @@ void main() {
   });
 
   testWidgets(
-      'muestra mensaje vacío cuando PublicationSuccess contiene lista vacía',
+      'shows empty message when PublicationSuccess contains empty list',
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
       final state = PublicationSuccess(
@@ -103,10 +101,10 @@ void main() {
   });
 
   testWidgets(
-      'renderiza items y spinner de carga al final cuando hasReachedMax es false',
+      'renders items and loading spinner at the end when hasReachedMax is false',
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
-      // Un solo post de ejemplo
+      // A single example post
       final pub = Publication(
         id: 1,
         username: 'user1',
@@ -126,10 +124,10 @@ void main() {
       await tester.pumpWidget(buildTestableWidget(state));
       await tester.pump();
 
-      // Debe encontrar la tarjeta
+      // Should find the card
       expect(find.byType(PublicationCard), findsOneWidget);
 
-      // Debe encontrar el spinner al final de la lista
+      // Should find the spinner at the end of the list
       expect(
         find.byWidgetPredicate((w) =>
             w is Padding &&
@@ -138,10 +136,10 @@ void main() {
         findsOneWidget,
       );
 
-      // Forzamos el scroll al final para disparar LoadMorePublications
+      // Force scroll at the end to trigger LoadMorePublications
       final listView = tester.widget<ListView>(find.byType(ListView));
       final controller = listView.controller!;
-      // Esperamos un frame para que esté todo montado
+      // Wait for a frame for everything to be mounted
       await tester.pump();
       controller.jumpTo(controller.position.maxScrollExtent + 300);
       await tester.pump(const Duration(milliseconds: 200));
@@ -151,7 +149,7 @@ void main() {
   });
 
   testWidgets(
-      'muestra "No more posts to show." cuando hasReachedMax es true',
+      'shows "No more posts to show." when hasReachedMax is true',
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
       final pub = Publication(
@@ -177,7 +175,7 @@ void main() {
     });
   });
 
-  testWidgets('renderiza SizedBox.shrink() para estados no manejados',
+  testWidgets('renders SizedBox.shrink() for unhandled states',
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
       final state = PublicationInitial();
