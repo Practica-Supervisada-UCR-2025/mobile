@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:mobile/src/profile/_children/_children.dart';
 import '../../src/profile/domain/domain.dart';
 import 'paths.dart';
 import 'router_utils.dart';

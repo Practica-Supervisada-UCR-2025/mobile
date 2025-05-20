@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/src/profile/_children/edit_profile/presenter/bloc/edit_profile_bloc.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileEditPage extends StatefulWidget {
@@ -32,7 +33,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     _lastNameController = TextEditingController(text: widget.user.lastName);
     _usernameController = TextEditingController(text: widget.user.username);
     _emailController = TextEditingController(text: widget.user.email);
-
     _setupTextControllerListeners();
   }
 
@@ -45,9 +45,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     ];
 
     for (final controller in controllers) {
-      controller.addListener(() {
-        _checkFormDirty();
-      });
+      controller.addListener(_checkFormDirty);
     }
   }
 
@@ -98,15 +96,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         updates['username'] = _usernameController.text;
       }
 
-      File? profilePicture;
-      if (_selectedImage != null) {
-        profilePicture = _selectedImage;
-      } else if (_isRemovingImage) {
+      if (_isRemovingImage) {
         updates['profile_picture'] = null;
       }
 
-      context.read<ProfileBloc>().add(
-        ProfileUpdate(updates: updates, profilePicture: profilePicture),
+      context.read<EditProfileBloc>().add(
+        EditProfileSubmitted(updates: updates, profilePicture: _selectedImage),
       );
     }
   }
@@ -120,10 +115,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
         actions: [
-          // Save button in app bar
-          BlocBuilder<ProfileBloc, ProfileState>(
+          BlocBuilder<EditProfileBloc, EditProfileState>(
             builder: (context, state) {
-              final isLoading = state is ProfileUpdating;
+              final isLoading = state is EditProfileUpdating;
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: TextButton.icon(
@@ -168,40 +162,43 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: BlocConsumer<ProfileBloc, ProfileState>(
+      body: BlocConsumer<EditProfileBloc, EditProfileState>(
         listener: (context, state) {
-          if (state is ProfileUpdateSuccess) {
+          if (state is EditProfileSuccess) {
+            // Update the profile in the ProfileBloc
+            context.read<ProfileBloc>().add(ProfileRefreshed(state.user));
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
                   children: [
-                    Icon(Icons.check_circle_outline, color: Colors.white),
-                    SizedBox(width: 8),
-                    Expanded(child: Text('Profile updated successfully')),
+                    const Icon(Icons.check_circle_outline, color: Colors.white),
+                    const SizedBox(width: 8),
+                    const Expanded(child: Text('Profile updated successfully')),
                   ],
                 ),
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.all(16),
+                margin: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
             );
             context.pop();
-          } else if (state is ProfileUpdateFailure) {
+          } else if (state is EditProfileFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
                   children: [
-                    Icon(Icons.error_outline, color: Colors.white),
-                    SizedBox(width: 8),
+                    const Icon(Icons.error_outline, color: Colors.white),
+                    const SizedBox(width: 8),
                     Expanded(child: Text('Update failed: ${state.error}')),
                   ],
                 ),
                 backgroundColor: Theme.of(context).colorScheme.error,
                 behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.all(16),
+                margin: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -222,9 +219,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       selectedImage: _selectedImage,
                       onImageSelected: _handleImageChanged,
                     ),
-
                     const SizedBox(height: 32),
-
                     EditProfileFields(
                       firstNameController: _firstNameController,
                       lastNameController: _lastNameController,

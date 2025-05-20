@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/auth/auth.dart';
+import 'package:mobile/src/profile/_children/edit_profile/domain/repository/edit_profile.repository.dart';
+import 'package:mobile/src/profile/_children/edit_profile/presenter/bloc/edit_profile_bloc.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'src/create/create.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
@@ -45,6 +47,9 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<PublicationRepository>(
           create: (context) => PublicationRepositoryAPI(),
         ),
+        RepositoryProvider<EditProfileRepository>(
+          create: (_) => EditProfileRepositoryImpl(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -75,14 +80,18 @@ class MyApp extends StatelessWidget {
                   profileRepository: context.read<ProfileRepository>(),
                 ),
           ),
-          BlocProvider<CreatePostBloc>(
-            create: (context) => CreatePostBloc(),
-          ),
+          BlocProvider<CreatePostBloc>(create: (context) => CreatePostBloc()),
           BlocProvider<PublicationBloc>(
             create:
                 (context) => PublicationBloc(
                   publicationRepository: context.read<PublicationRepository>(),
                 )..add(LoadPublications()),
+          ),
+          BlocProvider<EditProfileBloc>(
+            create:
+                (context) => EditProfileBloc(
+                  editProfileRepository: context.read<EditProfileRepository>(),
+                ),
           ),
         ],
         child: Builder(

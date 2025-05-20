@@ -20,3 +20,12 @@ class ProfileUpdate extends ProfileEvent {
   @override
   List<Object?> get props => [updates, profilePicture];
 }
+
+class ProfileRefreshed extends ProfileEvent {
+  final User user;
+
+  const ProfileRefreshed(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}

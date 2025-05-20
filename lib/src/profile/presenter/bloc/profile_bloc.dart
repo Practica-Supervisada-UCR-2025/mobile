@@ -15,6 +15,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc({required this.profileRepository}) : super(ProfileInitial()) {
     on<ProfileLoad>(_onProfileLoad);
     on<ProfileUpdate>(_onProfileUpdate);
+    on<ProfileRefreshed>((event, emit) {
+      emit(ProfileSuccess(user: event.user));
+    });
   }
 
   Future<void> _onProfileLoad(
