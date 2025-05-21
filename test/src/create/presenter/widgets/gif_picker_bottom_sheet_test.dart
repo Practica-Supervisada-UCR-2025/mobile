@@ -1,14 +1,13 @@
-// gif_picker_bottom_sheet_test.dart (REVISADO)
-import 'dart:async'; // Importante para Future.delayed
+
+import 'dart:async'; 
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile/src/create/create.dart'; // Ajusta esta ruta si es necesario
+import 'package:mobile/src/create/create.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
 import 'package:mobile/src/shared/models/trending_response.dart';
 import 'package:mobile/src/shared/services/tenor_gif_service.dart';
-import 'package:mobile/src/create/presenter/widgets/gif_picker_bottom_sheet.dart'; // Ajusta esta ruta
 import 'package:mocktail/mocktail.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
@@ -191,15 +190,13 @@ void main() {
         await tester.pumpWidget(buildTestableWidget(gifService: mockGifService, createPostBloc: mockCreatePostBloc));
         await tester.pumpAndSettle();
 
-        // Scroll hasta el final del primer conjunto de GIFs
         await tester.dragUntilVisible(
-          find.image(NetworkImage('http://example.com/gif11.gif')), // El último GIF de la primera página
+          find.image(NetworkImage('http://example.com/gif11.gif')),
           find.byType(GridView),
-          const Offset(0.0, -1000.0), // Ajusta la cantidad de scroll según sea necesario
+          const Offset(0.0, -1000.0),
         );
         await tester.pumpAndSettle();
 
-        // Verificar que el nuevo GIF se ha cargado
         expect(find.image(NetworkImage('http://example.com/gif12.gif')), findsOneWidget);
         verify(() => mockGifService.getTrendingGifs(pos: 'nextPage2')).called(1);
       });

@@ -65,16 +65,12 @@ class TenorGifService {
     if (response.statusCode == 200) {
       final dynamic decoded;
       try {
-        // Paso 1: Intentar decodificar el JSON
         decoded = json.decode(response.body);
       } catch (e, s) {
-        // Si json.decode falla, es un error de formato JSON.
         log('JSON decoding error in getTrendingGifs: $e\nStacktrace: $s', name: 'TenorGifService');
         throw Exception('Failed to load trending GIFs: Invalid JSON format');
       }
 
-      // Paso 2: Verificar la estructura del JSON decodificado.
-      // No necesitamos un try-catch aquí si las verificaciones son cuidadosas.
       if (decoded is Map) {
         if (decoded.containsKey('results') && decoded['results'] is List) {
           final List results = decoded['results'];
@@ -88,7 +84,6 @@ class TenorGifService {
           throw Exception('Failed to load trending GIFs: Missing "results" key in JSON or invalid structure');
         }
       } else {
-        // El JSON decodificado no es un mapa en absoluto.
         log('Decoded JSON is not a Map in getTrendingGifs. Actual type: ${decoded.runtimeType}. Value: $decoded', name: 'TenorGifService');
         throw Exception('Failed to load trending GIFs: JSON structure is not a Map'); // Podrías usar el mensaje de "invalid structure" también.
       }

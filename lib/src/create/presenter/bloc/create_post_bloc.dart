@@ -18,7 +18,6 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
       // Validar que el tamaño no sea mayor a 5MB (5 * 1024 * 1024 bytes)
       if (gif.sizeBytes != null && gif.sizeBytes! > 5 * 1024 * 1024) {
         // No emitir un nuevo estado si el tamaño es inválido
-        // log('GIF muy grande: ${gif.sizeBytes} bytes', name: 'CreatePostBloc');
         return;
       }
 

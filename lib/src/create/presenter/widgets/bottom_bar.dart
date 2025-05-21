@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile/core/core.dart'; // Assuming MediaPickerService, IMAGES_ALLOWED, MAX_IMAGE_SIZE are here
-import 'package:mobile/src/create/create.dart'; // Assuming CreatePostBloc, CreatePostState, GifPickerBottomSheet are here
+import 'package:mobile/core/core.dart'; 
+import 'package:mobile/src/create/create.dart';
 
 class BottomBar extends StatelessWidget {
   final Function(File?) onImageSelected;
@@ -18,8 +18,8 @@ class BottomBar extends StatelessWidget {
           SnackBar(content: Text(error)),
         );
       },
-      allowedExtensions: [...IMAGES_ALLOWED, 'gif'], // Make sure IMAGES_ALLOWED is defined
-      maxSizeInBytes: MAX_IMAGE_SIZE, // Make sure MAX_IMAGE_SIZE is defined
+      allowedExtensions: [...IMAGES_ALLOWED, 'gif'], 
+      maxSizeInBytes: MAX_IMAGE_SIZE,
     );
 
     if (image != null) {
@@ -35,8 +35,8 @@ class BottomBar extends StatelessWidget {
           SnackBar(content: Text(error)),
         );
       },
-      allowedExtensions: [...IMAGES_ALLOWED, 'gif'], // Make sure IMAGES_ALLOWED is defined
-      maxSizeInBytes: MAX_IMAGE_SIZE, // Make sure MAX_IMAGE_SIZE is defined
+      allowedExtensions: [...IMAGES_ALLOWED, 'gif'], 
+      maxSizeInBytes: MAX_IMAGE_SIZE,
     );
 
     if (photo != null) {
@@ -71,14 +71,14 @@ class BottomBar extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.image_outlined),
-              onPressed: () => _pickImageFromGallery(context), // From develop
+              onPressed: () => _pickImageFromGallery(context),
             ),
             IconButton(
-              icon: const Icon(Icons.camera_alt_outlined), // From develop
-              onPressed: () => _takePhoto(context),        // From develop
+              icon: const Icon(Icons.camera_alt_outlined),
+              onPressed: () => _takePhoto(context),       
             ),
             IconButton(
-              icon: const Icon(Icons.gif_box_outlined), // From HEAD
+              icon: const Icon(Icons.gif_box_outlined), 
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
@@ -88,7 +88,7 @@ class BottomBar extends StatelessWidget {
                   ),
                   builder: (_) => BlocProvider.value(
                     value: context.read<CreatePostBloc>(),
-                    child: const GifPickerBottomSheet(), // Assuming this is correctly imported/defined
+                    child: const GifPickerBottomSheet(),
                   ),
                 );
               },
@@ -96,9 +96,7 @@ class BottomBar extends StatelessWidget {
             const Spacer(),
             BlocBuilder<CreatePostBloc, CreatePostState>(
               builder: (context, state) {
-                // Assuming CreatePostState has a 'text' field
-                // final textLength = state.text.length; // From HEAD
-                final textLength = state.text.runes.length; // From develop (more accurate)
+                final textLength = state.text.runes.length;
                 final isOverLimit = textLength > 300;
 
                 return Text(

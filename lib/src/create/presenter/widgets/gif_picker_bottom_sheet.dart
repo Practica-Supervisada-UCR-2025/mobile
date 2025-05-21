@@ -1,6 +1,3 @@
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/src/create/create.dart';
@@ -21,7 +18,6 @@ class GifPickerBottomSheet extends StatefulWidget {
 
 class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
   final _searchController = TextEditingController();
-  // final _gifService = TenorGifService();
   final ScrollController _scrollController = ScrollController();
 
   List<GifModel> _gifs = [];
