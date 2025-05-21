@@ -71,7 +71,6 @@ class PostTextField extends StatelessWidget {
                         right: 4,
                         child: GestureDetector(
                           onTap: () {
-                            debugPrint('❌ Eliminando GIF');
                             context.read<CreatePostBloc>().add(GifRemoved());
                           },
                           child: Container(
