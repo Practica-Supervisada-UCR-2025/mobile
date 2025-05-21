@@ -45,32 +45,19 @@ class EditProfileRepositoryImpl implements EditProfileRepository {
     Map<String, dynamic> updates,
     File imageFile,
   ) async {
-    // Check file size (max 4MB)
-    final fileSize = await imageFile.length();
-    if (fileSize > 4 * 1024 * 1024) {
-      throw Exception('Image size exceeds 4MB limit');
-    }
+    final uri = Uri.parse('$API_BASE_URL/user/auth/profile');
+    final request = http.MultipartRequest('PATCH', uri);
 
-    // Create multipart request
-    final request = http.MultipartRequest(
-      'PATCH',
-      Uri.parse('$API_BASE_URL/user/auth/profile'),
-    );
-
-    // Set headers
     request.headers['Authorization'] = 'Bearer $token';
 
-    // Add text fields for profile updates
     updates.forEach((key, value) {
       if (value != null) {
         request.fields[key] = value.toString();
       }
     });
 
-    // Detect mime type
     final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
 
-    // Add file to request with correct field name
     request.files.add(
       await http.MultipartFile.fromPath(
         'profile_picture',
@@ -79,13 +66,11 @@ class EditProfileRepositoryImpl implements EditProfileRepository {
       ),
     );
 
-    // Send request
-    final streamedResponse = await request.send();
+    final streamedResponse = await client.send(request);
     final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return User.fromJson(data);
+      return User.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to update user profile: ${response.body}');
     }
