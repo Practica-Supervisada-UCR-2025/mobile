@@ -53,6 +53,7 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
       image: image,
       isOverLimit: state.isOverLimit,
       isValid: isValid,
+      selectedGif: state.selectedGif,
     ));
   }
 }
