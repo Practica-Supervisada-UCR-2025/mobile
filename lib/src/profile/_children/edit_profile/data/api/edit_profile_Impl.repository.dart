@@ -8,19 +8,19 @@ import 'package:mime/mime.dart';
 
 class EditProfileRepositoryImpl implements EditProfileRepository {
   final http.Client client;
+  final String token = LocalStorage().accessToken;
 
   EditProfileRepositoryImpl({http.Client? client})
     : client = client ?? http.Client();
 
   @override
   Future<User> updateUserProfile(
-    String token,
     Map<String, dynamic> updates, {
     File? profilePicture,
   }) async {
     // If there's a profile picture to upload, use multipart/form-data request
     if (profilePicture != null) {
-      return _updateWithProfilePicture(token, updates, profilePicture);
+      return _updateWithProfilePicture(updates, profilePicture);
     }
 
     final response = await client.patch(
@@ -41,7 +41,6 @@ class EditProfileRepositoryImpl implements EditProfileRepository {
   }
 
   Future<User> _updateWithProfilePicture(
-    String token,
     Map<String, dynamic> updates,
     File imageFile,
   ) async {
