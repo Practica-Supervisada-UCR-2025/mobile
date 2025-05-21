@@ -27,6 +27,7 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
         event.updates,
         profilePicture: event.profilePicture,
       );
+
       emit(EditProfileSuccess(user: updatedUser));
     } catch (e) {
       emit(EditProfileFailure(error: e.toString()));

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/src/profile/_children/edit_profile/presenter/bloc/edit_profile_bloc.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileEditPage extends StatefulWidget {
@@ -165,7 +164,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       body: BlocConsumer<EditProfileBloc, EditProfileState>(
         listener: (context, state) {
           if (state is EditProfileSuccess) {
-            // Update the profile in the ProfileBloc
             context.read<ProfileBloc>().add(ProfileRefreshed(state.user));
 
             ScaffoldMessenger.of(context).showSnackBar(
@@ -185,7 +183,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 ),
               ),
             );
-            context.pop();
+            context.pop(true);
           } else if (state is EditProfileFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

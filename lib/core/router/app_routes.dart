@@ -15,16 +15,7 @@ import '../../src/profile/presenter/presenter.dart';
 import '../../src/settings/presenter/presenter.dart';
 
 final List<RouteBase> appRoutes = [
-  GoRoute(
-    path: Paths.login,
-    builder: (context, state) => const LoginPage(),
-    /* BLOC
-    builder: (context, state) => BlocProvider.value(
-      value: _blocValue,
-      child: LoginScreen(),
-    ),
-    */
-  ),
+  GoRoute(path: Paths.login, builder: (context, state) => const LoginPage()),
   GoRoute(
     path: Paths.register,
     builder: (context, state) => const RegisterPage(),
