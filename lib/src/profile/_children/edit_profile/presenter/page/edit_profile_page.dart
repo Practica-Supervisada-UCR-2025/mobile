@@ -18,7 +18,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _usernameController;
-  late TextEditingController _emailController;
   final _formKey = GlobalKey<FormState>();
   bool _isFormDirty = false;
 
@@ -31,7 +30,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     _firstNameController = TextEditingController(text: widget.user.firstName);
     _lastNameController = TextEditingController(text: widget.user.lastName);
     _usernameController = TextEditingController(text: widget.user.username);
-    _emailController = TextEditingController(text: widget.user.email);
     _setupTextControllerListeners();
   }
 
@@ -40,7 +38,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       _firstNameController,
       _lastNameController,
       _usernameController,
-      _emailController,
     ];
 
     for (final controller in controllers) {
@@ -53,7 +50,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         _firstNameController.text != widget.user.firstName ||
         _lastNameController.text != widget.user.lastName ||
         _usernameController.text != widget.user.username ||
-        _emailController.text != widget.user.email ||
         _selectedImage != null ||
         _isRemovingImage;
 
@@ -77,7 +73,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _usernameController.dispose();
-    _emailController.dispose();
     super.dispose();
   }
 
@@ -222,7 +217,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       firstNameController: _firstNameController,
                       lastNameController: _lastNameController,
                       usernameController: _usernameController,
-                      emailController: _emailController,
                       formKey: _formKey,
                     ),
                   ],

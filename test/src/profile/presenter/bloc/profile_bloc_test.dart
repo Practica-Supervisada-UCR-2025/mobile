@@ -84,5 +84,40 @@ void main() {
         verify(mockProfileRepository.getCurrentUser(any)).called(1);
       },
     );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'should emit [ProfileSuccess] when ProfileRefreshed event is added',
+      build: () {
+        return profileBloc;
+      },
+      act: (bloc) => bloc.add(ProfileRefreshed(testUser)),
+      expect:
+          () => [
+            isA<ProfileSuccess>().having(
+              (state) => state.user,
+              'user',
+              testUser,
+            ),
+          ],
+    );
+  });
+
+  group('ProfileEvent Props', () {
+    test('ProfileLoad props should be empty', () {
+      const event = ProfileLoad();
+      expect(event.props, []);
+    });
+
+    test('ProfileRefreshed props should contain user', () {
+      final user = User(
+        firstName: "user",
+        lastName: "name",
+        username: "user1",
+        email: "user@ucr.ac.cr",
+        image: "https://dummyjson.com/icon/emilys/128",
+      );
+      final event = ProfileRefreshed(user);
+      expect(event.props, [user]);
+    });
   });
 }
