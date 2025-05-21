@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -247,6 +249,213 @@ void main() {
 
       await tester.pumpAndSettle();
       expect(find.text('Profile updated successfully'), findsOneWidget);
+    });
+
+    testWidgets('should call _saveChanges when save button is pressed', (
+      WidgetTester tester,
+    ) async {
+      // Setup mock repository response
+      when(
+        mockEditProfileRepository.updateUserProfile(
+          any,
+          profilePicture: anyNamed('profilePicture'),
+        ),
+      ).thenAnswer((_) async => updatedUser);
+
+      final editBloc = EditProfileBloc(
+        editProfileRepository: mockEditProfileRepository,
+      );
+      final profileBloc = ProfileBloc(profileRepository: mockProfileRepository);
+
+      // Create a mock navigation observer
+      final mockObserver = MockNavigatorObserver();
+
+      // Create router with two routes to simulate proper navigation stack
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder:
+                (context, state) => Scaffold(
+                  body: Center(
+                    child: ElevatedButton(
+                      onPressed: () => context.push('/edit'),
+                      child: const Text('Navigate to Edit'),
+                    ),
+                  ),
+                ),
+          ),
+          GoRoute(
+            path: '/edit',
+            builder:
+                (context, state) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider.value(value: editBloc),
+                    BlocProvider.value(value: profileBloc),
+                  ],
+                  child: ProfileEditPage(user: testUser),
+                ),
+          ),
+        ],
+        observers: [mockObserver],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+      // First navigate to the edit page to establish a navigation stack
+      await tester.tap(find.text('Navigate to Edit'));
+      await tester.pumpAndSettle();
+
+      // Make form dirty
+      await tester.enterText(find.byType(TextField).first, 'Jane');
+      await tester.pump();
+
+      // edit userName
+      await tester.enterText(find.byType(TextField).at(2), 'jane6');
+      await tester.pump();
+
+      // Tap save button
+      await tester.tap(find.byKey(const Key('save_button')));
+      await tester.pump();
+
+      // Verify the repository method was called
+      verify(
+        mockEditProfileRepository.updateUserProfile(
+          any,
+          profilePicture: anyNamed('profilePicture'),
+        ),
+      ).called(1);
+
+      // Verify the bloc state transitioned to success
+      expect(editBloc.state, isA<EditProfileSuccess>());
+    });
+
+    testWidgets('should handle image selection and mark form as dirty', (
+      WidgetTester tester,
+    ) async {
+      final editBloc = EditProfileBloc(
+        editProfileRepository: mockEditProfileRepository,
+      );
+      final profileBloc = ProfileBloc(profileRepository: mockProfileRepository);
+      final mockImageFile = File('test/test_assets/fake_image.jpg');
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: editBloc),
+              BlocProvider.value(value: profileBloc),
+            ],
+            child: ProfileEditPage(user: testUser),
+          ),
+        ),
+      );
+
+      // Verify initial state - save button should be disabled
+      expect(
+        tester
+            .widget<TextButton>(find.byKey(const Key('save_button')))
+            .onPressed,
+        isNull,
+      );
+
+      // Find the ProfileImagePicker widget
+      final imagePickerFinder = find.byType(ProfileImagePicker);
+      expect(imagePickerFinder, findsOneWidget);
+
+      // Get the widget instance and call the callback directly
+      final imagePicker = tester.widget<ProfileImagePicker>(imagePickerFinder);
+      imagePicker.onImageSelected(mockImageFile);
+      await tester.pump();
+
+      // Verify form is now dirty (save button enabled)
+      expect(
+        tester
+            .widget<TextButton>(find.byKey(const Key('save_button')))
+            .onPressed,
+        isNotNull,
+      );
+    });
+
+    testWidgets('should include image in updates when saving', (
+      WidgetTester tester,
+    ) async {
+      final mockImageFile = File('test/test_assets/fake_image.jpg');
+      final editBloc = EditProfileBloc(
+        editProfileRepository: mockEditProfileRepository,
+      );
+      final profileBloc = ProfileBloc(profileRepository: mockProfileRepository);
+      final mockObserver = MockNavigatorObserver();
+
+      // Setup mock to capture the profilePicture parameter
+      when(
+        mockEditProfileRepository.updateUserProfile(
+          any,
+          profilePicture: captureAnyNamed('profilePicture'),
+        ),
+      ).thenAnswer((_) async => updatedUser);
+
+      // Create router with navigation stack
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder:
+                (context, state) => Scaffold(
+                  body: Center(
+                    child: ElevatedButton(
+                      onPressed: () => context.push('/edit'),
+                      child: const Text('Navigate to Edit'),
+                    ),
+                  ),
+                ),
+          ),
+          GoRoute(
+            path: '/edit',
+            builder:
+                (context, state) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider.value(value: editBloc),
+                    BlocProvider.value(value: profileBloc),
+                  ],
+                  child: ProfileEditPage(user: testUser),
+                ),
+          ),
+        ],
+        observers: [mockObserver],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+      // First navigate to the edit page to establish a navigation stack
+      await tester.tap(find.text('Navigate to Edit'));
+      await tester.pumpAndSettle();
+
+      // Select an image
+      final imagePicker = tester.widget<ProfileImagePicker>(
+        find.byType(ProfileImagePicker),
+      );
+      imagePicker.onImageSelected(mockImageFile);
+      await tester.pump();
+
+      // Make another change to ensure form is dirty
+      await tester.enterText(find.byType(TextField).first, 'Jane');
+      await tester.pump();
+
+      // Save the changes
+      await tester.tap(find.byKey(const Key('save_button')));
+      await tester.pump();
+
+      // Verify the image was included in the update
+      final captured =
+          verify(
+            mockEditProfileRepository.updateUserProfile(
+              any,
+              profilePicture: captureAnyNamed('profilePicture'),
+            ),
+          ).captured;
+
+      expect(captured.last, equals(mockImageFile));
     });
   });
 }
