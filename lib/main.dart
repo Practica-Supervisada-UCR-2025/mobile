@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/auth/auth.dart';
-import 'package:mobile/src/profile/_children/edit_profile/domain/repository/edit_profile.repository.dart';
-import 'package:mobile/src/profile/_children/edit_profile/presenter/bloc/edit_profile_bloc.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'src/create/create.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
@@ -47,8 +45,13 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<PublicationRepository>(
           create: (context) => PublicationRepositoryAPI(),
         ),
+        RepositoryProvider<ApiService>(create: (_) => ApiServiceImpl()),
+
         RepositoryProvider<EditProfileRepository>(
-          create: (_) => EditProfileRepositoryImpl(),
+          create:
+              (context) => EditProfileRepositoryImpl(
+                apiService: context.read<ApiService>(),
+              ),
         ),
       ],
       child: MultiBlocProvider(
