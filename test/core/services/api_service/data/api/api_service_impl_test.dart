@@ -10,8 +10,6 @@ import 'api_service_impl_test.mocks.dart';
 
 // Mock classes
 @GenerateMocks([http.Client, LocalStorage])
-class MockHttpClient extends Mock implements http.Client {}
-
 void main() {
   late MockClient mockClient;
   late MockLocalStorage mockLocalStorage;
