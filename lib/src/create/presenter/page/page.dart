@@ -1,3 +1,4 @@
+import 'dart:async'; // Necesario para StreamSubscription
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,24 +7,19 @@ import 'package:mobile/src/create/create.dart';
 
 class CreatePageController {
   final CreatePostBloc bloc;
-  File? selectedImage;
-  final Function(File?) onImageChanged;
+  final Function(File?) onImageSelectedByPicker; 
   
   CreatePageController({
     required this.bloc,
-    required this.onImageChanged,
+    required this.onImageSelectedByPicker,
   });
-  
-  void handleImageSelected(File? image) {
-    selectedImage = image;
+
+  void handleImagePicked(File? image) {
     bloc.add(PostImageChanged(image));
-    onImageChanged(image);
   }
-  
+
   void removeImage() {
-    selectedImage = null;
     bloc.add(const PostImageChanged(null));
-    onImageChanged(null);
   }
 }
 
@@ -36,31 +32,45 @@ class CreatePage extends StatefulWidget {
 
 class _CreatePageState extends State<CreatePage> {
   final _textController = TextEditingController();
-  File? _selectedImage;
+  File? _selectedImageFromPage;
   final _bloc = CreatePostBloc();
   late final CreatePageController _controller;
-  
+  StreamSubscription<CreatePostState>? _blocStateSubscription;
+
   @override
   void initState() {
     super.initState();
     _controller = CreatePageController(
       bloc: _bloc,
-      onImageChanged: (image) {
-        setState(() {
-          _selectedImage = image;
-        });
+      onImageSelectedByPicker: (image) {
       },
     );
-    
-    _textController.addListener(() {
+
+    _blocStateSubscription = _bloc.stream.listen((newState) {
+      if (mounted) {
+        if (_selectedImageFromPage?.path != newState.image?.path) {
+          setState(() {
+            _selectedImageFromPage = newState.image;
+          });
+        }
+      }
     });
   }
 
   @override
   void dispose() {
     _textController.dispose();
+    _blocStateSubscription?.cancel();
     _bloc.close();
     super.dispose();
+  }
+
+  void _onImageSelectedFromPicker(File? imageFile) {
+    _bloc.add(PostImageChanged(imageFile));
+  }
+
+  void _onRemoveImageFromPostWidget() {
+    _bloc.add(const PostImageChanged(null));
   }
 
   @override
@@ -74,7 +84,7 @@ class _CreatePageState extends State<CreatePage> {
           backgroundColor: Theme.of(context).colorScheme.surface,
           elevation: 0,
           scrolledUnderElevation: 0,
-          title: const TopActions(),
+          title: const TopActions(), 
         ),
         body: SafeArea(
           bottom: false,
@@ -85,26 +95,21 @@ class _CreatePageState extends State<CreatePage> {
                   child: Column(
                     children: [
                       PostTextField(textController: _textController),
-                      
-                      if (_selectedImage != null)
+
+                      if (_selectedImageFromPage != null)
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 2.0),
                           child: PostImage(
-                            key: ValueKey<String>(_selectedImage?.path ?? ''),
-                            image: _selectedImage,
-                            onRemove: _controller.removeImage,
+                            key: ValueKey<String>(_selectedImageFromPage!.path),
+                            image: _selectedImageFromPage,
+                            onRemove: _onRemoveImageFromPostWidget,
                           ),
                         ),
                     ],
                   ),
                 ),
               ),
-              BlocSelector<CreatePostBloc, CreatePostState, int>(
-                selector: (state) => state.text.length,
-                builder: (context, textLength) {
-                  return BottomBar(onImageSelected: _controller.handleImageSelected);
-                },
-              ),
+              BottomBar(onImageSelected: _onImageSelectedFromPicker),
             ],
           ),
         ),
