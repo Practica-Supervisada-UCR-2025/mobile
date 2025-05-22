@@ -42,8 +42,6 @@ class _PostImageState extends State<PostImage> {
   @override
   Widget build(BuildContext context) {
     if (widget.image == null) return const SizedBox();
-      print('🔍 PostImage is building with image: ${widget.image?.path}');
-
     return Stack(
       key: widget.image != null ? ValueKey<String>(widget.image!.path) : null,
       alignment: Alignment.topRight,
