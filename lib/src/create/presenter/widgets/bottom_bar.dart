@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/core.dart'; 
 import 'package:mobile/src/create/create.dart';
+import 'package:mobile/src/shared/models/gif_model.dart';
 
 class BottomBar extends StatelessWidget {
   final Function(File?) onImageSelected;
@@ -44,6 +45,14 @@ class BottomBar extends StatelessWidget {
     }
   }
 
+  Future<void> _pickGifFromMediaPicker(BuildContext context) async {
+    final GifModel? gif = await MediaPickerService.pickGifFromTenor(context: context);
+
+    if (gif != null) {
+      context.read<CreatePostBloc>().add(PostGifChanged(gif));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -78,20 +87,8 @@ class BottomBar extends StatelessWidget {
               onPressed: () => _takePhoto(context),       
             ),
             IconButton(
-              icon: const Icon(Icons.gif_box_outlined), 
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                  ),
-                  builder: (_) => BlocProvider.value(
-                    value: context.read<CreatePostBloc>(),
-                    child: const GifPickerBottomSheet(),
-                  ),
-                );
-              },
+              icon: const Icon(Icons.gif_box_outlined),
+              onPressed: () => _pickGifFromMediaPicker(context),
             ),
             const Spacer(),
             BlocBuilder<CreatePostBloc, CreatePostState>(
