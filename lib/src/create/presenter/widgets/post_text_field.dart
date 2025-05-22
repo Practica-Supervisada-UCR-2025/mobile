@@ -33,7 +33,6 @@ class PostTextField extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               if (state.selectedGif != null)
-                // Contenedor para el GIF con restricciones de tamaño
                 SizedBox(
                   height: 200,
                   width: double.infinity,
@@ -71,7 +70,7 @@ class PostTextField extends StatelessWidget {
                         right: 4,
                         child: GestureDetector(
                           onTap: () {
-                            context.read<CreatePostBloc>().add(GifRemoved());
+                            context.read<CreatePostBloc>().add(const PostGifChanged(null));
                           },
                           child: Container(
                             decoration: const BoxDecoration(
