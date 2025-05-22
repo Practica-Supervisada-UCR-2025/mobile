@@ -1,4 +1,4 @@
-import 'dart:async'; // Necesario para StreamSubscription
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ import 'package:mobile/src/create/create.dart';
 class CreatePageController {
   final CreatePostBloc bloc;
   final Function(File?) onImageSelectedByPicker; 
-  
+
   CreatePageController({
     required this.bloc,
     required this.onImageSelectedByPicker,
@@ -34,18 +34,11 @@ class _CreatePageState extends State<CreatePage> {
   final _textController = TextEditingController();
   File? _selectedImageFromPage;
   final _bloc = CreatePostBloc();
-  late final CreatePageController _controller;
   StreamSubscription<CreatePostState>? _blocStateSubscription;
 
   @override
   void initState() {
     super.initState();
-    _controller = CreatePageController(
-      bloc: _bloc,
-      onImageSelectedByPicker: (image) {
-      },
-    );
-
     _blocStateSubscription = _bloc.stream.listen((newState) {
       if (mounted) {
         if (_selectedImageFromPage?.path != newState.image?.path) {
