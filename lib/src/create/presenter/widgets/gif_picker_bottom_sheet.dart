@@ -139,7 +139,7 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
                 border: OutlineInputBorder(),
               ),
               onSubmitted: _search,
-              onChanged: (value) { // Agregar onChanged
+              onChanged: (value) {
                 if (value.trim().isEmpty) {
                   _loadTrending();
                 }
@@ -163,7 +163,7 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
                     final gif = _gifs[index];
                     return GestureDetector(
                       onTap: () {
-                        context.read<CreatePostBloc>().add(GifSelected(gif));
+                        context.read<CreatePostBloc>().add(PostGifChanged(gif));
                         Navigator.pop(context);
                       },
                       child: Image.network(
