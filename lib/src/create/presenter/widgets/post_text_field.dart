@@ -80,7 +80,7 @@ class PostTextField extends StatelessWidget {
                             padding: const EdgeInsets.all(5),
                             child: const Icon(
                               Icons.close,
-                              size: 16, // Tamaño del icono
+                              size: 16,
                               color: Colors.white,
                             ),
                           ),
