@@ -105,13 +105,12 @@ void main() {
       ],
     );
 
-    // TEST CORREGIDO
     blocTest<CreatePostBloc, CreatePostState>(
       'should emit new state with selectedGif when GifSelected is added',
       build: () => createPostBloc,
       act: (bloc) {
         final gif = GifModel(id: '123', tinyGifUrl: 'https://media.tenor.com/sample.gif');
-        bloc.add(GifSelected(gif));
+        bloc.add(PostGifChanged(gif));
       },
       expect: () => [
         isA<CreatePostChanged>() 
@@ -120,8 +119,18 @@ void main() {
             .having((state) => state.selectedGif?.id, 'selectedGif.id', '123')
             .having((state) => state.selectedGif?.tinyGifUrl, 'selectedGif.tinyGifUrl', 'https://media.tenor.com/sample.gif') 
             .having((state) => state.isOverLimit, 'isOverLimit', false) 
-            .having((state) => state.isValid, 'isValid', false), 
+            .having((state) => state.isValid, 'isValid', true), 
       ],
+    );
+
+    blocTest<CreatePostBloc, CreatePostState>(
+      'should not emit new state when GIF is too large',
+      build: () => createPostBloc,
+      act: (bloc) {
+        final largeGif = GifModel(id: 'big', tinyGifUrl: 'url', sizeBytes: 6 * 1024 * 1024);
+        bloc.add(PostGifChanged(largeGif));
+      },
+      expect: () => [],
     );
 
     test('CreatePostChanged.copyWith returns new instance with updated values', () {
