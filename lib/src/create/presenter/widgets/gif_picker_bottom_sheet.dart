@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile/src/create/create.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
 import 'package:mobile/src/shared/services/tenor_gif_service.dart';
 
 class GifPickerBottomSheet extends StatefulWidget {
   final TenorGifService? gifService;
+  final void Function(GifModel gif) onGifSelected;
 
   const GifPickerBottomSheet({
     super.key,
     this.gifService,
+    required this.onGifSelected,
   });
 
   @override
@@ -25,15 +25,19 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
   bool _isLoadingMore = false;
   int _currentPage = 0;
   String? _currentQuery;
-  String? _nextTrendingPos;
+  String? _nextTrendingPos; 
   late final TenorGifService _gifService;
-
 
   @override
   void initState() {
     super.initState();
     _gifService = widget.gifService ?? TenorGifService();
     _loadTrending();
+    _searchController.addListener(() {
+      if (_searchController.text.trim().isEmpty && _currentQuery != null) {
+        _loadTrending();
+      }
+    });
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100 && !_isLoadingMore) {
         _loadMoreGifs();
@@ -42,12 +46,11 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
   }
 
   Future<void> _loadTrending() async {
+    if(!mounted) return;
+    setState(() => _loading = true);
     try {
-      _currentQuery = null;
-      _currentPage = 0;
-      _nextTrendingPos = null;
-
-      final response = await _gifService.getTrendingGifs();
+      _currentQuery = null; 
+      final response = await _gifService.getTrendingGifs(pos: null);
       if (mounted) {
         setState(() {
           _gifs = response.gifs;
@@ -65,19 +68,21 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
     }
   }
 
-
-
   Future<void> _search(String query) async {
-    if (query.trim().isEmpty) return;
-
+    if (query.trim().isEmpty) {
+      _loadTrending(); 
+      return;
+    }
+    if(!mounted) return;
     setState(() => _loading = true);
     try {
       _currentQuery = query;
-      _currentPage = 0;
+      _currentPage = 0; 
       final gifs = await _gifService.searchGifs(query, pos: _currentPage);
       if (mounted) {
         setState(() {
           _gifs = gifs;
+          _nextTrendingPos = null; 
           _loading = false;
         });
       }
@@ -92,36 +97,41 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
   }
 
   Future<void> _loadMoreGifs() async {
-    if (_isLoadingMore) return;
-    _isLoadingMore = true;
+    if (_isLoadingMore || !mounted) return;
+    setState(() => _isLoadingMore = true);
 
     try {
-      List<GifModel> more;
-
-      if (_currentQuery != null) {
+      List<GifModel> moreGifs = [];
+      if (_currentQuery != null) { 
         _currentPage++;
-        more = await _gifService.searchGifs(_currentQuery!, pos: _currentPage);
+        final List<GifModel> newSearchGifs = await _gifService.searchGifs(_currentQuery!, pos: _currentPage);
+        moreGifs.addAll(newSearchGifs);
       } else if (_nextTrendingPos != null) {
         final response = await _gifService.getTrendingGifs(pos: _nextTrendingPos);
-        more = response.gifs;
+        moreGifs.addAll(response.gifs);
         _nextTrendingPos = response.next;
-      } else {
-        more = [];
       }
 
       if (mounted) {
         setState(() {
-          _gifs.addAll(more);
+          _gifs.addAll(moreGifs);
         });
       }
     } catch (e) {
       debugPrint('Error loading more GIFs: $e');
     } finally {
-      _isLoadingMore = false;
+      if (mounted) {
+        setState(() => _isLoadingMore = false);
+      }
     }
   }
 
-
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,28 +157,39 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
             ),
             const SizedBox(height: 16),
             if (_loading)
-              const CircularProgressIndicator()
+              const Center(child: CircularProgressIndicator())
+            else if (_gifs.isEmpty)
+               const Center(child: Text("No GIFs found.")) 
             else
               SizedBox(
                 height: 300,
                 child: GridView.builder(
                   controller: _scrollController,
-                  itemCount: _gifs.length,
+                  itemCount: _gifs.length + (_isLoadingMore ? 1 : 0), 
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
                   ),
                   itemBuilder: (_, index) {
+                    if (index == _gifs.length && _isLoadingMore) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
                     final gif = _gifs[index];
                     return GestureDetector(
                       onTap: () {
-                        context.read<CreatePostBloc>().add(PostGifChanged(gif));
-                        Navigator.pop(context);
+                        widget.onGifSelected(gif);
                       },
                       child: Image.network(
                         gif.tinyGifUrl,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
+                          return const Center(child: CircularProgressIndicator());
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.error_outline);
+                        },
                       ),
                     );
                   },
