@@ -12,47 +12,61 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
 
   CreatePostBloc() : super(const CreatePostInitial()) {
     on<PostTextChanged>(_onTextChanged);
-    on<GifSelected>((event, emit) {
-      final gif = event.gif;
-
-      // Validar que el tamaño no sea mayor a 5MB (5 * 1024 * 1024 bytes)
-      if (gif.sizeBytes != null && gif.sizeBytes! > 5 * 1024 * 1024) {
-        // No emitir un nuevo estado si el tamaño es inválido
-        return;
-      }
-
-      emit(state.copyWith(selectedGif: gif));
-    });
-    on<GifRemoved>((event, emit) {
-      emit(state.copyWith(selectedGif: null));
-    });
     on<PostImageChanged>(_onImageChanged);
+    on<PostGifChanged>(_onGifChanged);
   }
+
   void _onTextChanged(PostTextChanged event, Emitter<CreatePostState> emit) {
     final text = event.text;
     final isOverLimit = text.runes.length > maxLength;
-    final isValid = !isOverLimit && (text.isNotEmpty || state.image != null);
+    final isValid = !isOverLimit && (text.isNotEmpty || state.image != null || state.selectedGif != null);
 
     emit(CreatePostChanged(
       text: text,
-      image: state.image,
+      image: state.image, 
       isOverLimit: isOverLimit,
       isValid: isValid,
-      selectedGif: state.selectedGif,
+      selectedGif: state.selectedGif, 
     ));
   }
 
   void _onImageChanged(PostImageChanged event, Emitter<CreatePostState> emit) {
-    final image = event.image;
-     
-    final isValid = !state.isOverLimit && (image != null || state.text.isNotEmpty);
-    
+    final newImage = event.image;
+    final newSelectedGif = null; 
+
+    final currentText = state.text;
+    final isOverLimit = state.isOverLimit;
+
+    final isValid = !isOverLimit && (currentText.isNotEmpty || newImage != null || newSelectedGif != null);
+
     emit(CreatePostChanged(
-      text: state.text,
-      image: image,
-      isOverLimit: state.isOverLimit,
+      text: currentText,
+      image: newImage,
+      isOverLimit: isOverLimit,
       isValid: isValid,
-      selectedGif: state.selectedGif,
+      selectedGif: newSelectedGif,
+    ));
+  }
+
+  void _onGifChanged(PostGifChanged event, Emitter<CreatePostState> emit) {
+    final newSelectedGif = event.gif;
+
+    if (newSelectedGif != null && newSelectedGif.sizeBytes != null && newSelectedGif.sizeBytes! > 5 * 1024 * 1024) {
+      return; 
+    }
+
+    final newImage = null; 
+    final currentText = state.text; 
+    final isOverLimit = state.isOverLimit; 
+
+    final isValid = !isOverLimit && (currentText.isNotEmpty || newImage != null || newSelectedGif != null);
+
+    emit(CreatePostChanged(
+      text: currentText,
+      image: newImage,
+      isOverLimit: isOverLimit,
+      isValid: isValid,
+      selectedGif: newSelectedGif,
     ));
   }
 }
