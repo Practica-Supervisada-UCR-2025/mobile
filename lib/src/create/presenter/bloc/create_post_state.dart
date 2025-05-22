@@ -1,8 +1,5 @@
 part of 'create_post_bloc.dart';
 
-// Objeto centinela para el método copyWith.
-// Se usa para diferenciar cuando un argumento no se pasa en absoluto
-// de cuando un argumento se pasa explícitamente como null.
 const Object _noValueSentinel = Object();
 
 sealed class CreatePostState extends Equatable {
@@ -21,11 +18,8 @@ sealed class CreatePostState extends Equatable {
   });
 
   @override
-  // Combinamos los props de ambas ramas
   List<Object?> get props => [text, image, isOverLimit, isValid, selectedGif];
 
-  // Declaración del método copyWith combinada.
-  // Las implementaciones están en las subclases.
   CreatePostState copyWith({
     String? text,
     dynamic image = _noValueSentinel, 
@@ -69,7 +63,6 @@ final class CreatePostInitial extends CreatePostState {
       return this;
     }
     
-    // Si se especifica algún cambio, transiciona a CreatePostChanged.
     return CreatePostChanged(
       text: text ?? this.text,
       image: newImage, 
