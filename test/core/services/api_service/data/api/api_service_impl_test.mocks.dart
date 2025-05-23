@@ -283,6 +283,17 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
           as String);
 
   @override
+  String get userProfilePicture =>
+      (super.noSuchMethod(
+            Invocation.getter(#userProfilePicture),
+            returnValue: _i5.dummyValue<String>(
+              this,
+              Invocation.getter(#userProfilePicture),
+            ),
+          )
+          as String);
+
+  @override
   bool get isLoggedIn =>
       (super.noSuchMethod(Invocation.getter(#isLoggedIn), returnValue: false)
           as bool);
@@ -314,6 +325,12 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   @override
   set userEmail(String? email) => super.noSuchMethod(
     Invocation.setter(#userEmail, email),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set userProfilePicture(String? picture) => super.noSuchMethod(
+    Invocation.setter(#userProfilePicture, picture),
     returnValueForMissingStub: null,
   );
 

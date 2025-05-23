@@ -122,7 +122,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get userProfilePicture =>
       (super.noSuchMethod(
             Invocation.getter(#userProfilePicture),
-            returnValue: _i8.dummyValue<String>(
+            returnValue: _i7.dummyValue<String>(
               this,
               Invocation.getter(#userProfilePicture),
             ),
