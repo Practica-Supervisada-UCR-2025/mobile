@@ -34,7 +34,9 @@ class MyApp extends StatelessWidget {
           create: (_) => LogoutLocalRepository(LocalStorage()),
         ),
         RepositoryProvider<PermissionsRepository>(
-          create: (_) => PermissionsRepositoryImpl(),
+          create: (_) => PermissionsRepositoryImpl(
+            permissionService: PermissionServiceImpl(),
+          ),
         ),
         RepositoryProvider<ProfileRepository>(
           create: (context) => ProfileRepositoryAPI(),

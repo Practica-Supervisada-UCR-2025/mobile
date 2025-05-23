@@ -3,11 +3,12 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/core/constants/constants.dart';
+import 'package:mobile/core/storage/user_session.storage.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mobile/src/profile/profile.dart';
 
-@GenerateMocks([http.Client])
+@GenerateMocks([http.Client, LocalStorage])
 import 'profile_dummy_repository_test.mocks.dart';
 
 class MockFile extends Mock implements File {}
@@ -15,9 +16,15 @@ class MockFile extends Mock implements File {}
 void main() {
   late MockClient mockClient;
   late ProfileRepositoryAPI repository;
+  late MockLocalStorage mockLocalStorage;
 
   setUp(() {
     mockClient = MockClient();
+    mockLocalStorage = MockLocalStorage();
+    when(mockLocalStorage.userId).thenReturn('1');
+    when(mockLocalStorage.accessToken).thenReturn('token');
+    when(mockLocalStorage.refreshToken).thenReturn('refreshToken');
+    when(mockLocalStorage.username).thenReturn('test');
     repository = ProfileRepositoryAPI(client: mockClient);
   });
 
@@ -35,7 +42,7 @@ void main() {
           'profile_picture': 'https://dummyjson.com/icon/emilys/128',
         },
       };
-
+      
       when(
         mockClient.get(
           url,

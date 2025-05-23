@@ -26,6 +26,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       final user = await profileRepository.getCurrentUser(
         LocalStorage().accessToken,
       );
+      LocalStorage localStorage = LocalStorage();
+      localStorage.userProfilePicture = user.image;
       emit(ProfileSuccess(user: user));
     } catch (e) {
       emit(ProfileFailure(error: e.toString()));
