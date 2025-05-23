@@ -77,7 +77,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
           Publication(
             id: id,
             username: LocalStorage().username.isNotEmpty ? LocalStorage().username : 'User',
-            profileImageUrl: 'https://i.pinimg.com/736x/7b/8c/d8/7b8cd8b068e4b9f80b4bcf0928d7d499.jpg',
+            profileImageUrl: LocalStorage().userProfilePicture.isNotEmpty ? LocalStorage().userProfilePicture : 'https://i.pinimg.com/736x/7b/8c/d8/7b8cd8b068e4b9f80b4bcf0928d7d499.jpg',
             content: content,
             createdAt: createdAt,
             attachment: attachment,

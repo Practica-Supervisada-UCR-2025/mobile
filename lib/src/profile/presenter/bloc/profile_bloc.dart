@@ -28,6 +28,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       );
       LocalStorage localStorage = LocalStorage();
       localStorage.userProfilePicture = user.image;
+      localStorage.username = user.username;
       emit(ProfileSuccess(user: user));
     } catch (e) {
       emit(ProfileFailure(error: e.toString()));
