@@ -58,7 +58,9 @@ class EditProfileRepositoryImpl implements EditProfileRepository {
     if (response.statusCode == 200) {
       return User.fromJson(json.decode(response.body));
     } else {
-      throw Exception('Failed to update user profile: ${response.body}');
+      throw Exception(
+        'Failed to update user profile: ${jsonDecode(response.body)['message']}',
+      );
     }
   }
 }
