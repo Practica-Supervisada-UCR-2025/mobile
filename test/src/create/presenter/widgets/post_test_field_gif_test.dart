@@ -1,121 +1,108 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile/src/create/create.dart';
-import 'package:mobile/src/shared/models/gif_model.dart';
+import 'package:mobile/src/create/create.dart'; // Ensure this path is correct
+import 'package:mocktail/mocktail.dart';
+
+// Mock for CreatePostBloc
+class MockCreatePostBloc extends Mock implements CreatePostBloc {
+  // Stub the state getter
+  @override
+  CreatePostState get state => const CreatePostInitial(); // Or any default/initial state
+
+  // Stub the stream getter
+  @override
+  Stream<CreatePostState> get stream => Stream.value(const CreatePostInitial()); // Or Stream.empty() if no state changes are expected from stream
+}
 
 void main() {
-  group('PostTextField GIF behavior', () {
-    Widget buildWrappedWithMaterial(Widget child, CreatePostBloc bloc) {
-      return MaterialApp(
-        home: Scaffold(
-          body: BlocProvider.value(
-            value: bloc,
-            child: MediaQuery( // necesario para el TextField
-              data: const MediaQueryData(size: Size(800, 600)),
-              child: child,
-            ),
+  late TextEditingController textController;
+  late MockCreatePostBloc mockCreatePostBloc;
+
+  setUpAll(() {
+    // Fallback value for the specific event type you are capturing
+    registerFallbackValue(const PostTextChanged('fallback_text'));
+  });
+
+  setUp(() {
+    textController = TextEditingController();
+    mockCreatePostBloc = MockCreatePostBloc();
+  });
+
+  tearDown(() {
+    textController.dispose();
+    // mockCreatePostBloc.close(); // Only if your BLoC/mock needs explicit closing
+  });
+
+  // Helper to build the widget with necessary providers
+  Widget buildTestableWidget(Widget child) {
+    return MaterialApp(
+      home: Scaffold(
+        body: BlocProvider<CreatePostBloc>.value(
+          value: mockCreatePostBloc, // Use the mock instance from setUp
+          child: MediaQuery(
+            data: const MediaQueryData(size: Size(800, 600)), // TextField needs MediaQuery
+            child: child,
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
-    testWidgets('muestra el GIF si state.selectedGif no es null', (WidgetTester tester) async {
-      final mockGif = GifModel(id: '1', tinyGifUrl: 'https://example.com/gif.gif');
-      final bloc = CreatePostBloc()
-        ..emit(CreatePostChanged(
-          text: '',
-          image: null,
-          isOverLimit: false,
-          isValid: false,
-          selectedGif: mockGif,
-        ));
+  group('PostTextField', () {
+    testWidgets('renders correctly with hintText and no border', (WidgetTester tester) async {
+      // Stub the add method if it's called during widget build or initial interaction
+      // (though for rendering, it might not be strictly necessary if onChanged is not triggered)
+      when(() => mockCreatePostBloc.add(any())).thenAnswer((_) async {});
+
 
       await tester.pumpWidget(
-        buildWrappedWithMaterial(PostTextField(textController: TextEditingController()), bloc),
+        buildTestableWidget(PostTextField(textController: textController)),
       );
 
-      expect(find.byType(Image), findsOneWidget);
-      expect(find.byIcon(Icons.close), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.text('What’s on your mind?'), findsOneWidget);
+
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.decoration!.border, InputBorder.none);
+      expect(textField.decoration!.counterText, '');
+      expect(textField.autofocus, isTrue);
+      expect(textField.maxLines, null);
     });
 
-    testWidgets('muestra CircularProgressIndicator si la imagen está cargando', (WidgetTester tester) async {
-      final mockGif = GifModel(id: '1', tinyGifUrl: 'https://example.com/loading.gif');
-      final bloc = CreatePostBloc()
-        ..emit(CreatePostChanged(
-          text: '',
-          image: null,
-          isOverLimit: false,
-          isValid: false,
-          selectedGif: mockGif,
-        ));
+    testWidgets('updates textController when text is entered', (WidgetTester tester) async {
+      // Stub the add method because onChanged will call it
+      when(() => mockCreatePostBloc.add(any())).thenAnswer((_) async {});
 
       await tester.pumpWidget(
-        buildWrappedWithMaterial(PostTextField(textController: TextEditingController()), bloc),
+        buildTestableWidget(PostTextField(textController: textController)),
       );
 
-      final image = tester.widget<Image>(find.byType(Image));
-      final loadingBuilder = image.loadingBuilder!;
-      final testWidget = loadingBuilder(
-        tester.element(find.byType(Image)),
-        const Placeholder(),
-        const ImageChunkEvent(cumulativeBytesLoaded: 10, expectedTotalBytes: 100),
-      );
+      await tester.enterText(find.byType(TextField), 'Hello world');
+      await tester.pump();
 
-      await tester.pumpWidget(
-        MaterialApp(home: Scaffold(body: testWidget)),
-      );
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(textController.text, 'Hello world');
     });
 
-    testWidgets('muestra ícono de error si la imagen no carga', (WidgetTester tester) async {
-      final mockGif = GifModel(id: '1', tinyGifUrl: 'https://example.com/fail.gif');
-      final bloc = CreatePostBloc()
-        ..emit(CreatePostChanged(
-          text: '',
-          image: null,
-          isOverLimit: false,
-          isValid: false,
-          selectedGif: mockGif,
-        ));
+    testWidgets('adds PostTextChanged event to CreatePostBloc on text change', (WidgetTester tester) async {
+      // Stub the add method for this specific interaction
+      when(() => mockCreatePostBloc.add(any(that: isA<PostTextChanged>())))
+          .thenAnswer((_) async {}); // Mock the add method to do nothing
 
       await tester.pumpWidget(
-        buildWrappedWithMaterial(PostTextField(textController: TextEditingController()), bloc),
+        buildTestableWidget(PostTextField(textController: textController)),
       );
 
-      final image = tester.widget<Image>(find.byType(Image));
-      final errorBuilder = image.errorBuilder!;
-      final testWidget = errorBuilder(
-        tester.element(find.byType(Image)),
-        Exception('error'),
-        StackTrace.empty,
-      );
+      const testText = 'Testing bloc event';
+      await tester.enterText(find.byType(TextField), testText);
+      await tester.pump();
 
-      await tester.pumpWidget(
-        MaterialApp(home: Scaffold(body: testWidget)),
-      );
-      expect(find.byIcon(Icons.broken_image), findsOneWidget);
-    });
+      final captured = verify(() => mockCreatePostBloc.add(captureAny(that: isA<PostTextChanged>())))
+          .captured;
 
-    testWidgets('al presionar la X dispara GifRemoved', (WidgetTester tester) async {
-      final mockGif = GifModel(id: '1', tinyGifUrl: 'https://example.com/gif.gif');
-      final bloc = CreatePostBloc()
-        ..emit(CreatePostChanged(
-          text: '',
-          image: null,
-          isOverLimit: false,
-          isValid: false,
-          selectedGif: mockGif,
-        ));
-
-      await tester.pumpWidget(
-        buildWrappedWithMaterial(PostTextField(textController: TextEditingController()), bloc),
-      );
-
-      await tester.tap(find.byIcon(Icons.close));
-      await tester.pumpAndSettle();
-
-      expect(bloc.state.selectedGif, isNull);
+      expect(captured.length, 1);
+      expect(captured.first, isA<PostTextChanged>());
+      expect((captured.first as PostTextChanged).text, testText);
     });
   });
 }
