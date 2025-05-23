@@ -7,7 +7,7 @@ import 'package:mobile/src/create/create.dart';
 
 class CreatePageController {
   final CreatePostBloc bloc;
-  final Function(File?) onImageSelectedByPicker; 
+  final Function(File?) onImageSelectedByPicker;
 
   CreatePageController({
     required this.bloc,
@@ -66,6 +66,10 @@ class _CreatePageState extends State<CreatePage> {
     _bloc.add(const PostImageChanged(null));
   }
 
+  void _onRemoveGifFromPostWidget() {
+    _bloc.add(const PostGifChanged(null));
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -77,7 +81,7 @@ class _CreatePageState extends State<CreatePage> {
           backgroundColor: Theme.of(context).colorScheme.surface,
           elevation: 0,
           scrolledUnderElevation: 0,
-          title: const TopActions(), 
+          title: const TopActions(),
         ),
         body: SafeArea(
           bottom: false,
@@ -88,16 +92,31 @@ class _CreatePageState extends State<CreatePage> {
                   child: Column(
                     children: [
                       PostTextField(textController: _textController),
+                      const SizedBox(height: 12),
+                      BlocBuilder<CreatePostBloc, CreatePostState>(
+                        builder: (context, state) {
+                          if (state.selectedGif != null) {
+                            return PostImage(
+                              key: ValueKey<String>('gif-${state.selectedGif!.tinyGifUrl}'),
+                              gifData: state.selectedGif,
+                              onRemove: _onRemoveGifFromPostWidget,
+                            );
+                          }
 
-                      if (_selectedImageFromPage != null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                          child: PostImage(
-                            key: ValueKey<String>(_selectedImageFromPage!.path),
-                            image: _selectedImageFromPage,
-                            onRemove: _onRemoveImageFromPostWidget,
-                          ),
-                        ),
+                          if (_selectedImageFromPage != null) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                              child: PostImage(
+                                key: ValueKey<String>('image-${_selectedImageFromPage!.path}'),
+                                image: _selectedImageFromPage,
+                                onRemove: _onRemoveImageFromPostWidget,
+                              ),
+                            );
+                          }
+
+                          return const SizedBox.shrink();
+                        },
+                      ),
                     ],
                   ),
                 ),
