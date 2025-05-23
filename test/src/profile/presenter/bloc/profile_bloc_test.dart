@@ -14,6 +14,7 @@ import 'profile_bloc_test.mocks.dart';
 void main() {
   late MockProfileRepository mockProfileRepository;
   late ProfileBloc profileBloc;
+  late MockLocalStorage mockLocalStorage;
 
   final testUser = User(
     firstName: "user",
@@ -37,6 +38,11 @@ void main() {
     mockProfileRepository = MockProfileRepository();
 
     profileBloc = ProfileBloc(profileRepository: mockProfileRepository);
+
+    mockLocalStorage = MockLocalStorage();
+    LocalStorage.init();
+    when(mockLocalStorage.accessToken).thenReturn('1');
+    when(mockLocalStorage.userId).thenReturn('1');
   });
 
   // after each test, reset the mock
@@ -53,7 +59,7 @@ void main() {
       'should emit [ProfileLoading, ProfileSuccess] when a fetch is successful',
       build: () {
         when(
-          mockProfileRepository.getCurrentUser('1'),
+          mockProfileRepository.getCurrentUser(any),
         ).thenAnswer((_) async => testUser);
 
         return profileBloc;
@@ -69,7 +75,7 @@ void main() {
             ),
           ],
       verify: (_) {
-        verify(mockProfileRepository.getCurrentUser('1')).called(1);
+        verify(mockProfileRepository.getCurrentUser(any)).called(1);
       },
     );
 
@@ -77,7 +83,7 @@ void main() {
       'should emit [ProfileLoading, ProfileError] when a fetch fails',
       build: () {
         when(
-          mockProfileRepository.getCurrentUser('1'),
+          mockProfileRepository.getCurrentUser(any),
         ).thenThrow(Exception('Failed to load user'));
 
         return profileBloc;
@@ -85,7 +91,7 @@ void main() {
       act: (bloc) => bloc.add(const ProfileLoad()),
       expect: () => [isA<ProfileLoading>(), isA<ProfileFailure>()],
       verify: (_) {
-        verify(mockProfileRepository.getCurrentUser('1')).called(1);
+        verify(mockProfileRepository.getCurrentUser(any)).called(1);
       },
     );
   });
@@ -99,7 +105,7 @@ void main() {
     }
 
     blocTest<ProfileBloc, ProfileState>(
-      'should emit [ProfileUpdating, ProfileUpdateSuccess, ProfileSuccess] when update is successful',
+      'should emit [ProfileUpdating, ProfileUpdateSuccess, ProfileSuccess] when update succeeds',
       build: () {
         profileBloc = prepareSuccessState();
 
@@ -107,7 +113,7 @@ void main() {
 
         when(
           mockProfileRepository.updateUserProfile(
-            "1",
+            LocalStorage().accessToken,
             userUpdates,
             profilePicture: null,
           ),
@@ -135,13 +141,13 @@ void main() {
             ),
             isA<ProfileSuccess>().having(
               (state) => state.user,
-              'final state user',
+              'updated user in success state',
               updatedUser,
             ),
           ],
       verify: (_) {
         verify(
-          mockProfileRepository.updateUserProfile("1", {
+          mockProfileRepository.updateUserProfile(LocalStorage().accessToken, {
             'firstName': 'updated',
             'lastName': 'user',
           }, profilePicture: null),
@@ -158,7 +164,7 @@ void main() {
 
         when(
           mockProfileRepository.updateUserProfile(
-            "1",
+            LocalStorage().accessToken,
             userUpdates,
             profilePicture: null,
           ),
@@ -193,7 +199,7 @@ void main() {
           ],
       verify: (_) {
         verify(
-          mockProfileRepository.updateUserProfile("1", {
+          mockProfileRepository.updateUserProfile(LocalStorage().accessToken, {
             'firstName': 'updated',
             'lastName': 'user',
           }, profilePicture: null),

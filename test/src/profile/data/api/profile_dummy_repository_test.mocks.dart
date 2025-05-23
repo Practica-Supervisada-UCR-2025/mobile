@@ -8,6 +8,7 @@ import 'dart:convert' as _i4;
 import 'dart:typed_data' as _i6;
 
 import 'package:http/http.dart' as _i2;
+import 'package:mobile/core/storage/user_session.storage.dart' as _i7;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i5;
 
@@ -216,4 +217,129 @@ class MockClient extends _i1.Mock implements _i2.Client {
     Invocation.method(#close, []),
     returnValueForMissingStub: null,
   );
+}
+
+/// A class which mocks [LocalStorage].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
+  MockLocalStorage() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  String get accessToken =>
+      (super.noSuchMethod(
+            Invocation.getter(#accessToken),
+            returnValue: _i5.dummyValue<String>(
+              this,
+              Invocation.getter(#accessToken),
+            ),
+          )
+          as String);
+
+  @override
+  String get refreshToken =>
+      (super.noSuchMethod(
+            Invocation.getter(#refreshToken),
+            returnValue: _i5.dummyValue<String>(
+              this,
+              Invocation.getter(#refreshToken),
+            ),
+          )
+          as String);
+
+  @override
+  String get userId =>
+      (super.noSuchMethod(
+            Invocation.getter(#userId),
+            returnValue: _i5.dummyValue<String>(
+              this,
+              Invocation.getter(#userId),
+            ),
+          )
+          as String);
+
+  @override
+  String get username =>
+      (super.noSuchMethod(
+            Invocation.getter(#username),
+            returnValue: _i5.dummyValue<String>(
+              this,
+              Invocation.getter(#username),
+            ),
+          )
+          as String);
+
+  @override
+  String get userEmail =>
+      (super.noSuchMethod(
+            Invocation.getter(#userEmail),
+            returnValue: _i5.dummyValue<String>(
+              this,
+              Invocation.getter(#userEmail),
+            ),
+          )
+          as String);
+
+  @override
+  String get userProfilePicture =>
+      (super.noSuchMethod(
+            Invocation.getter(#userProfilePicture),
+            returnValue: _i5.dummyValue<String>(
+              this,
+              Invocation.getter(#userProfilePicture),
+            ),
+          )
+          as String);
+
+  @override
+  bool get isLoggedIn =>
+      (super.noSuchMethod(Invocation.getter(#isLoggedIn), returnValue: false)
+          as bool);
+
+  @override
+  set accessToken(String? token) => super.noSuchMethod(
+    Invocation.setter(#accessToken, token),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set refreshToken(String? token) => super.noSuchMethod(
+    Invocation.setter(#refreshToken, token),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set userId(String? id) => super.noSuchMethod(
+    Invocation.setter(#userId, id),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set username(String? username) => super.noSuchMethod(
+    Invocation.setter(#username, username),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set userEmail(String? email) => super.noSuchMethod(
+    Invocation.setter(#userEmail, email),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set userProfilePicture(String? picture) => super.noSuchMethod(
+    Invocation.setter(#userProfilePicture, picture),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  _i3.Future<void> clear() =>
+      (super.noSuchMethod(
+            Invocation.method(#clear, []),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
 }

@@ -1,7 +1,7 @@
 class User {
-  final String username;
   final String firstName;
   final String lastName;
+  final String username;
   final String email;
   final String image;
 
@@ -14,12 +14,20 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    final data = json['data'];
+    final fullName = data['full_name'] ?? '';
+    final parts = fullName.split(' ');
+    final firstName = parts.isNotEmpty ? parts.first : '';
+    final lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+    final username = data['username'] ?? '';
+    final email = data['email'] ?? '';
+    final image = data['profile_picture'] ?? '';
     return User(
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      username: json['username'],
-      email: json['email'],
-      image: json['image'],
+      username: username,
+      email: email,
+      image: image,
+      firstName: firstName,
+      lastName: lastName,
     );
   }
 }
