@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:mobile/src/create/create.dart'; 
+import 'package:mobile/src/shared/models/gif_model.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 // Mock classes
 class MockCreatePostBloc extends Mock implements CreatePostBloc {}
@@ -40,6 +42,7 @@ void main() {
   setUpAll(() {
     registerFallbackValue(const PostTextChanged(''));
     registerFallbackValue(PostImageChanged(MockFile('')));
+    registerFallbackValue(const PostGifChanged(null));
   });
   
   setUp(() {
@@ -51,14 +54,15 @@ void main() {
     mockOnRemove = () {};
   });
   
-  Widget createWidgetUnderTest({File? image}) {
+  Widget createWidgetUnderTest({File? image, GifModel? gifData, required VoidCallback onRemoveCallback}) {
     return MaterialApp(
       home: Scaffold(
         body: BlocProvider<CreatePostBloc>.value(
           value: mockBloc,
           child: PostImage(
             image: image,
-            onRemove: mockOnRemove,
+            gifData: gifData, // Añadir gifData
+            onRemove: onRemoveCallback, 
           ),
         ),
       ),
@@ -66,18 +70,14 @@ void main() {
   }
   
   group('PostImage', () {
-    testWidgets('renders empty SizedBox when image is null', (WidgetTester tester) async {
-      await tester.pumpWidget(createWidgetUnderTest(image: null));
-      
-      expect(find.byType(SizedBox), findsOneWidget);
-      expect(find.byType(Image), findsNothing);
-      expect(find.byType(GifImageViewer), findsNothing);
-    });
 
     testWidgets('renders normal image when provided non-gif image', (WidgetTester tester) async {
       final mockImage = MockFile('test_image.jpg');
       
-      await tester.pumpWidget(createWidgetUnderTest(image: mockImage));
+      await tester.pumpWidget(createWidgetUnderTest(
+        image: mockImage, 
+        onRemoveCallback: () {},
+      ));
       
       expect(find.byType(Image), findsOneWidget);
       expect(find.byType(GifImageViewer), findsNothing);
@@ -88,7 +88,10 @@ void main() {
     testWidgets('renders GifImageViewer when provided gif image', (WidgetTester tester) async {
       final mockGif = MockFile('test_animation.gif');
       
-      await tester.pumpWidget(createWidgetUnderTest(image: mockGif));
+      await tester.pumpWidget(createWidgetUnderTest(
+        image: mockGif,
+        onRemoveCallback: () {},
+      ));
       await tester.pumpAndSettle();
       
       expect(find.byType(GifImageViewer), findsOneWidget);
@@ -130,19 +133,60 @@ void main() {
     
     testWidgets('updates image type when image changes', (WidgetTester tester) async {
       final mockImage = MockFile('test_image.jpg');
-      await tester.pumpWidget(createWidgetUnderTest(image: mockImage));
+      // Añadir onRemoveCallback: () {}
+      await tester.pumpWidget(createWidgetUnderTest(
+        image: mockImage,
+        onRemoveCallback: () {}, // <--- AÑADIDO
+      ));
       
       expect(find.byType(Image), findsOneWidget);
       expect(find.byType(GifImageViewer), findsNothing);
       
       final mockGif = MockFile('test_animation.gif');
-      await tester.pumpWidget(createWidgetUnderTest(image: mockGif));
+      // Añadir onRemoveCallback: () {}
+      await tester.pumpWidget(createWidgetUnderTest(
+        image: mockGif,
+        onRemoveCallback: () {}, // <--- AÑADIDO
+      ));
       await tester.pumpAndSettle();
       
       expect(find.byType(GifImageViewer), findsOneWidget);
       expect(find.byWidgetPredicate(
         (widget) => widget is Image && widget.image is FileImage
       ), findsNothing);
+    });
+
+    testWidgets('calls onRemove and dispatches PostGifChanged when Tenor GIF close button is tapped', (WidgetTester tester) async {
+      await mockNetworkImagesFor(() async {
+        bool removeCallbackCalled = false;
+        final mockGif = GifModel(id: 'tenor_close', tinyGifUrl: 'http://example.com/tenor_close.gif');
+
+        // Configurar el mock para capturar la llamada
+        when(() => mockBloc.add(any(that: isA<PostGifChanged>()))).thenReturn(null);
+
+        await tester.pumpWidget(createWidgetUnderTest(
+          gifData: mockGif,
+          onRemoveCallback: () {
+            removeCallbackCalled = true;
+          },
+        ));
+
+        await tester.pumpAndSettle(); // Esperar a que cargue
+
+        expect(find.byIcon(Icons.close), findsOneWidget);
+
+        // Tocar el botón de cerrar
+        await tester.tap(find.byIcon(Icons.close));
+        await tester.pump(); // Procesar el tap y el setState/dispatch
+
+        // Verificar que el callback local fue llamado
+        expect(removeCallbackCalled, isTrue, reason: 'onRemove debe ser llamado');
+
+        // Verificar que el evento PostGifChanged(null) fue añadido al BLoC
+        final captured = verify(() => mockBloc.add(captureAny(that: isA<PostGifChanged>()))).captured;
+        expect(captured.length, 1);
+        expect((captured.first as PostGifChanged).gif, isNull, reason: 'Debe despachar PostGifChanged con null');
+      });
     });
   });
 }

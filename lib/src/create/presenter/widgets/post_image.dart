@@ -137,20 +137,18 @@ class _PostImageState extends State<PostImage> {
     );
   }
 
-  Widget _buildCloseButton(VoidCallback onTap) {
+  Widget _buildCloseButton(VoidCallback onTapCallbackFromParent) {
     return Positioned(
       top: 12,
       right: 28,
       child: GestureDetector(
-        onTap: () {
-              widget.onRemove();
-              context.read<CreatePostBloc>().add(PostImageChanged(null));
-            },        child: Container(
+        onTap: onTapCallbackFromParent, 
+        child: Container(
           decoration: const BoxDecoration(
             color: Colors.black,
             shape: BoxShape.circle,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 12.0),
+          padding: const EdgeInsets.all(8.0),
           child: const Icon(
             Icons.close,
             color: Colors.white,
@@ -160,4 +158,5 @@ class _PostImageState extends State<PostImage> {
       ),
     );
   }
+  
 }
