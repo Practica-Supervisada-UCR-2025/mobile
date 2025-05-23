@@ -1,20 +1,15 @@
-// test/publication_bloc_test.dart
-
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-// Import your BLoC, events, states, repository interface and models
 import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
 
-/// A mock PublicationRepository so we can control its output in tests.
 class MockPublicationRepository extends Mock implements PublicationRepository {}
 
 void main() {
   late PublicationBloc bloc;
   late PublicationRepository repository;
 
-  // Two sample publications to use in the tests
   final samplePub1 = Publication(
     id: 1,
     username: 'user1',

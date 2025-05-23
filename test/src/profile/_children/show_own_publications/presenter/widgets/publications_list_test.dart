@@ -39,7 +39,6 @@ void main() {
   });
 
   Widget buildTestableWidget(PublicationState state) {
-    // Stub the bloc's state and stream
     when(() => mockBloc.state).thenReturn(state);
     whenListen(
       mockBloc,
@@ -76,7 +75,6 @@ void main() {
       expect(find.text('Failed to load posts'), findsOneWidget);
       expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
 
-      // When tapping Retry, LoadPublications should be triggered
       await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
       await tester.pump();
       verify(() => mockBloc.add(LoadPublications())).called(1);
@@ -104,7 +102,6 @@ void main() {
       'renders items and loading spinner at the end when hasReachedMax is false',
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
-      // A single example post
       final pub = Publication(
         id: 1,
         username: 'user1',
@@ -124,10 +121,8 @@ void main() {
       await tester.pumpWidget(buildTestableWidget(state));
       await tester.pump();
 
-      // Should find the card
       expect(find.byType(PublicationCard), findsOneWidget);
 
-      // Should find the spinner at the end of the list
       expect(
         find.byWidgetPredicate((w) =>
             w is Padding &&
@@ -136,10 +131,8 @@ void main() {
         findsOneWidget,
       );
 
-      // Force scroll at the end to trigger LoadMorePublications
       final listView = tester.widget<ListView>(find.byType(ListView));
       final controller = listView.controller!;
-      // Wait for a frame for everything to be mounted
       await tester.pump();
       controller.jumpTo(controller.position.maxScrollExtent + 300);
       await tester.pump(const Duration(milliseconds: 200));
