@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:mobile/core/storage/user_session.storage.dart';
 import 'package:mobile/src/profile/domain/models/models.dart';
 import 'package:mobile/src/profile/domain/repository/repository.dart';
 
@@ -22,9 +23,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     emit(ProfileLoading());
     try {
-      // todo: Remove hardcoded user ID and use the one from LocalStorage
-      // final user = await profileRepository.getCurrentUser(LocalStorage().accessToken);
-      final user = await profileRepository.getCurrentUser("1");
+      final user = await profileRepository.getCurrentUser(
+        LocalStorage().accessToken,
+      );
+      LocalStorage localStorage = LocalStorage();
+      localStorage.userProfilePicture = user.image;
       emit(ProfileSuccess(user: user));
     } catch (e) {
       emit(ProfileFailure(error: e.toString()));
@@ -42,7 +45,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(ProfileUpdating(user: currentState.user));
       try {
         final updatedUser = await profileRepository.updateUserProfile(
-          "1",
+          LocalStorage().accessToken,
           event.updates,
           profilePicture: event.profilePicture,
         );
