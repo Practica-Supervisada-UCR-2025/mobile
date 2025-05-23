@@ -25,10 +25,7 @@ class ProfileRepositoryAPI implements ProfileRepository {
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
-        User user = User.fromJson(data);
-        LocalStorage localStorage = LocalStorage();
-        localStorage.userProfilePicture = user.image;
-        return user;
+        return User.fromJson(data);
       } else {
         final errorData = json.decode(response.body);
         throw Exception(errorData['message'] ?? 'Failed to load user');
