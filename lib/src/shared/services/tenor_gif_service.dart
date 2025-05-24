@@ -74,18 +74,16 @@ class TenorGifService {
       if (decoded is Map) {
         if (decoded.containsKey('results') && decoded['results'] is List) {
           final List results = decoded['results'];
-          // Asegurarse de que 'next' se maneje correctamente si no existe o es null.
           final next = decoded.containsKey('next') ? decoded['next']?.toString() : null;
           final gifs = results.map((e) => GifModel.fromJson(e)).toList();
           return TrendingGifResponse(gifs: gifs, next: next);
         } else {
-          // El JSON es un mapa, pero no tiene 'results' o 'results' no es una lista.
           log('Missing "results" key or invalid structure in getTrendingGifs JSON. Decoded Map: $decoded', name: 'TenorGifService');
           throw Exception('Failed to load trending GIFs: Missing "results" key in JSON or invalid structure');
         }
       } else {
         log('Decoded JSON is not a Map in getTrendingGifs. Actual type: ${decoded.runtimeType}. Value: $decoded', name: 'TenorGifService');
-        throw Exception('Failed to load trending GIFs: JSON structure is not a Map'); // Podrías usar el mensaje de "invalid structure" también.
+        throw Exception('Failed to load trending GIFs: JSON structure is not a Map');
       }
     } else {
       log('Failed to load trending GIFs. Status code: ${response.statusCode}, Body: ${response.body}', name: 'TenorGifService');

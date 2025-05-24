@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile/src/create/create.dart'; // Ensure this path is correct
+import 'package:mobile/src/create/create.dart'; 
 import 'package:mocktail/mocktail.dart';
 
-// Mock for CreatePostBloc
 class MockCreatePostBloc extends Mock implements CreatePostBloc {
-  // Stub the state getter
   @override
-  CreatePostState get state => const CreatePostInitial(); // Or any default/initial state
+  CreatePostState get state => const CreatePostInitial(); 
 
-  // Stub the stream getter
   @override
-  Stream<CreatePostState> get stream => Stream.value(const CreatePostInitial()); // Or Stream.empty() if no state changes are expected from stream
+  Stream<CreatePostState> get stream => Stream.value(const CreatePostInitial());
 }
-
 void main() {
   late TextEditingController textController;
   late MockCreatePostBloc mockCreatePostBloc;
 
   setUpAll(() {
-    // Fallback value for the specific event type you are capturing
     registerFallbackValue(const PostTextChanged('fallback_text'));
   });
 
@@ -31,17 +26,15 @@ void main() {
 
   tearDown(() {
     textController.dispose();
-    // mockCreatePostBloc.close(); // Only if your BLoC/mock needs explicit closing
   });
 
-  // Helper to build the widget with necessary providers
   Widget buildTestableWidget(Widget child) {
     return MaterialApp(
       home: Scaffold(
         body: BlocProvider<CreatePostBloc>.value(
-          value: mockCreatePostBloc, // Use the mock instance from setUp
+          value: mockCreatePostBloc, 
           child: MediaQuery(
-            data: const MediaQueryData(size: Size(800, 600)), // TextField needs MediaQuery
+            data: const MediaQueryData(size: Size(800, 600)),
             child: child,
           ),
         ),
@@ -51,8 +44,6 @@ void main() {
 
   group('PostTextField', () {
     testWidgets('renders correctly with hintText and no border', (WidgetTester tester) async {
-      // Stub the add method if it's called during widget build or initial interaction
-      // (though for rendering, it might not be strictly necessary if onChanged is not triggered)
       when(() => mockCreatePostBloc.add(any())).thenAnswer((_) async {});
 
 
@@ -71,7 +62,6 @@ void main() {
     });
 
     testWidgets('updates textController when text is entered', (WidgetTester tester) async {
-      // Stub the add method because onChanged will call it
       when(() => mockCreatePostBloc.add(any())).thenAnswer((_) async {});
 
       await tester.pumpWidget(
@@ -85,9 +75,8 @@ void main() {
     });
 
     testWidgets('adds PostTextChanged event to CreatePostBloc on text change', (WidgetTester tester) async {
-      // Stub the add method for this specific interaction
       when(() => mockCreatePostBloc.add(any(that: isA<PostTextChanged>())))
-          .thenAnswer((_) async {}); // Mock the add method to do nothing
+          .thenAnswer((_) async {}); 
 
       await tester.pumpWidget(
         buildTestableWidget(PostTextField(textController: textController)),
