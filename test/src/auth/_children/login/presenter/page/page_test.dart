@@ -127,8 +127,6 @@ void main() {
           ),
         ),
       );
-
-      // todo: Implement a proper HomePage widget and check for its presence
       expect(find.byType(Scaffold), findsOneWidget);
     });
 

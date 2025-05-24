@@ -11,12 +11,11 @@ class ProfileLoad extends ProfileEvent {
   const ProfileLoad();
 }
 
-class ProfileUpdate extends ProfileEvent {
-  final Map<String, dynamic> updates;
-  final File? profilePicture;
+class ProfileRefreshed extends ProfileEvent {
+  final User user;
 
-  const ProfileUpdate({required this.updates, this.profilePicture});
+  const ProfileRefreshed(this.user);
 
   @override
-  List<Object?> get props => [updates, profilePicture];
+  List<Object?> get props => [user];
 }
