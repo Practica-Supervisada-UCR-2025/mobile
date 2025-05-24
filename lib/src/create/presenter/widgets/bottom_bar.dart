@@ -2,52 +2,58 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile/core/core.dart'; 
+import 'package:mobile/core/core.dart';
 import 'package:mobile/src/create/create.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
 
-class BottomBar extends StatelessWidget {
+class BottomBar extends StatefulWidget {
   final Function(File?) onImageSelected;
 
   const BottomBar({super.key, required this.onImageSelected});
 
-  Future<void> _pickImageFromGallery(BuildContext context) async {
+  @override
+  State<BottomBar> createState() => _BottomBarState();
+}
+
+class _BottomBarState extends State<BottomBar> {
+  Future<void> _pickImageFromGallery() async {
     final image = await MediaPickerService.pickImageFromGallery(
       context: context,
       onInvalidFile: (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error)),
-        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
       },
-      allowedExtensions: [...IMAGES_ALLOWED, 'gif'], 
+      allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
       maxSizeInBytes: MAX_IMAGE_SIZE,
     );
 
+    if (!mounted) return;
     if (image != null) {
-      onImageSelected(image);
+      widget.onImageSelected(image);
     }
   }
 
-  Future<void> _takePhoto(BuildContext context) async {
+  Future<void> _takePhoto() async {
     final photo = await MediaPickerService.takePhoto(
       context: context,
       onInvalidFile: (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error)),
-        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
       },
-      allowedExtensions: [...IMAGES_ALLOWED, 'gif'], 
+      allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
       maxSizeInBytes: MAX_IMAGE_SIZE,
     );
 
+    if (!mounted) return;
     if (photo != null) {
-      onImageSelected(photo);
+      widget.onImageSelected(photo);
     }
   }
 
-  Future<void> _pickGifFromMediaPicker(BuildContext context) async {
+  Future<void> _pickGifFromMediaPicker() async {
     final GifModel? gif = await MediaPickerService.pickGifFromTenor(context: context);
 
+    if (!mounted) return;
     if (gif != null) {
       context.read<CreatePostBloc>().add(PostGifChanged(gif));
     }
@@ -80,15 +86,15 @@ class BottomBar extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.image_outlined),
-              onPressed: () => _pickImageFromGallery(context),
+              onPressed: _pickImageFromGallery,
             ),
             IconButton(
               icon: const Icon(Icons.camera_alt_outlined),
-              onPressed: () => _takePhoto(context),       
+              onPressed: _takePhoto,
             ),
             IconButton(
               icon: const Icon(Icons.gif_box_outlined),
-              onPressed: () => _pickGifFromMediaPicker(context),
+              onPressed: _pickGifFromMediaPicker,
             ),
             const Spacer(),
             BlocBuilder<CreatePostBloc, CreatePostState>(
