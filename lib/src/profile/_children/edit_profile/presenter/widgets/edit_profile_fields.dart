@@ -5,7 +5,6 @@ class EditProfileFields extends StatelessWidget {
   final TextEditingController firstNameController;
   final TextEditingController lastNameController;
   final TextEditingController usernameController;
-  final TextEditingController emailController;
   final GlobalKey<FormState> formKey;
 
   const EditProfileFields({
@@ -13,7 +12,6 @@ class EditProfileFields extends StatelessWidget {
     required this.firstNameController,
     required this.lastNameController,
     required this.usernameController,
-    required this.emailController,
     required this.formKey,
   });
 
@@ -29,8 +27,6 @@ class EditProfileFields extends StatelessWidget {
           _buildLastNameField(context),
           const SizedBox(height: 16),
           _buildUsernameField(context),
-          const SizedBox(height: 16),
-          _buildEmailField(context),
         ],
       ),
     );
@@ -75,21 +71,6 @@ class EditProfileFields extends StatelessWidget {
         prefixIcon: Icons.alternate_email,
       ),
       validator: UserValidator.validateUsername,
-    );
-  }
-
-  Widget _buildEmailField(BuildContext context) {
-    return TextFormField(
-      controller: emailController,
-      keyboardType: TextInputType.emailAddress,
-      cursorColor: Theme.of(context).colorScheme.primary,
-      decoration: _getInputDecoration(
-        context: context,
-        labelText: 'Email',
-        hintText: 'email@example.com',
-        prefixIcon: Icons.email_outlined,
-      ),
-      validator: UserValidator.validateEmail,
     );
   }
 
