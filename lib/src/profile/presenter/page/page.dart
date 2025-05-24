@@ -12,15 +12,25 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true; // Keep the state when navigating back
+
   @override
   void initState() {
     super.initState();
+    // Load profile data when the widget is initialized
+    _loadProfile();
+  }
+
+  void _loadProfile() {
     context.read<ProfileBloc>().add(ProfileLoad());
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
@@ -86,9 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 20),
                     Divider(color: Theme.of(context).colorScheme.outline),
-                    Expanded(
-                      child: ShowOwnPublicationsPage(),
-                    ),
+                    Expanded(child: ShowOwnPublicationsPage()),
                   ],
                 );
               } else if (state is ProfileFailure) {
@@ -110,8 +118,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildModifyButton(User user) {
     return SecondaryButton(
-      onPressed: () {
-        context.push(Paths.editProfile, extra: user);
+      onPressed: () async {
+        final result = await context.push(Paths.editProfile, extra: user);
+        // Reload profile when returning from edit page to fresh data
+
+        if (result == true) {
+          _loadProfile();
+        }
       },
       isLoading: false,
       text: 'Edit Profile',

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mobile/core/core.dart';
@@ -22,14 +20,6 @@ void main() {
     username: "user1",
     email: "user@ucr.ac.cr",
     image: "https://dummyjson.com/icon/emilys/128",
-  );
-
-  final updatedUser = User(
-    firstName: "updated",
-    lastName: "user",
-    username: "updated_user1",
-    email: "updated_user@ucr.ac.cr",
-    image: "https://dummyjson.com/icon/emilys/256",
   );
 
   setUp(() async {
@@ -94,167 +84,40 @@ void main() {
         verify(mockProfileRepository.getCurrentUser(any)).called(1);
       },
     );
-  });
-
-  group('ProfileBloc - Update Profile Tests', () {
-    // Helper function to prepare the bloc with a successful state
-    ProfileBloc prepareSuccessState() {
-      final bloc = ProfileBloc(profileRepository: mockProfileRepository);
-      bloc.emit(ProfileSuccess(user: testUser));
-      return bloc;
-    }
 
     blocTest<ProfileBloc, ProfileState>(
-      'should emit [ProfileUpdating, ProfileUpdateSuccess, ProfileSuccess] when update succeeds',
+      'should emit [ProfileSuccess] when ProfileRefreshed event is added',
       build: () {
-        profileBloc = prepareSuccessState();
-
-        final userUpdates = {'firstName': 'updated', 'lastName': 'user'};
-
-        when(
-          mockProfileRepository.updateUserProfile(
-            LocalStorage().accessToken,
-            userUpdates,
-            profilePicture: null,
-          ),
-        ).thenAnswer((_) async => updatedUser);
-
         return profileBloc;
       },
-      act:
-          (bloc) => bloc.add(
-            ProfileUpdate(
-              updates: {'firstName': 'updated', 'lastName': 'user'},
-            ),
-          ),
+      act: (bloc) => bloc.add(ProfileRefreshed(testUser)),
       expect:
           () => [
-            isA<ProfileUpdating>().having(
-              (state) => state.user,
-              'original user',
-              testUser,
-            ),
-            isA<ProfileUpdateSuccess>().having(
-              (state) => state.user,
-              'updated user',
-              updatedUser,
-            ),
             isA<ProfileSuccess>().having(
               (state) => state.user,
-              'updated user in success state',
-              updatedUser,
-            ),
-          ],
-      verify: (_) {
-        verify(
-          mockProfileRepository.updateUserProfile(LocalStorage().accessToken, {
-            'firstName': 'updated',
-            'lastName': 'user',
-          }, profilePicture: null),
-        ).called(1);
-      },
-    );
-
-    blocTest<ProfileBloc, ProfileState>(
-      'should emit [ProfileUpdating, ProfileUpdateFailure] when update fails',
-      build: () {
-        profileBloc = prepareSuccessState();
-
-        final userUpdates = {'firstName': 'updated', 'lastName': 'user'};
-
-        when(
-          mockProfileRepository.updateUserProfile(
-            LocalStorage().accessToken,
-            userUpdates,
-            profilePicture: null,
-          ),
-        ).thenThrow(Exception('Failed to update profile'));
-
-        return profileBloc;
-      },
-      act:
-          (bloc) => bloc.add(
-            ProfileUpdate(
-              updates: {'firstName': 'updated', 'lastName': 'user'},
-            ),
-          ),
-      expect:
-          () => [
-            isA<ProfileUpdating>().having(
-              (state) => state.user,
-              'original user',
+              'user',
               testUser,
             ),
-            isA<ProfileUpdateFailure>()
-                .having(
-                  (state) => state.user,
-                  'original user restored',
-                  testUser,
-                )
-                .having(
-                  (state) => state.error,
-                  'error message',
-                  'Exception: Failed to update profile',
-                ),
           ],
-      verify: (_) {
-        verify(
-          mockProfileRepository.updateUserProfile(LocalStorage().accessToken, {
-            'firstName': 'updated',
-            'lastName': 'user',
-          }, profilePicture: null),
-        ).called(1);
-      },
     );
+  });
 
-    test(
-      'should not emit any states when current state is not ProfileSuccess',
-      () {
-        // Set the state to something other than ProfileSuccess
-        profileBloc.emit(ProfileInitial());
+  group('ProfileEvent Props', () {
+    test('ProfileLoad props should be empty', () {
+      const event = ProfileLoad();
+      expect(event.props, []);
+    });
 
-        // Add the update event
-        profileBloc.add(ProfileUpdate(updates: {'firstName': 'updated'}));
-
-        // Use expectLater to verify no state changes occur
-        expectLater(profileBloc.stream, emitsInOrder([]));
-
-        // Verify no repository calls were made
-        verifyNever(mockProfileRepository.updateUserProfile(any, any));
-      },
-    );
-
-    test('props should contain updates and profilePicture', () {
-      final testFile = File('test_image.jpg');
-
-      final event1 = ProfileUpdate(
-        updates: {'name': 'test'},
-        profilePicture: testFile,
+    test('ProfileRefreshed props should contain user', () {
+      final user = User(
+        firstName: "user",
+        lastName: "name",
+        username: "user1",
+        email: "user@ucr.ac.cr",
+        image: "https://dummyjson.com/icon/emilys/128",
       );
-
-      final event2 = ProfileUpdate(
-        updates: {'name': 'test'},
-        profilePicture: testFile,
-      );
-
-      final event3 = ProfileUpdate(
-        updates: {'name': 'different'},
-        profilePicture: testFile,
-      );
-
-      expect(event1, equals(event2));
-      expect(event1, isNot(equals(event3)));
-
-      expect(
-        event1.props,
-        containsAll([
-          {'name': 'test'},
-          testFile,
-        ]),
-      );
-
-      expect(event1.hashCode, equals(event2.hashCode));
-      expect(event1.hashCode, isNot(equals(event3.hashCode)));
+      final event = ProfileRefreshed(user);
+      expect(event.props, [user]);
     });
   });
 }
