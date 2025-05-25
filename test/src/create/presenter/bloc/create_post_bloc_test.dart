@@ -1,18 +1,21 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
+import 'package:mobile/src/create/create.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
-import 'package:mobile/src/create/presenter/bloc/create_post_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockFile extends Mock implements File {}
+class MockCreatePostRepository extends Mock implements CreatePostRepository {}
 
 void main() {
   late CreatePostBloc createPostBloc;
   late File mockImage;
+  late MockCreatePostRepository mockRepository;
 
   setUp(() {
-    createPostBloc = CreatePostBloc();
+    mockRepository = MockCreatePostRepository();
+    createPostBloc = CreatePostBloc(createPostRepository: mockRepository);
     mockImage = MockFile();
   });
 
