@@ -1,40 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:mobile/src/profile/profile.dart';
 
-class MockPublicationBloc extends Mock implements PublicationBloc {}
-
-class FakePublicationEvent extends Fake implements PublicationEvent {}
-class FakePublicationState extends Fake implements PublicationState {}
-
-class MockPublicationRepository extends Mock implements PublicationRepository {}
+import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
 
 void main() {
-  setUpAll(() {
-    registerFallbackValue(FakePublicationEvent());
-    registerFallbackValue(FakePublicationState());
-  });
+  testWidgets(
+    'ShowOwnPublicationsPage builds the BlocProvider and displays PublicationsList',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(home: ShowOwnPublicationsPage()),
+      );
+      expect(find.byType(BlocProvider<PublicationBloc>), findsOneWidget);
+      expect(find.byType(PublicationsList), findsOneWidget);
+    },
+  );
 
-  testWidgets('ShowOwnPublicationsPage renders PublicationsList and dispatches LoadPublications',
-      (WidgetTester tester) async {
-    // Arrange
-    final mockRepository = MockPublicationRepository();
+  testWidgets(
+    'When PublicationsList fails and Retry is pressed, the error message reappears',
+    (WidgetTester tester) async {
+      final failureBloc = PublicationBloc(
+        publicationRepository: _FakeFailureRepository(),
+      );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: RepositoryProvider<PublicationRepository>.value(
-          value: mockRepository,
-          child: const ShowOwnPublicationsPage(),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: BlocProvider<PublicationBloc>.value(
+            value: failureBloc,
+            child: const PublicationsList(),
+          ),
         ),
-      ),
-    );
+      );
 
-    // Act
-    await tester.pump(); // Dispara la construcción de BlocProvider y la lista
+      failureBloc.add(LoadPublications());
+      await tester.pumpAndSettle();
 
-    // Assert
-    expect(find.byType(PublicationsList), findsOneWidget);
-  });
+      expect(find.text('Failed to load posts'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Failed to load posts'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
+    },
+  );
+}
+
+class _FakeFailureRepository implements PublicationRepository {
+  @override
+  Future<PublicationResponse> fetchPublications({
+    required int page,
+    required int limit,
+  }) {
+    throw Exception('simulated failure');
+  }
 }

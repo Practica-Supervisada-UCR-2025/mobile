@@ -18,7 +18,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _usernameController;
-  late TextEditingController _emailController;
   final _formKey = GlobalKey<FormState>();
   bool _isFormDirty = false;
 
@@ -31,8 +30,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     _firstNameController = TextEditingController(text: widget.user.firstName);
     _lastNameController = TextEditingController(text: widget.user.lastName);
     _usernameController = TextEditingController(text: widget.user.username);
-    _emailController = TextEditingController(text: widget.user.email);
-
     _setupTextControllerListeners();
   }
 
@@ -41,13 +38,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       _firstNameController,
       _lastNameController,
       _usernameController,
-      _emailController,
     ];
 
     for (final controller in controllers) {
-      controller.addListener(() {
-        _checkFormDirty();
-      });
+      controller.addListener(_checkFormDirty);
     }
   }
 
@@ -56,7 +50,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         _firstNameController.text != widget.user.firstName ||
         _lastNameController.text != widget.user.lastName ||
         _usernameController.text != widget.user.username ||
-        _emailController.text != widget.user.email ||
         _selectedImage != null ||
         _isRemovingImage;
 
@@ -80,7 +73,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _usernameController.dispose();
-    _emailController.dispose();
     super.dispose();
   }
 
@@ -88,31 +80,22 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     if (_formKey.currentState?.validate() ?? false) {
       final updates = <String, dynamic>{};
 
-      if (_firstNameController.text != widget.user.firstName) {
-        updates['firstName'] = _firstNameController.text;
-      }
-
-      if (_lastNameController.text != widget.user.lastName) {
-        updates['lastName'] = _lastNameController.text;
+      if (_lastNameController.text != widget.user.lastName ||
+          _firstNameController.text != widget.user.firstName) {
+        updates['full_name'] =
+            '${_firstNameController.text} ${_lastNameController.text}';
       }
 
       if (_usernameController.text != widget.user.username) {
         updates['username'] = _usernameController.text;
       }
 
-      if (_emailController.text != widget.user.email) {
-        updates['email'] = _emailController.text;
-      }
-
-      File? profilePicture;
-      if (_selectedImage != null) {
-        profilePicture = _selectedImage;
-      } else if (_isRemovingImage) {
+      if (_isRemovingImage) {
         updates['profile_picture'] = null;
       }
 
-      context.read<ProfileBloc>().add(
-        ProfileUpdate(updates: updates, profilePicture: profilePicture),
+      context.read<EditProfileBloc>().add(
+        EditProfileSubmitted(updates: updates, profilePicture: _selectedImage),
       );
     }
   }
@@ -126,10 +109,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
         actions: [
-          // Save button in app bar
-          BlocBuilder<ProfileBloc, ProfileState>(
+          BlocBuilder<EditProfileBloc, EditProfileState>(
             builder: (context, state) {
-              final isLoading = state is ProfileUpdating;
+              final isLoading = state is EditProfileUpdating;
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: TextButton.icon(
@@ -174,40 +156,42 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: BlocConsumer<ProfileBloc, ProfileState>(
+      body: BlocConsumer<EditProfileBloc, EditProfileState>(
         listener: (context, state) {
-          if (state is ProfileUpdateSuccess) {
+          if (state is EditProfileSuccess) {
+            context.read<ProfileBloc>().add(ProfileRefreshed(state.user));
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
                   children: [
-                    Icon(Icons.check_circle_outline, color: Colors.white),
-                    SizedBox(width: 8),
-                    Expanded(child: Text('Profile updated successfully')),
+                    const Icon(Icons.check_circle_outline, color: Colors.white),
+                    const SizedBox(width: 8),
+                    const Expanded(child: Text('Profile updated successfully')),
                   ],
                 ),
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.all(16),
+                margin: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
             );
-            context.pop();
-          } else if (state is ProfileUpdateFailure) {
+            context.pop(true);
+          } else if (state is EditProfileFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
                   children: [
-                    Icon(Icons.error_outline, color: Colors.white),
-                    SizedBox(width: 8),
+                    const Icon(Icons.error_outline, color: Colors.white),
+                    const SizedBox(width: 8),
                     Expanded(child: Text('Update failed: ${state.error}')),
                   ],
                 ),
                 backgroundColor: Theme.of(context).colorScheme.error,
                 behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.all(16),
+                margin: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -228,14 +212,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       selectedImage: _selectedImage,
                       onImageSelected: _handleImageChanged,
                     ),
-
                     const SizedBox(height: 32),
-
                     EditProfileFields(
                       firstNameController: _firstNameController,
                       lastNameController: _lastNameController,
                       usernameController: _usernameController,
-                      emailController: _emailController,
                       formKey: _formKey,
                     ),
                   ],
