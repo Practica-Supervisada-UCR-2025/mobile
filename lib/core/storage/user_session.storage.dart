@@ -61,6 +61,10 @@ class LocalStorage {
   set userEmail(String email) => _prefs.setString('userEmail', email);
   String get userEmail => _prefs.getString('userEmail') ?? '';
 
+  // User Profile Picture
+  set userProfilePicture(String picture) => _prefs.setString('userProfilePicture', picture);
+  String get userProfilePicture => _prefs.getString('userProfilePicture') ?? '';
+
   // Check if user is logged in
   bool get isLoggedIn => accessToken.isNotEmpty && userId.isNotEmpty;
 
