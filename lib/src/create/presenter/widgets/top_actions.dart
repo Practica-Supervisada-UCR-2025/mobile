@@ -36,7 +36,6 @@ class TopActions extends StatelessWidget {
 
             return TextButton(
               onPressed: isEnabled ? () {
-                // Action to post the content
               } : null,
               style: TextButton.styleFrom(
                 backgroundColor: isEnabled ? AppColors.primary 

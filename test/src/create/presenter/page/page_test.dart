@@ -115,57 +115,39 @@ void main() {
     });
 
     group('Image handling tests', () {
-      late MockFile mockFile;
       late MockCreatePostBloc mockBloc;
       
       setUp(() {
-        mockFile = MockFile();
         mockBloc = MockCreatePostBloc();
         when(() => mockBloc.add(any())).thenReturn(null);
         when(() => mockBloc.state).thenReturn(const CreatePostInitial());
       });
 
-      testWidgets('Image selection updates state and adds event to bloc', (tester) async {
-        bool imageChanged = false;
-        File? selectedImage;
-        
+      testWidgets('Image selection sends PostImageChanged event to bloc', (tester) async {
+        final mockBloc = MockCreatePostBloc();
+        final imageFile = File('test.jpg');
+
         final controller = CreatePageController(
           bloc: mockBloc,
-          onImageChanged: (image) {
-            imageChanged = true;
-            selectedImage = image;
-          },
+          onImageSelectedByPicker: (_) {},
         );
-        
-        controller.handleImageSelected(mockFile);
-        
-        expect(imageChanged, isTrue);
-        expect(selectedImage, equals(mockFile));
-        expect(controller.selectedImage, equals(mockFile));
-        
-        verify(() => mockBloc.add(PostImageChanged(mockFile))).called(1);
+
+        controller.handleImagePicked(imageFile);
+
+        verify(() => mockBloc.add(PostImageChanged(imageFile))).called(1);
       });
+
       
-      testWidgets('Image removal updates state and adds null event to bloc', (tester) async {
-        bool imageChanged = false;
-        File? selectedImage = mockFile;
-        
+      testWidgets('Image removal sends PostImageChanged(null) to bloc', (tester) async {
+        final mockBloc = MockCreatePostBloc();
+
         final controller = CreatePageController(
           bloc: mockBloc,
-          onImageChanged: (image) {
-            imageChanged = true;
-            selectedImage = image;
-          },
+          onImageSelectedByPicker: (_) {},
         );
-        
-        controller.selectedImage = mockFile;
-        
+
         controller.removeImage();
-        
-        expect(imageChanged, isTrue);
-        expect(selectedImage, isNull);
-        expect(controller.selectedImage, isNull);
-        
+
         verify(() => mockBloc.add(const PostImageChanged(null))).called(1);
       });
     });

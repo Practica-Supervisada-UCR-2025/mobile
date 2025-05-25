@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
+import 'package:mobile/src/shared/models/gif_model.dart';
 import 'package:mobile/src/create/presenter/bloc/create_post_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -52,6 +53,7 @@ void main() {
       expect(initialState.image, null);
       expect(initialState.isOverLimit, false);
       expect(initialState.isValid, false);
+      expect(initialState.selectedGif, null);
     });
 
     // Text change tests
@@ -70,7 +72,7 @@ void main() {
     blocTest<CreatePostBloc, CreatePostState>(
       'should emit [CreatePostChanged] with isOverLimit true when text exceeds the limit',
       build: () => createPostBloc,
-      act: (bloc) => bloc.add(PostTextChanged('A' * 301)), // 301 characters
+      act: (bloc) => bloc.add(PostTextChanged('A' * 301)), 
       expect: () => [
         isA<CreatePostChanged>()
             .having((state) => state.text, 'text', 'A' * 301)
@@ -94,7 +96,7 @@ void main() {
     blocTest<CreatePostBloc, CreatePostState>(
       'should emit [CreatePostChanged] with isValid true when text is exactly at the limit',
       build: () => createPostBloc,
-      act: (bloc) => bloc.add(PostTextChanged('A' * 300)), // 300 characters
+      act: (bloc) => bloc.add(PostTextChanged('A' * 300)),
       expect: () => [
         isA<CreatePostChanged>()
             .having((state) => state.text, 'text', 'A' * 300)
@@ -103,6 +105,113 @@ void main() {
       ],
     );
 
+    blocTest<CreatePostBloc, CreatePostState>(
+      'should emit new state with selectedGif when GifSelected is added',
+      build: () => createPostBloc,
+      act: (bloc) {
+        final gif = GifModel(id: '123', tinyGifUrl: 'https://media.tenor.com/sample.gif');
+        bloc.add(PostGifChanged(gif));
+      },
+      expect: () => [
+        isA<CreatePostChanged>() 
+            .having((state) => state.text, 'text', '') 
+            .having((state) => state.image, 'image', null) 
+            .having((state) => state.selectedGif?.id, 'selectedGif.id', '123')
+            .having((state) => state.selectedGif?.tinyGifUrl, 'selectedGif.tinyGifUrl', 'https://media.tenor.com/sample.gif') 
+            .having((state) => state.isOverLimit, 'isOverLimit', false) 
+            .having((state) => state.isValid, 'isValid', true), 
+      ],
+    );
+
+    blocTest<CreatePostBloc, CreatePostState>(
+      'should not emit new state when GIF is too large',
+      build: () => createPostBloc,
+      act: (bloc) {
+        final largeGif = GifModel(id: 'big', tinyGifUrl: 'url', sizeBytes: 6 * 1024 * 1024);
+        bloc.add(PostGifChanged(largeGif));
+      },
+      expect: () => [],
+    );
+
+    test('CreatePostChanged.copyWith returns new instance with updated values', () {
+      final original = CreatePostChanged(
+        text: 'Hello',
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+        image: null,
+      );
+
+      final updated = original.copyWith(
+        text: 'Updated text',
+        isOverLimit: true,
+        isValid: false,
+        selectedGif: GifModel(id: '1', tinyGifUrl: 'url'),
+      );
+
+      expect(updated.text, 'Updated text');
+      expect(updated.isOverLimit, true);
+      expect(updated.isValid, false);
+      expect(updated.selectedGif?.id, '1');
+    });
+
+    test('CreatePostInitial.copyWith returns CreatePostChanged with overridden values', () {
+      final initial = const CreatePostInitial();
+
+      final newState = initial.copyWith(
+        text: 'Copied',
+        isOverLimit: true,
+        isValid: false,
+        selectedGif: GifModel(id: '42', tinyGifUrl: 'https://tenor.com/gif42.gif'),
+        image: mockImage,
+      );
+
+      expect(newState, isA<CreatePostChanged>());
+      expect(newState.text, 'Copied');
+      expect(newState.isOverLimit, true);
+      expect(newState.isValid, false);
+      expect(newState.selectedGif?.id, '42');
+      expect(newState.image, mockImage);
+    });
+
+    test('CreatePostChanged.copyWith without arguments returns identical state', () {
+      final gif = GifModel(id: 'abc', tinyGifUrl: 'https://tenor.com/abc.gif');
+
+      final original = CreatePostChanged(
+        text: 'unchanged',
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: gif,
+        image: null,
+      );
+
+      final copied = original.copyWith();
+
+      expect(copied, equals(original));
+      expect(identical(copied, original), isFalse, reason: 'copyWith should return a new instance');
+    });
+
+    test('CreatePostChanged props and equality', () {
+      final gif = GifModel(id: '1', tinyGifUrl: 'url');
+      final imageFile = MockFile();
+      final state1 = CreatePostChanged(
+        text: 'text',
+        image: imageFile,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: gif,
+      );
+      final state2 = CreatePostChanged(
+        text: 'text',
+        image: imageFile,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: gif,
+      );
+
+      expect(state1.props, equals(['text', imageFile, false, true, gif]));
+      expect(state1, equals(state2));
+    });
     // Image change tests
     blocTest<CreatePostBloc, CreatePostState>(
       'should emit [CreatePostChanged] with isValid true when adding an image with no text',
@@ -120,11 +229,12 @@ void main() {
     blocTest<CreatePostBloc, CreatePostState>(
       'should emit [CreatePostChanged] with isValid true when adding an image with valid text',
       build: () => createPostBloc,
-      seed: () => const CreatePostChanged(
+      seed: () => const CreatePostChanged( 
         text: 'Valid text',
         image: null,
         isOverLimit: false,
         isValid: true,
+        selectedGif: null,
       ),
       act: (bloc) => bloc.add(PostImageChanged(mockImage)),
       expect: () => [
@@ -144,6 +254,7 @@ void main() {
         image: null,
         isOverLimit: true,
         isValid: false,
+        selectedGif: null,
       ),
       act: (bloc) => bloc.add(PostImageChanged(mockImage)),
       expect: () => [
@@ -163,6 +274,7 @@ void main() {
         image: mockImage,
         isOverLimit: false,
         isValid: true,
+        selectedGif: null,
       ),
       act: (bloc) => bloc.add(const PostImageChanged(null)),
       expect: () => [
@@ -181,7 +293,8 @@ void main() {
         text: '',
         image: mockImage,
         isOverLimit: false,
-        isValid: true,
+        isValid: true, 
+        selectedGif: null,
       ),
       act: (bloc) => bloc.add(const PostImageChanged(null)),
       expect: () => [
@@ -201,6 +314,7 @@ void main() {
         image: mockImage,
         isOverLimit: true,
         isValid: false,
+        selectedGif: null,
       ),
       act: (bloc) => bloc.add(const PostImageChanged(null)),
       expect: () => [

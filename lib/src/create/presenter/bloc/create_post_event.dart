@@ -24,3 +24,12 @@ class PostImageChanged extends CreatePostEvent {
   @override
   List<Object?> get props => [image];
 }
+
+class PostGifChanged extends CreatePostEvent {
+  final GifModel? gif;
+
+  const PostGifChanged(this.gif);
+
+  @override
+  List<Object?> get props => [gif];
+}
