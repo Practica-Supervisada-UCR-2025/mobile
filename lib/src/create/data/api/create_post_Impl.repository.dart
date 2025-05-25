@@ -45,7 +45,13 @@ class CreatePostRepositoryImpl implements CreatePostRepository {
     );
 
     if (response.statusCode != 201) {
-      throw CreatePostException('Failed to create post: ${jsonDecode(response.body)['message']}');
+      String errorMessage;
+      try {
+        errorMessage = jsonDecode(response.body)['message'];
+      } catch (e) {
+        errorMessage = 'Unknown error occurred';
+      }
+      throw CreatePostException('Failed to create post: $errorMessage');
     }
   }
 
@@ -72,7 +78,13 @@ class CreatePostRepositoryImpl implements CreatePostRepository {
     );
 
     if (response.statusCode != 201) {
-      throw CreatePostException('Failed to create post with image: ${jsonDecode(response.body)['message']}');
+      String errorMessage;
+      try {
+        errorMessage = jsonDecode(response.body)['message'];
+      } catch (e) {
+        errorMessage = 'Unknown error occurred';
+      }
+      throw CreatePostException('Failed to create post with image: $errorMessage');
     }
   }
 
@@ -87,7 +99,13 @@ class CreatePostRepositoryImpl implements CreatePostRepository {
     );
 
     if (response.statusCode != 201) {
-      throw CreatePostException('Failed to create post with GIF: ${jsonDecode(response.body)['message']}');
+      String errorMessage;
+      try {
+        errorMessage = jsonDecode(response.body)['message'];
+      } catch (e) {
+        errorMessage = 'Unknown error occurred';
+      }
+      throw CreatePostException('Failed to create post with GIF: $errorMessage');
     }
   }
 }
