@@ -1,1 +1,1 @@
-export 'profile_dummy.repository.dart';
+export 'profile.repository.dart';
