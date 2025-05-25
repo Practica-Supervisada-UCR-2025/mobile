@@ -78,4 +78,15 @@ void main() {
     expect(selected, isNotNull);
     expect(selected!.id, equals('1'));
   });
+
+  testWidgets('displays loading indicator while fetching GIFs', (tester) async {
+    when(() => mockService.getTrendingGifs(pos: null))
+        .thenAnswer((_) async => TrendingGifResponse(gifs: [], next: null));
+
+    await tester.pumpWidget(
+      createWidgetUnderTest(onGifSelected: (_) {}),
+    );
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
 }
