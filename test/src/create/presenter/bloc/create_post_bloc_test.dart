@@ -59,6 +59,222 @@ void main() {
       expect(initialState.selectedGif, null);
     });
 
+    test('PostTextChanged props should return correct values', () {
+      const event = PostTextChanged('Test text');
+      expect(event.props, ['Test text']);
+    });
+
+    test('PostImageChanged props should return correct values', () {
+      final event = PostImageChanged(mockImage);
+      expect(event.props, [mockImage]);
+    });
+
+    test('PostGifChanged props should return correct values', () {
+      final gif = GifModel(id: '123', tinyGifUrl: 'https://example.com/gif');
+      final event = PostGifChanged(gif);
+      expect(event.props, [gif]);
+    });
+
+    test('PostSubmitted props should return correct values', () {
+      final gif = GifModel(id: '123', tinyGifUrl: 'https://example.com/gif');
+      final event = PostSubmitted(text: 'Test', image: mockImage, selectedGif: gif);
+      expect(event.props, ['Test', mockImage, gif]);
+    });
+
+    test('CreatePostInitial.copyWith should return the same instance when no arguments are provided', () {
+      const initialState = CreatePostInitial();
+      final copiedState = initialState.copyWith();
+      expect(copiedState, same(initialState));
+    });
+
+    test('CreatePostInitial.copyWith should override values when arguments are provided', () {
+      const initialState = CreatePostInitial();
+      final updatedState = initialState.copyWith(
+        text: 'Updated text',
+        isValid: true,
+      );
+      expect(updatedState, isA<CreatePostChanged>());
+      expect(updatedState.text, 'Updated text');
+      expect(updatedState.isValid, true);
+    });
+
+    test('CreatePostInitial.copyWith should override text when provided', () {
+      const initialState = CreatePostInitial();
+      final updatedState = initialState.copyWith(text: 'Updated text');
+      expect(updatedState, isA<CreatePostChanged>());
+      expect(updatedState.text, 'Updated text');
+      expect(updatedState.isValid, false);
+    });
+
+    test('CreatePostInitial.copyWith should override isValid when provided', () {
+      const initialState = CreatePostInitial();
+      final updatedState = initialState.copyWith(isValid: true);
+      expect(updatedState, isA<CreatePostChanged>());
+      expect(updatedState.isValid, true);
+      expect(updatedState.text, '');
+    });
+
+    test('CreatePostInitial.copyWith should override multiple values when provided', () {
+      const initialState = CreatePostInitial();
+      final updatedState = initialState.copyWith(
+        text: 'Updated text',
+        isValid: true,
+        isOverLimit: true,
+      );
+      expect(updatedState, isA<CreatePostChanged>());
+      expect(updatedState.text, 'Updated text');
+      expect(updatedState.isValid, true);
+      expect(updatedState.isOverLimit, true);
+    });
+
+    test('PostSubmitting.copyWith should return the same instance when no arguments are provided', () {
+      final state = PostSubmitting(
+        text: 'Submitting text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+      );
+      final copiedState = state.copyWith();
+      expect(copiedState, equals(state));
+    });
+
+    test('PostSubmitting.copyWith should override values when arguments are provided', () {
+      final state = PostSubmitting(
+        text: 'Submitting text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+      );
+      final updatedState = state.copyWith(
+        isValid: false,
+        text: 'Updated text',
+      );
+      expect(updatedState.isValid, false);
+      expect(updatedState.text, 'Updated text');
+    });
+
+    test('PostSubmitSuccess.copyWith should return the same instance when no arguments are provided', () {
+      final state = PostSubmitSuccess(
+        text: 'Success text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+      );
+      final copiedState = state.copyWith();
+      expect(copiedState, equals(state)); // Debe ser igual al estado original
+    });
+
+    test('PostSubmitSuccess.copyWith should override values when arguments are provided', () {
+      final state = PostSubmitSuccess(
+        text: 'Success text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+      );
+      final updatedState = state.copyWith(
+        text: 'Updated text',
+        isValid: false,
+      );
+      expect(updatedState.text, 'Updated text');
+      expect(updatedState.isValid, false);
+    });
+
+    test('PostSubmitFailure.copyWith should return the same instance when no arguments are provided', () {
+      final state = PostSubmitFailure(
+        text: 'Failure text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+        error: 'Error message',
+      );
+      final copiedState = state.copyWith();
+      expect(copiedState, equals(state)); // Debe ser igual al estado original
+    });
+
+    test('PostSubmitFailure.copyWith should override values when arguments are provided', () {
+      final state = PostSubmitFailure(
+        text: 'Failure text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+        error: 'Error message',
+      );
+      final updatedState = state.copyWith(
+        error: 'Updated error',
+        isValid: false,
+      );
+      expect((updatedState as PostSubmitFailure).error, 'Updated error');
+      expect(updatedState.isValid, false);
+    });
+    test('CreatePostInitial.copyWith should return updated state', () {
+      const initialState = CreatePostInitial();
+      final updatedState = initialState.copyWith(text: 'Updated text', isValid: true);
+      expect(updatedState, isA<CreatePostChanged>());
+      expect(updatedState.text, 'Updated text');
+      expect(updatedState.isValid, true);
+    });
+
+    test('CreatePostChanged.copyWith should return updated state', () {
+      final state = CreatePostChanged(
+        text: 'Initial text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+      );
+      final updatedState = state.copyWith(text: 'Updated text', isValid: false);
+      expect(updatedState.text, 'Updated text');
+      expect(updatedState.isValid, false);
+    });
+
+    test('PostSubmitting.copyWith should return updated state', () {
+      final state = PostSubmitting(
+        text: 'Submitting text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+      );
+      final updatedState = state.copyWith(isValid: false);
+      expect(updatedState.isValid, false);
+    });
+
+    test('PostSubmitSuccess.copyWith should return updated state', () {
+      final state = PostSubmitSuccess(
+        text: 'Success text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+      );
+      final updatedState = state.copyWith(text: 'Updated text');
+      expect(updatedState.text, 'Updated text');
+    });
+
+    test('PostSubmitFailure.copyWith should return updated state', () {
+      final state = PostSubmitFailure(
+        text: 'Failure text',
+        image: mockImage,
+        isOverLimit: false,
+        isValid: true,
+        selectedGif: null,
+        error: 'Error message',
+      );
+      final updatedState = state.copyWith(error: 'Updated error');
+      expect((updatedState as PostSubmitFailure).error, 'Updated error');
+      expect(updatedState.text, 'Failure text');
+      expect(updatedState.image, mockImage);
+      expect(updatedState.isOverLimit, false);
+      expect(updatedState.isValid, true);
+      expect(updatedState.selectedGif, null);
+    });
+
     // Text change tests
     blocTest<CreatePostBloc, CreatePostState>(
       'should emit [CreatePostChanged] with valid text when text is within the limit',
