@@ -33,7 +33,7 @@ class CreatePostRepositoryImpl implements CreatePostRepository {
       return _createTextPost(content);
     }
 
-    throw Exception('Cannot create empty post. Provide at least text, image, or gif.');
+    throw CreatePostException('Cannot create empty post. Provide at least text, image, or gif.');
   }
 
   Future<void> _createTextPost(String text) async {
@@ -44,8 +44,8 @@ class CreatePostRepositoryImpl implements CreatePostRepository {
       },
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to create post: ${jsonDecode(response.body)['message']}');
+    if (response.statusCode != 201) {
+      throw CreatePostException('Failed to create post: ${jsonDecode(response.body)['message']}');
     }
   }
 
@@ -71,8 +71,8 @@ class CreatePostRepositoryImpl implements CreatePostRepository {
       [file],
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to create post with image: ${jsonDecode(response.body)['message']}');
+    if (response.statusCode != 201) {
+      throw CreatePostException('Failed to create post with image: ${jsonDecode(response.body)['message']}');
     }
   }
 
@@ -86,8 +86,8 @@ class CreatePostRepositoryImpl implements CreatePostRepository {
       },
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to create post with GIF: ${jsonDecode(response.body)['message']}');
+    if (response.statusCode != 201) {
+      throw CreatePostException('Failed to create post with GIF: ${jsonDecode(response.body)['message']}');
     }
   }
 }
