@@ -56,7 +56,16 @@ class TopActions extends StatelessWidget {
           },
           builder: (context, state) {
             if (state is PostSubmitting) {
-              return const CircularProgressIndicator();
+              return const Padding(
+                padding: EdgeInsets.only(right: 16.0),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.0,
+                  ),
+                ),
+              );
             }
             
             final isEnabled = state.isValid;
