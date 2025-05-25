@@ -328,5 +328,62 @@ void main() {
             .having((state) => state.isValid, 'isValid', false),
       ],
     );
+
+    blocTest<CreatePostBloc, CreatePostState>(
+      'should emit [PostSubmitting, PostSubmitSuccess] when post is successfully submitted',
+      build: () {
+        when(() => mockRepository.createPost(
+          text: any(named: 'text'),
+          image: any(named: 'image'),
+          selectedGif: any(named: 'selectedGif'),
+        )).thenAnswer((_) async {});
+        return createPostBloc;
+      },
+      act: (bloc) => bloc.add(PostSubmitted(text: 'Test post', image: mockImage)),
+      expect: () => [
+        isA<PostSubmitting>()
+            .having((state) => state.text, 'text', 'Test post')
+            .having((state) => state.image, 'image', mockImage),
+        isA<PostSubmitSuccess>()
+            .having((state) => state.text, 'text', 'Test post')
+            .having((state) => state.image, 'image', mockImage),
+      ],
+      verify: (_) {
+        verify(() => mockRepository.createPost(
+          text: 'Test post',
+          image: mockImage,
+          selectedGif: null,
+        )).called(1);
+      },
+    );
+
+    blocTest<CreatePostBloc, CreatePostState>(
+      'should emit [PostSubmitting, PostSubmitFailure] when post submission fails',
+      build: () {
+        when(() => mockRepository.createPost(
+          text: any(named: 'text'),
+          image: any(named: 'image'),
+          selectedGif: any(named: 'selectedGif'),
+        )).thenThrow(Exception('Submission failed'));
+        return createPostBloc;
+      },
+      act: (bloc) => bloc.add(PostSubmitted(text: 'Test post', image: mockImage)),
+      expect: () => [
+        isA<PostSubmitting>()
+            .having((state) => state.text, 'text', 'Test post')
+            .having((state) => state.image, 'image', mockImage),
+        isA<PostSubmitFailure>()
+            .having((state) => state.text, 'text', 'Test post')
+            .having((state) => state.image, 'image', mockImage)
+            .having((state) => state.error, 'error', 'Exception: Submission failed'),
+      ],
+      verify: (_) {
+        verify(() => mockRepository.createPost(
+          text: 'Test post',
+          image: mockImage,
+          selectedGif: null,
+        )).called(1);
+      },
+    );
   });
 }

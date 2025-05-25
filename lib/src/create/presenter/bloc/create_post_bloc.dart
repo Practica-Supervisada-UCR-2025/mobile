@@ -76,20 +76,20 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
   Future<void> _onPostSubmitted(
     PostSubmitted event, 
     Emitter<CreatePostState> emit,
-  ) async { 
+  ) async {
+    final textToSubmit = event.text ?? state.text;
+    final imageToSubmit = event.image ?? state.image;
+    final gifToSubmit = event.selectedGif ?? state.selectedGif;
+
     emit(PostSubmitting(
-      text: state.text,
-      image: state.image,
+      text: textToSubmit,
+      image: imageToSubmit,
       isOverLimit: state.isOverLimit,
       isValid: state.isValid,
-      selectedGif: state.selectedGif,
+      selectedGif: gifToSubmit,
     ));
 
     try {
-      final textToSubmit = event.text ?? state.text;
-      final imageToSubmit = event.image ?? state.image;
-      final gifToSubmit = event.selectedGif ?? state.selectedGif;
-
       await createPostRepository!.createPost(
         text: textToSubmit,
         image: imageToSubmit,
@@ -97,19 +97,19 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
       );
 
       emit(PostSubmitSuccess(
-        text: state.text,
-        image: state.image,
+        text: textToSubmit,
+        image: imageToSubmit,
         isOverLimit: state.isOverLimit,
         isValid: state.isValid,
-        selectedGif: state.selectedGif,
+        selectedGif: gifToSubmit,
       ));
     } catch (e) {
       emit(PostSubmitFailure(
-        text: state.text,
-        image: state.image,
+        text: textToSubmit,
+        image: imageToSubmit,
         isOverLimit: state.isOverLimit,
         isValid: state.isValid,
-        selectedGif: state.selectedGif,
+        selectedGif: gifToSubmit,
         error: e.toString(),
       ));
     }
