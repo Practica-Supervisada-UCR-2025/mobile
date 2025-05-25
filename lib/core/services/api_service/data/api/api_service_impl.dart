@@ -18,9 +18,9 @@ class ApiServiceImpl implements ApiService {
 
   String _getBaseUrl({String? endpoint}) {
     if (endpoint != null && endpoint.startsWith('posts/newPost')) {
-      return API_POST_BASE_URL;
+      return baseUrl == API_BASE_URL ? API_POST_BASE_URL : baseUrl;
     }
-    return API_BASE_URL;
+    return baseUrl;
   }
 
   Map<String, String> _getHeaders({bool authenticated = true}) {
