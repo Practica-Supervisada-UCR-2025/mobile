@@ -30,12 +30,45 @@ class TopActions extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        BlocBuilder<CreatePostBloc, CreatePostState>(
+        BlocConsumer<CreatePostBloc, CreatePostState>(
+          listener: (context, state) {
+            if (state is PostSubmitFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('There was an error creating the post. Please try again.'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } else if (state is PostSubmitSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Post successfully created!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              
+              Future.delayed(const Duration(milliseconds: 300), () {
+                if (context.mounted) {
+                  context.pop();
+                }
+              });
+            }
+          },
           builder: (context, state) {
+            if (state is PostSubmitting) {
+              return const CircularProgressIndicator();
+            }
+            
             final isEnabled = state.isValid;
 
             return TextButton(
               onPressed: isEnabled ? () {
+                final bloc = context.read<CreatePostBloc>();
+                bloc.add(PostSubmitted(
+                  text: state.text,
+                  image: state.image,
+                  selectedGif: state.selectedGif,
+                ));
               } : null,
               style: TextButton.styleFrom(
                 backgroundColor: isEnabled ? AppColors.primary 
