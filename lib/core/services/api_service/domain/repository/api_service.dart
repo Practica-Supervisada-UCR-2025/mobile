@@ -23,4 +23,11 @@ abstract class ApiService {
     List<http.MultipartFile> files, {
     bool authenticated = true,
   });
+
+  Future<http.Response> postMultipart(
+    String endpoint,
+    Map<String, String> fields,
+    List<http.MultipartFile> files, {
+    bool authenticated = true,
+  });
 }

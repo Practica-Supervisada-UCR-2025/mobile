@@ -3,8 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/core/services/services.dart';
 import 'package:mobile/src/create/create.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:provider/provider.dart';
+
 class MockFile extends Mock implements File {
   final String fakePath = '/fake/path/image.jpg';
   
@@ -12,21 +15,36 @@ class MockFile extends Mock implements File {
   String get path => fakePath;
 }
 
+class MockApiService extends Mock implements ApiService {}
+
 class MockCreatePostBloc extends Mock implements CreatePostBloc {}
 
 void main() {
+  late MockApiService mockApiService;
+  
   setUpAll(() {
     registerFallbackValue(const PostTextChanged(''));
     registerFallbackValue(PostImageChanged(MockFile()));
   });
   
+  setUp(() {
+    mockApiService = MockApiService();
+  });
+  
+  Widget createTestableCreatePage() {
+    return MultiProvider(
+      providers: [
+        Provider<ApiService>.value(value: mockApiService),
+      ],
+      child: const MaterialApp(
+        home: CreatePage(),
+      ),
+    );
+  }
+  
   group('CreatePage', () {
     testWidgets('renders CreatePage and subcomponents', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: CreatePage(),
-        ),
-      );
+      await tester.pumpWidget(createTestableCreatePage());
 
       expect(find.byType(CreatePage), findsOneWidget);
       expect(find.byType(TopActions), findsOneWidget);
@@ -35,22 +53,14 @@ void main() {
     });
 
     testWidgets('renders a TextField with placeholder', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: CreatePage(),
-        ),
-      );
+      await tester.pumpWidget(createTestableCreatePage());
       
       expect(find.byType(TextField), findsOneWidget);
       expect(find.text('What’s on your mind?'), findsOneWidget);
     });
 
     testWidgets('can enter text in PostTextField', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: CreatePage(),
-        ),
-      );
+      await tester.pumpWidget(createTestableCreatePage());
 
       final field = find.byType(TextField);
       expect(field, findsOneWidget);
@@ -78,8 +88,13 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp.router(
-          routerConfig: router,
+        MultiProvider(
+          providers: [
+            Provider<ApiService>.value(value: mockApiService),
+          ],
+          child: MaterialApp.router(
+            routerConfig: router,
+          ),
         ),
       );
 
@@ -94,78 +109,52 @@ void main() {
     });
 
     testWidgets('Post button exists', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: CreatePage(),
-        ),
-      );
+      await tester.pumpWidget(createTestableCreatePage());
 
       final postButton = find.text('Post');
       expect(postButton, findsOneWidget);
     });
 
     testWidgets('BottomBar contains image button icon', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: CreatePage(),
-        ),
-      );
+      await tester.pumpWidget(createTestableCreatePage());
 
       expect(find.byIcon(Icons.image_outlined), findsOneWidget);
     });
 
     group('Image handling tests', () {
-      late MockFile mockFile;
       late MockCreatePostBloc mockBloc;
       
       setUp(() {
-        mockFile = MockFile();
         mockBloc = MockCreatePostBloc();
         when(() => mockBloc.add(any())).thenReturn(null);
         when(() => mockBloc.state).thenReturn(const CreatePostInitial());
       });
 
-      testWidgets('Image selection updates state and adds event to bloc', (tester) async {
-        bool imageChanged = false;
-        File? selectedImage;
-        
+      testWidgets('Image selection sends PostImageChanged event to bloc', (tester) async {
+        final mockBloc = MockCreatePostBloc();
+        final imageFile = File('test.jpg');
+
         final controller = CreatePageController(
           bloc: mockBloc,
-          onImageChanged: (image) {
-            imageChanged = true;
-            selectedImage = image;
-          },
+          onImageSelectedByPicker: (_) {},
         );
-        
-        controller.handleImageSelected(mockFile);
-        
-        expect(imageChanged, isTrue);
-        expect(selectedImage, equals(mockFile));
-        expect(controller.selectedImage, equals(mockFile));
-        
-        verify(() => mockBloc.add(PostImageChanged(mockFile))).called(1);
+
+        controller.handleImagePicked(imageFile);
+
+        verify(() => mockBloc.add(PostImageChanged(imageFile))).called(1);
       });
+
       
-      testWidgets('Image removal updates state and adds null event to bloc', (tester) async {
-        bool imageChanged = false;
-        File? selectedImage = mockFile;
-        
+      testWidgets('Image removal sends PostImageChanged(null) to bloc', (tester) async {
+        final mockBloc = MockCreatePostBloc();
+
         final controller = CreatePageController(
           bloc: mockBloc,
-          onImageChanged: (image) {
-            imageChanged = true;
-            selectedImage = image;
-          },
+          onImageSelectedByPicker: (_) {},
         );
-        
-        controller.selectedImage = mockFile;
-        
+
         controller.removeImage();
-        
-        expect(imageChanged, isTrue);
-        expect(selectedImage, isNull);
-        expect(controller.selectedImage, isNull);
-        
+
         verify(() => mockBloc.add(const PostImageChanged(null))).called(1);
       });
     });

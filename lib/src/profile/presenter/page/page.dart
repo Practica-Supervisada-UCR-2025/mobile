@@ -137,7 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildCreatePostButton() {
     return SecondaryButton(
       onPressed: () {
-        // todo: Implement create post functionality
+        context.push(Paths.create);
       },
       isLoading: false,
       text: 'New Post',

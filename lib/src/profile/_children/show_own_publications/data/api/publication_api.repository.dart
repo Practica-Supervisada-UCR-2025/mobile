@@ -29,7 +29,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
 
     
     final uri = Uri.parse(
-      '$_baseUrl/api/user/posts/mine?page=$page&limit=$limit',
+      '${_baseUrl}user/posts/mine?page=$page&limit=$limit',
     );
     final resp = await client.get(
       uri,

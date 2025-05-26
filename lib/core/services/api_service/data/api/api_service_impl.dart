@@ -16,7 +16,12 @@ class ApiServiceImpl implements ApiService {
        localStorage = localStorage ?? LocalStorage(),
        baseUrl = baseUrl ?? API_BASE_URL;
 
-  String _getBaseUrl() => baseUrl;
+  String _getBaseUrl({String? endpoint}) {
+    if (endpoint != null && endpoint.startsWith('posts/newPost')) {
+      return baseUrl == API_BASE_URL ? API_POST_BASE_URL : baseUrl;
+    }
+    return baseUrl;
+  }
 
   Map<String, String> _getHeaders({bool authenticated = true}) {
     final headers = {'Content-Type': 'application/json'};
@@ -29,7 +34,7 @@ class ApiServiceImpl implements ApiService {
   @override
   Future<http.Response> get(String endpoint, {bool authenticated = true}) {
     return client.get(
-      Uri.parse('${_getBaseUrl()}$endpoint'),
+      Uri.parse('${_getBaseUrl(endpoint: endpoint)}$endpoint'),
       headers: _getHeaders(authenticated: authenticated),
     );
   }
@@ -41,7 +46,7 @@ class ApiServiceImpl implements ApiService {
     bool authenticated = true,
   }) {
     return client.post(
-      Uri.parse('${_getBaseUrl()}$endpoint'),
+      Uri.parse('${_getBaseUrl(endpoint: endpoint)}$endpoint'),
       headers: _getHeaders(authenticated: authenticated),
       body: json.encode(body ?? {}),
     );
@@ -54,7 +59,7 @@ class ApiServiceImpl implements ApiService {
     bool authenticated = true,
   }) {
     return client.patch(
-      Uri.parse('${_getBaseUrl()}$endpoint'),
+      Uri.parse('${_getBaseUrl(endpoint: endpoint)}$endpoint'),
       headers: _getHeaders(authenticated: authenticated),
       body: json.encode(body ?? {}),
     );
@@ -63,7 +68,7 @@ class ApiServiceImpl implements ApiService {
   @override
   Future<http.Response> delete(String endpoint, {bool authenticated = true}) {
     return client.delete(
-      Uri.parse('${_getBaseUrl()}$endpoint'),
+      Uri.parse('${_getBaseUrl(endpoint: endpoint)}$endpoint'),
       headers: _getHeaders(authenticated: authenticated),
     );
   }
@@ -75,8 +80,29 @@ class ApiServiceImpl implements ApiService {
     List<http.MultipartFile> files, {
     bool authenticated = true,
   }) async {
-    final uri = Uri.parse('${_getBaseUrl()}$endpoint');
+    final uri = Uri.parse('${_getBaseUrl(endpoint: endpoint)}$endpoint');
     final request = http.MultipartRequest('PATCH', uri);
+
+    if (authenticated) {
+      request.headers['Authorization'] = 'Bearer ${localStorage.accessToken}';
+    }
+
+    request.fields.addAll(fields);
+    request.files.addAll(files);
+
+    final streamedResponse = await request.send();
+    return http.Response.fromStream(streamedResponse);
+  }
+
+  @override
+  Future<http.Response> postMultipart(
+    String endpoint,
+    Map<String, String> fields,
+    List<http.MultipartFile> files, {
+    bool authenticated = true,
+  }) async {
+    final uri = Uri.parse('${_getBaseUrl(endpoint: endpoint)}$endpoint');
+    final request = http.MultipartRequest('POST', uri);
 
     if (authenticated) {
       request.headers['Authorization'] = 'Bearer ${localStorage.accessToken}';
