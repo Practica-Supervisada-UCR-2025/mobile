@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/core/storage/storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mobile/src/profile/profile.dart'
     show
@@ -16,6 +18,8 @@ import 'package:mobile/src/profile/profile.dart'
         PublicationLoading,
         PublicationFailure,
         PublicationSuccess,
+        PublicationDeleteSuccess,
+        PublicationDeleteFailure,
         Publication,
         PublicationsList,
         PublicationCard;
@@ -29,9 +33,14 @@ class FakePublicationState extends Fake implements PublicationState {}
 void main() {
   late MockPublicationBloc mockBloc;
 
-  setUpAll(() {
+  setUpAll(() async {
     registerFallbackValue(FakePublicationEvent());
     registerFallbackValue(FakePublicationState());
+    SharedPreferences.setMockInitialValues({
+      'accessToken': '',
+      'username': 'MockUser',
+    });
+    await LocalStorage.init();
   });
 
   setUp(() {
@@ -47,9 +56,11 @@ void main() {
     );
 
     return MaterialApp(
-      home: BlocProvider<PublicationBloc>.value(
-        value: mockBloc,
-        child: const PublicationsList(),
+      home: Scaffold(
+        body: BlocProvider<PublicationBloc>.value(
+          value: mockBloc,
+          child: const PublicationsList(),
+        ),
       ),
     );
   }
@@ -103,7 +114,7 @@ void main() {
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
       final pub = Publication(
-        id: 1,
+        id: '1',
         username: 'user1',
         profileImageUrl: 'https://example.com/avatar.png',
         content: 'Hello World',
@@ -146,7 +157,7 @@ void main() {
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
       final pub = Publication(
-        id: 2,
+        id: '2',
         username: 'user2',
         profileImageUrl: 'https://example.com/avatar2.png',
         content: 'Second post',
@@ -177,4 +188,71 @@ void main() {
       expect(find.byType(SizedBox), findsOneWidget);
     });
   });
+
+  testWidgets('shows success SnackBar when PublicationDeleteSuccess is emitted',
+      (WidgetTester tester) async {
+    await mockNetworkImagesFor(() async {
+      final successState = PublicationDeleteSuccess('123');
+
+      when(() => mockBloc.state).thenReturn(successState);
+      whenListen(
+        mockBloc,
+        Stream<PublicationState>.fromIterable([
+          PublicationSuccess(
+            publications: [],
+            totalPosts: 0,
+            totalPages: 1,
+            currentPage: 1,
+          ),
+          successState,
+        ]),
+        initialState: PublicationSuccess(
+          publications: [],
+          totalPosts: 0,
+          totalPages: 1,
+          currentPage: 1,
+        ),
+      );
+
+      await tester.pumpWidget(buildTestableWidget(successState));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.text('Post deleted successfully'), findsOneWidget);
+    });
+  });
+
+  testWidgets('shows error SnackBar when PublicationDeleteFailure is emitted',
+      (WidgetTester tester) async {
+    await mockNetworkImagesFor(() async {
+      final failureState = PublicationDeleteFailure('Something went wrong');
+
+      when(() => mockBloc.state).thenReturn(failureState);
+      whenListen(
+        mockBloc,
+        Stream<PublicationState>.fromIterable([
+          PublicationSuccess(
+            publications: [],
+            totalPosts: 0,
+            totalPages: 1,
+            currentPage: 1,
+          ),
+          failureState,
+        ]),
+        initialState: PublicationSuccess(
+          publications: [],
+          totalPosts: 0,
+          totalPages: 1,
+          currentPage: 1,
+        ),
+      );
+
+      await tester.pumpWidget(buildTestableWidget(failureState));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.text('Something went wrong'), findsOneWidget);
+    });
+  });
+
 }

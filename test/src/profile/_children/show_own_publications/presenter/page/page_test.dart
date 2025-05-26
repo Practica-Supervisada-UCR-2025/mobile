@@ -56,4 +56,8 @@ class _FakeFailureRepository implements PublicationRepository {
   }) {
     throw Exception('simulated failure');
   }
+  @override
+  Future<void> deletePublication({
+    required String postId,
+  }) async {}
 }

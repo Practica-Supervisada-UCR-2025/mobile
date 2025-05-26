@@ -11,7 +11,7 @@ void main() {
   late PublicationRepository repository;
 
   final samplePub1 = Publication(
-    id: 1,
+    id: '1',
     username: 'user1',
     profileImageUrl: 'https://img.example/1.png',
     content: 'First post',
@@ -21,7 +21,7 @@ void main() {
     comments: 0,
   );
   final samplePub2 = Publication(
-    id: 2,
+    id: '2',
     username: 'user2',
     profileImageUrl: 'https://img.example/2.png',
     content: 'Second post',
@@ -167,4 +167,62 @@ void main() {
       expect(LoadMorePublications(), equals(LoadMorePublications()));
     });
   });
+
+  group('DeletePublicationRequested', () {
+    blocTest<PublicationBloc, PublicationState>(
+      'emits [Deleting, DeleteSuccess, Success] when deletion is successful',
+      build: () {
+        when(() => repository.deletePublication(postId: '1'))
+            .thenAnswer((_) async => Future.value());
+        return bloc;
+      },
+      seed: () => PublicationSuccess(
+        publications: [samplePub1, samplePub2],
+        totalPosts: 2,
+        totalPages: 1,
+        currentPage: 1,
+      ),
+      act: (b) => b.add(DeletePublicationRequested('1')),
+      expect: () => [
+        PublicationSuccess(
+          publications: [samplePub2],
+          totalPosts: 1,
+          totalPages: 1,
+          currentPage: 1,
+        ),
+      ],
+      verify: (_) {
+        verify(() => repository.deletePublication(postId: '1')).called(1);
+      },
+    );
+
+    blocTest<PublicationBloc, PublicationState>(
+      'emits [Deleting, DeleteFailure] when repository throws error',
+      build: () {
+        when(() => repository.deletePublication(postId: '1'))
+            .thenThrow(Exception('Delete failed'));
+        return bloc;
+      },
+      seed: () => PublicationSuccess(
+        publications: [samplePub1, samplePub2],
+        totalPosts: 2,
+        totalPages: 1,
+        currentPage: 1,
+      ),
+      act: (b) => b.add(DeletePublicationRequested('1')),
+      expect: () => [
+        isA<PublicationDeleteFailure>().having((e) => e.error, 'error', contains('Delete failed')),
+      ],
+    );
+
+    blocTest<PublicationBloc, PublicationState>(
+      'does nothing when current state is not PublicationSuccess',
+      build: () => bloc,
+      act: (b) => b.add(DeletePublicationRequested('1')),
+      expect: () => [],
+      verify: (_) {
+        verifyNever(() => repository.deletePublication(postId: any<String>(named: 'postId')));
+      },
+    );
+  });  
 }

@@ -30,7 +30,7 @@ void main() {
       final mockResponse = {
         'data': [
           {
-            'id': 1,
+            'id': '1',
             'content': 'Test content',
             'created_at': '2024-01-01T12:00:00Z',
             'file_url': 'https://example.com/image.png',
@@ -54,7 +54,7 @@ void main() {
       final result = await repository.fetchPublications(page: 1, limit: 10);
 
       expect(result.publications.length, 1);
-      expect(result.publications.first.id, 1);
+      expect(result.publications.first.id, '1');
       expect(result.totalPosts, 1);
     });
 
@@ -125,7 +125,7 @@ void main() {
       final mockResponse = {
         'data': [
           {
-            'id': 1,
+            'id': '1',
             'content': 'Broken date',
             'created_at': 'invalid-date',
             'file_url': '',
@@ -150,4 +150,124 @@ void main() {
       expect(result.publications.first.createdAt, isA<DateTime>());
     });    
   });
+
+  group('PublicationRepositoryAPI.deletePublication', () {
+    late PublicationRepositoryAPI repository;
+
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({
+        'accessToken': 'mock-token',
+        'username': 'MockUser',
+      });
+      await LocalStorage.init();
+    });
+
+    test('successfully deletes a publication', () async {
+      final mockResponse = {
+        'status': 'success',
+        'data': {'deleted': true},
+      };
+
+      repository = PublicationRepositoryAPI(
+        client: MockClient((request) async {
+          expect(request.method, equals('DELETE'));
+          expect(request.url.path, contains('/api/user/posts/delete/42'));
+          expect(request.body, isEmpty);
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      await repository.deletePublication(postId: '42');
+    });
+
+    test('throws exception if status is not success', () async {
+      final mockResponse = {
+        'status': 'error',
+        'message': 'Post could not be deleted.',
+      };
+
+      repository = PublicationRepositoryAPI(
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      expect(
+        () async => await repository.deletePublication(postId: '42'),
+        throwsA(predicate((e) =>
+            e is Exception && e.toString().contains('Post could not be deleted'))),
+      );
+    });
+
+    test('throws exception if deleted flag is false', () async {
+      final mockResponse = {
+        'status': 'success',
+        'data': {'deleted': false},
+      };
+
+      repository = PublicationRepositoryAPI(
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      expect(
+        () async => await repository.deletePublication(postId: '42'),
+        throwsA(predicate((e) =>
+            e is Exception &&
+            e.toString().contains('The post was not deleted properly'))),
+      );
+    });
+
+    test('throws exception on non-200 response with message', () async {
+      final mockResponse = {
+        'message': 'Error 401: Invalid response from the server.',
+      };
+
+      repository = PublicationRepositoryAPI(
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 401);
+        }),
+      );
+
+      expect(
+        () async => await repository.deletePublication(postId: '42'),
+        throwsA(predicate((e) =>
+            e is Exception &&
+            e.toString().contains('Error 401: Invalid response from the server.'))),
+      );
+    });
+
+    test('throws generic exception on malformed response body', () async {
+      repository = PublicationRepositoryAPI(
+        client: MockClient((request) async {
+          return http.Response('Not JSON', 500);
+        }),
+      );
+
+      expect(
+        () async => await repository.deletePublication(postId: '42'),
+        throwsA(predicate((e) =>
+            e is Exception &&
+            e.toString().contains('Invalid response from the server'))),
+      );
+    });
+
+    test('throws exception if token is empty', () async {
+      SharedPreferences.setMockInitialValues({
+        'accessToken': '',
+        'username': 'MockUser',
+      });
+      await LocalStorage.init();
+
+      repository = PublicationRepositoryAPI();
+
+      expect(
+        () async => await repository.deletePublication(postId: '42'),
+        throwsA(predicate(
+            (e) => e is Exception && e.toString().contains('Error 400: Invalid response from the server.'))),
+      );
+    });
+  });
+
 }

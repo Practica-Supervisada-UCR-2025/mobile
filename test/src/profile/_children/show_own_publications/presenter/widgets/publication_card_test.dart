@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 import 'package:mobile/src/profile/profile.dart';
+import 'package:mobile/core/storage/storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   late Publication basePost;
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({
+      'accessToken': 'mock-token',
+      'username': 'MockUser',
+    });
+    await LocalStorage.init();
     basePost = Publication(
-      id: 1,
-      username: 'TestUser',
+      id: '1',
+      username: 'MockUser',
       profileImageUrl: 'https://example.com/avatar.jpg',
       content: 'Base content.',
       createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
@@ -30,7 +37,7 @@ void main() {
       await tester.pump();
 
       // THEN: username, content and reaction counts appear
-      expect(find.text('TestUser'), findsOneWidget);
+      expect(find.text('MockUser'), findsOneWidget);
       expect(find.text('Base content.'), findsOneWidget);
       expect(find.text('7'), findsOneWidget);
       expect(find.text('3'), findsOneWidget);
@@ -138,8 +145,8 @@ void main() {
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
 
-      // THEN: the menu is dismissed
-      expect(find.text('Delete'), findsNothing);
+      // THEN: shows the dialog
+      expect(find.byType(AlertDialog), findsOneWidget);
     });
   });
 
