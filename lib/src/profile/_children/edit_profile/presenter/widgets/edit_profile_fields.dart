@@ -128,6 +128,8 @@ class EditProfileFields extends StatelessWidget {
       floatingLabelStyle: TextStyle(
         color: Theme.of(context).colorScheme.primary,
       ),
+      errorMaxLines: 2,
+      helperMaxLines: null,
     );
   }
 }
