@@ -56,7 +56,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
 
     for (final raw in postsJson) {
       if (raw is Map<String, dynamic>) {
-        final int id = raw['id'] is int ? raw['id'] as int : 0;
+        final String id = raw['id'] is String ? raw['id'] as String : '';
         final String content = raw['content'] is String ? raw['content'] as String : '';
         final String? fileUrl = raw['file_url'] is String ? raw['file_url'] as String : null;
         final String createdAtStr = raw['created_at'] is String ? raw['created_at'] as String : '';
@@ -100,4 +100,44 @@ class PublicationRepositoryAPI implements PublicationRepository {
       currentPage: currentPage,
     );
   }
+
+  @override
+  Future<void> deletePublication({
+    required String postId,
+  }) async {
+    final token = await _getJwtToken();
+    if (token.isEmpty) {
+      throw Exception('No JWT token found');
+    }
+
+    final postIdStr = postId.toString();
+    final uri = Uri.parse('$_baseUrl/api/user/posts/delete/$postIdStr');
+    final request = http.Request('DELETE', uri);
+    request.headers.addAll({
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    });
+    final streamedResponse = await client.send(request);
+    final response = await http.Response.fromStream(streamedResponse);
+    if (response.statusCode != 200) {
+      try {
+        final body = jsonDecode(response.body);
+        final message = body['message'] ?? 'Unknown error.';
+        throw Exception('Error ${response.statusCode}: $message');
+      } catch (_) {
+        throw Exception('Error ${response.statusCode}: Invalid response from the server.');
+      }
+    }
+
+    final Map<String, dynamic> data = jsonDecode(response.body);
+
+    if (data['status'] != 'success') {
+      throw Exception(data['message'] ?? 'The post could not be deleted.');
+    }
+
+    if (data['data']?['deleted'] != true) {
+      throw Exception('The post was not deleted properly.');
+    }
+  }
+
 }

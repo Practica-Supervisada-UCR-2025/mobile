@@ -10,3 +10,9 @@ abstract class PublicationEvent extends Equatable {
 class LoadPublications extends PublicationEvent {}
 
 class LoadMorePublications extends PublicationEvent {}
+
+class DeletePublicationRequested extends PublicationEvent {
+  final String postId;
+
+  DeletePublicationRequested(this.postId);
+}

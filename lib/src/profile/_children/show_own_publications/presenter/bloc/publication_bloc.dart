@@ -14,6 +14,7 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
       : super(PublicationInitial()) {
     on<LoadPublications>(_onLoadPublications);
     on<LoadMorePublications>(_onLoadMorePublications);
+    on<DeletePublicationRequested>(_onDeletePublicationRequested);
   }
 
   Future<void> _onLoadPublications(
@@ -26,7 +27,6 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
         page: _currentPage,
         limit: _limit,
       );
-
       emit(PublicationSuccess(
         publications: response.publications,
         totalPosts: response.totalPosts,
@@ -65,4 +65,27 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
       emit(PublicationFailure());
     }
   }
+
+  Future<void> _onDeletePublicationRequested(
+    DeletePublicationRequested event,
+    Emitter<PublicationState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! PublicationSuccess) return;
+    try {
+      await publicationRepository.deletePublication(postId: event.postId);
+      final updatedPublications = currentState.publications
+          .where((publication) => publication.id != event.postId)
+          .toList();
+      emit(PublicationSuccess(
+        publications: updatedPublications,
+        totalPosts: currentState.totalPosts - 1,
+        totalPages: currentState.totalPages,
+        currentPage: currentState.currentPage,
+      ));
+    } catch (e) {
+      emit(PublicationDeleteFailure(e.toString()));
+    }
+  }
+
 }

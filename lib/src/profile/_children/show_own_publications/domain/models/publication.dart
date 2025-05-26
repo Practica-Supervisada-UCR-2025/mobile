@@ -1,5 +1,5 @@
 class Publication {
-  final int id;
+  final String id;
   final String username;
   final String profileImageUrl;
   final String content;

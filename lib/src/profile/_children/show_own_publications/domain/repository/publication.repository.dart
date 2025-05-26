@@ -21,4 +21,8 @@ abstract class PublicationRepository {
     required int page,
     required int limit,
   });
+
+  Future<void> deletePublication({
+    required String postId,
+  });
 }

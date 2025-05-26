@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/storage/storage.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class PublicationCard extends StatelessWidget {
@@ -44,17 +45,25 @@ class PublicationCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      // No action for now
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem<String>(
-                        value: 'delete',
-                        child: Text('Delete'),
-                      ),
-                    ],
-                  ),
+                  if (LocalStorage().username == publication.username)
+                    PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'delete') {
+                          showDialog(
+                            context: context,
+                            builder: (context) => DeletePublicationDialog(
+                              publicationId: publication.id,
+                            ),
+                          );
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Text('Delete'),
+                        ),
+                      ],
+                    ),
                 ],
               ),
 

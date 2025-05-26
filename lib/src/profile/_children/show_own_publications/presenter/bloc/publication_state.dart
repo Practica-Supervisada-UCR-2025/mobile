@@ -34,3 +34,23 @@ class PublicationSuccess extends PublicationState {
   List<Object?> get props =>
       [publications, totalPosts, totalPages, currentPage];
 }
+
+class PublicationDeleting extends PublicationState {}
+
+class PublicationDeleteSuccess extends PublicationState {
+  final String postId;
+
+  const PublicationDeleteSuccess(this.postId);
+
+  @override
+  List<Object?> get props => [postId];
+}
+
+class PublicationDeleteFailure extends PublicationState {
+  final String error;
+
+  const PublicationDeleteFailure(this.error);
+
+  @override
+  List<Object?> get props => [error];
+}
