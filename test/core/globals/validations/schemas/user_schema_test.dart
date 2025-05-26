@@ -115,6 +115,13 @@ void main() {
     });
   });
 
+  group('UserValidator Schema - Validate last name', () {
+    test('should return error when last name is empty', () {
+      final result = UserValidator.validateLastName('...');
+      expect(result, 'The name can only contain letters and spaces');
+    });
+  });
+
   group('UserValidator Schema - Validate username', () {
     test('should return error when username is empty', () {
       final result = UserValidator.validateUsername('');

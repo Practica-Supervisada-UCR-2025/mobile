@@ -56,7 +56,7 @@ class EditProfileFields extends StatelessWidget {
         hintText: 'Enter your last name',
         prefixIcon: Icons.person_outline,
       ),
-      validator: UserValidator.validateName,
+      validator: UserValidator.validateLastName,
     );
   }
 
