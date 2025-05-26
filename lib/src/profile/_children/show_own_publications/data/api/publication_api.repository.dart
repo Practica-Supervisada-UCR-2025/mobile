@@ -111,7 +111,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
     }
 
     final postIdStr = postId.toString();
-    final uri = Uri.parse('$_baseUrl/api/user/posts/delete/$postIdStr');
+    final uri = Uri.parse('${_baseUrl}user/posts/delete/$postIdStr');
     final request = http.Request('DELETE', uri);
     request.headers.addAll({
       'Authorization': 'Bearer $token',
