@@ -4,8 +4,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile/core/core.dart';
+import 'package:mobile/src/create/presenter/widgets/gif_picker_bottom_sheet.dart';
+import 'package:mobile/src/shared/models/gif_model.dart';
+import 'package:mobile/src/shared/services/tenor_gif_service.dart'; 
 
 class MediaPickerService {
+  static Future<GifModel?> pickGifFromTenor({
+    required BuildContext context,
+    TenorGifService? gifService, 
+  }) async {
+    final GifModel? selectedGif = await showModalBottomSheet<GifModel>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (bottomSheetContext) { 
+        return GifPickerBottomSheet(
+          gifService: gifService,
+          onGifSelected: (gif) {
+            Navigator.of(bottomSheetContext).pop(gif);
+          },
+        );
+      },
+    );
+
+    return selectedGif;
+  }
+  
   static Future<File?> pickImageFromGallery({
     required BuildContext context,
     void Function(String message)? onInvalidFile,
