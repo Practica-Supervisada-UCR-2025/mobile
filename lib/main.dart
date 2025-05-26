@@ -55,6 +55,11 @@ class MyApp extends StatelessWidget {
               (context) => EditProfileRepositoryImpl(
                 apiService: context.read<ApiService>(),
               ),
+        ),        
+        RepositoryProvider<CreatePostRepository>(
+          create: (context) => CreatePostRepositoryImpl(
+            apiService: context.read<ApiService>(),
+          ),
         ),
       ],
       child: MultiBlocProvider(
@@ -86,7 +91,9 @@ class MyApp extends StatelessWidget {
                   profileRepository: context.read<ProfileRepository>(),
                 ),
           ),
-          BlocProvider<CreatePostBloc>(create: (context) => CreatePostBloc()),
+          BlocProvider<CreatePostBloc>(create: (context) => CreatePostBloc(
+            createPostRepository: context.read<CreatePostRepository>(),
+          )),
           BlocProvider<PublicationBloc>(
             create:
                 (context) => PublicationBloc(

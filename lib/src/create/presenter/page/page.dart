@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/core/services/services.dart';
+import 'package:provider/provider.dart';
 import 'package:mobile/src/create/create.dart';
 
 class CreatePageController {
@@ -33,12 +35,17 @@ class CreatePage extends StatefulWidget {
 class _CreatePageState extends State<CreatePage> {
   final _textController = TextEditingController();
   File? _selectedImageFromPage;
-  final _bloc = CreatePostBloc();
+  late final CreatePostBloc _bloc;
   StreamSubscription<CreatePostState>? _blocStateSubscription;
 
   @override
   void initState() {
     super.initState();
+    
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final createPostRepository = CreatePostRepositoryImpl(apiService: apiService);
+    _bloc = CreatePostBloc(createPostRepository: createPostRepository);
+    
     _blocStateSubscription = _bloc.stream.listen((newState) {
       if (mounted) {
         if (_selectedImageFromPage?.path != newState.image?.path) {
@@ -125,7 +132,7 @@ class _CreatePageState extends State<CreatePage> {
             ],
           ),
         ),
-      ),
+      )
     );
   }
 }

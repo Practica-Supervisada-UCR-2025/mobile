@@ -33,3 +33,18 @@ class PostGifChanged extends CreatePostEvent {
   @override
   List<Object?> get props => [gif];
 }
+
+class PostSubmitted extends CreatePostEvent {
+  final String? text;
+  final File? image;
+  final GifModel? selectedGif;
+
+  const PostSubmitted({
+    this.text,
+    this.image,
+    this.selectedGif,
+  });
+
+  @override
+  List<Object?> get props => [text, image, selectedGif];
+}

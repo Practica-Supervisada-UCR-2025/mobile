@@ -103,3 +103,92 @@ final class CreatePostChanged extends CreatePostState {
     );
   }
 }
+
+final class PostSubmitting extends CreatePostState {
+  const PostSubmitting({
+    required super.text,
+    required super.image,
+    required super.isOverLimit,
+    required super.isValid,
+    required super.selectedGif,
+  });
+
+  @override
+  CreatePostState copyWith({
+    String? text,
+    dynamic image = _noValueSentinel,
+    bool? isOverLimit,
+    bool? isValid,
+    dynamic selectedGif = _noValueSentinel,
+  }) {
+    return PostSubmitting(
+      text: text ?? this.text,
+      image: image == _noValueSentinel ? this.image : image as File?,
+      isOverLimit: isOverLimit ?? this.isOverLimit,
+      isValid: isValid ?? this.isValid,
+      selectedGif: selectedGif == _noValueSentinel ? this.selectedGif : selectedGif as GifModel?,
+    );
+  }
+}
+
+final class PostSubmitSuccess extends CreatePostState {
+  const PostSubmitSuccess({
+    required super.text,
+    required super.image,
+    required super.isOverLimit,
+    required super.isValid,
+    required super.selectedGif,
+  });
+
+  @override
+  CreatePostState copyWith({
+    String? text,
+    dynamic image = _noValueSentinel,
+    bool? isOverLimit,
+    bool? isValid,
+    dynamic selectedGif = _noValueSentinel,
+  }) {
+    return PostSubmitSuccess(
+      text: text ?? this.text,
+      image: image == _noValueSentinel ? this.image : image as File?,
+      isOverLimit: isOverLimit ?? this.isOverLimit,
+      isValid: isValid ?? this.isValid,
+      selectedGif: selectedGif == _noValueSentinel ? this.selectedGif : selectedGif as GifModel?,
+    );
+  }
+}
+
+final class PostSubmitFailure extends CreatePostState {
+  final String error;
+
+  const PostSubmitFailure({
+    required super.text,
+    required super.image,
+    required super.isOverLimit,
+    required super.isValid,
+    required super.selectedGif,
+    required this.error,
+  });
+
+  @override
+  List<Object?> get props => [...super.props, error];
+
+  @override
+  CreatePostState copyWith({
+    String? text,
+    dynamic image = _noValueSentinel,
+    bool? isOverLimit,
+    bool? isValid,
+    dynamic selectedGif = _noValueSentinel,
+    String? error,
+  }) {
+    return PostSubmitFailure(
+      text: text ?? this.text,
+      image: image == _noValueSentinel ? this.image : image as File?,
+      isOverLimit: isOverLimit ?? this.isOverLimit,
+      isValid: isValid ?? this.isValid,
+      selectedGif: selectedGif == _noValueSentinel ? this.selectedGif : selectedGif as GifModel?,
+      error: error ?? this.error,
+    );
+  }
+}
