@@ -65,8 +65,8 @@ class UserValidator {
 
     if (validator != null) return validator;
 
-    if (value != null && !RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-      return 'The username can only contain letters, numbers, and underscores';
+    if (value != null && !RegExp(r'^[a-zA-Z0-9_.]+$').hasMatch(value)) {
+      return 'Username can only contain letters, numbers, and underscores';
     }
 
     return null;

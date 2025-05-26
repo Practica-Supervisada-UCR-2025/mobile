@@ -4,23 +4,19 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-// Asegúrate que la ruta a tu servicio REAL sea correcta
 import 'package:mobile/src/shared/services/tenor_gif_service.dart';
-// Asegúrate que la ruta a tus modelos REALES sea correcta
 import 'package:mobile/src/shared/models/gif_model.dart';
-import 'package:mobile/src/shared/models/trending_response.dart'; // Importa si lo usas
+import 'package:mobile/src/shared/models/trending_response.dart'; 
 
-// Importa el archivo de mocks generado
 import 'tenor_gif_service_test.mocks.dart';
 
-// Anotación para generar el mock de http.Client
 @GenerateMocks([http.Client])
 void main() {
   late MockClient mockHttpClient;
-  late TenorGifService tenorGifService; // Esta será una instancia de tu servicio REAL
+  late TenorGifService tenorGifService; 
 
   const String fakeApiKey = 'FAKE_API_KEY_FOR_TESTS';
-  const String clientKey = 'ucr_conect'; // Tomado de tu servicio
+  const String clientKey = 'ucr_conect'; 
   const String baseUrl = 'https://tenor.googleapis.com/v2';
 
   Map<String, dynamic> createSampleGifJson(String id, String tinyGifUrl) {
@@ -35,7 +31,6 @@ void main() {
 
   setUp(() {
     mockHttpClient = MockClient();
-    // Instancia el servicio REAL, inyectando el cliente mock y la API key falsa
     tenorGifService = TenorGifService(client: mockHttpClient, apiKey: fakeApiKey);
   });
 
@@ -53,7 +48,6 @@ void main() {
           createSampleGifJson('gif1', 'http://example.com/gif1_tiny.gif'),
           createSampleGifJson('gif2', 'http://example.com/gif2_tiny.gif'),
         ];
-        // Asegúrate que el mock response tenga la estructura que espera el servicio real.
         final mockResponseBody = json.encode({'results': mockGifListJson, 'next': 'some_next_value_if_applicable'});
 
         when(mockHttpClient.get(searchUri))
@@ -74,7 +68,6 @@ void main() {
 
         expect(
           () => tenorGifService.searchGifs(query, limit: limit, pos: pos),
-          // El servicio real lanza 'Failed to load GIFs' para errores no-200
           throwsA(isA<Exception>().having(
               (e) => e.toString(), 'message', contains('Failed to load GIFs'))),
         );
@@ -82,21 +75,17 @@ void main() {
       });
 
       test('throws Exception on search JSON missing "results" key (200 OK but bad structure)', () async {
-        final mockResponseBody = json.encode({'data': []}); // No hay 'results'
+        final mockResponseBody = json.encode({'data': []}); 
         when(mockHttpClient.get(searchUri))
             .thenAnswer((_) async => http.Response(mockResponseBody, 200));
 
         expect(
           () => tenorGifService.searchGifs(query, limit: limit, pos: pos),
-          // Espera el mensaje del servicio real
           throwsA(isA<Exception>().having((e) => e.toString(), 'message',
               contains('Failed to load GIFs: Missing "results" key in JSON or invalid structure'))),
         );
-        verify(mockHttpClient.get(searchUri)).called(1); // Verifica que se llamó una vez
+        verify(mockHttpClient.get(searchUri)).called(1); 
       });
-
-      // Elimina la prueba duplicada que tenías aquí.
-      // La prueba anterior ya cubre el caso de "missing results" con el mensaje correcto.
     });
 
     group('getTrendingGifs', () {
@@ -118,7 +107,6 @@ void main() {
         when(mockHttpClient.get(trendingUriNoPos, headers: {'Accept': 'application/json'}))
             .thenAnswer((_) async => http.Response(mockResponseBody, 200));
 
-        // El servicio real devuelve TrendingGifResponse
         final result = await tenorGifService.getTrendingGifs(limit: limit, pos: initialPos);
 
         expect(result, isA<TrendingGifResponse>());
@@ -152,7 +140,7 @@ void main() {
         expect(
           () => tenorGifService.getTrendingGifs(limit: limit, pos: initialPos),
           throwsA(isA<Exception>().having((e) => e.toString(), 'message',
-              contains('Failed to load trending GIFs'))), // Mensaje genérico para no-200
+              contains('Failed to load trending GIFs'))),
         );
         verify(mockHttpClient.get(trendingUriNoPos, headers: {'Accept': 'application/json'})).called(1);
       });
@@ -164,13 +152,13 @@ void main() {
         expect(
           () => tenorGifService.getTrendingGifs(limit: limit, pos: initialPos),
           throwsA(isA<Exception>().having((e) => e.toString(), 'message',
-              contains('Failed to load trending GIFs: Invalid JSON format'))), // Mensaje de error de parseo
+              contains('Failed to load trending GIFs: Invalid JSON format'))),
         );
         verify(mockHttpClient.get(trendingUriNoPos, headers: {'Accept': 'application/json'})).called(1);
       });
 
       test('throws Exception on trending JSON missing "results" key (200 OK but bad structure)', () async {
-        final mockResponseBodyMissingResults = json.encode({'next': 'somePos'}); // Sin 'results'
+        final mockResponseBodyMissingResults = json.encode({'next': 'somePos'});
 
         when(mockHttpClient.get(trendingUriNoPos, headers: {'Accept': 'application/json'}))
             .thenAnswer((_) async => http.Response(mockResponseBodyMissingResults, 200));
@@ -178,14 +166,13 @@ void main() {
         expect(
           () => tenorGifService.getTrendingGifs(limit: limit, pos: initialPos),
           throwsA(isA<Exception>().having((e) => e.toString(), 'message',
-              contains('Failed to load trending GIFs: Missing "results" key in JSON or invalid structure'))), // Mensaje específico
+              contains('Failed to load trending GIFs: Missing "results" key in JSON or invalid structure'))),
         );
         verify(mockHttpClient.get(trendingUriNoPos, headers: {'Accept': 'application/json'})).called(1);
       });
     });
 
     test('TenorGifService (real) constructor uses provided apiKey', () {
-        // tenorGifService ya está creado en setUp
         expect(tenorGifService.currentApiKeyForTests, fakeApiKey);
     });
   });
