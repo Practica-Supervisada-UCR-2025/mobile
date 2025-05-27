@@ -17,6 +17,24 @@ class UserValidator {
     return null;
   }
 
+  static String? validateLastName(String? value) {
+    final validator = EzValidator<String>()
+        .maxLength(25, 'The last name must be at most 25 characters long')
+        .validate(value);
+
+    if (value == null || value.trim().isEmpty) {
+      return null;
+    }
+
+    if (validator != null) return validator;
+
+    if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+      return 'The name can only contain letters and spaces';
+    }
+
+    return null;
+  }
+
   static String? validateEmail(String? value) {
     final validator = EzValidator<String>()
         .required('This field is required')
@@ -65,8 +83,8 @@ class UserValidator {
 
     if (validator != null) return validator;
 
-    if (value != null && !RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-      return 'The username can only contain letters, numbers, and underscores';
+    if (value != null && !RegExp(r'^[a-zA-Z0-9_.]+$').hasMatch(value)) {
+      return 'Username can only contain letters, numbers, and underscores';
     }
 
     return null;
