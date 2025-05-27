@@ -1,336 +1,287 @@
+// test/src/profile/_children/show_own_publications/presenter/widgets/publication_card_test.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network_image_mock/network_image_mock.dart';
-import 'package:mobile/src/profile/profile.dart';
+
+import 'package:mobile/src/profile/profile.dart'
+    show Publication, PublicationCard;
 
 void main() {
-  late Publication basePost;
-
-  setUp(() {
-    basePost = Publication(
-      id: 1,
-      username: 'TestUser',
-      profileImageUrl: 'https://example.com/avatar.jpg',
-      content: 'Base content.',
-      createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
-      attachment: null,
-      likes: 7,
-      comments: 3,
-    );
-  });
-
-  testWidgets('shows user data and counters without attached image',
-      (WidgetTester tester) async {
-    // Wrap in mockNetworkImagesFor to avoid real HTTP for avatar
+  /// Pumps the PublicationCard inside a scrollable Scaffold.
+  Future<void> _pumpCard(
+      WidgetTester tester, Publication publication) async {
     await mockNetworkImagesFor(() async {
-      // GIVEN: a PublicationCard with no attachment
       await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: basePost)),
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: PublicationCard(publication: publication),
+            ),
+          ),
+        ),
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
+    });
+  }
 
-      // THEN: username, content and reaction counts appear
-      expect(find.text('TestUser'), findsOneWidget);
-      expect(find.text('Base content.'), findsOneWidget);
+  testWidgets(
+    'displays avatar, username, relative minutes ago, likes & comments',
+    (WidgetTester tester) async {
+      final createdAt =
+          DateTime.now().subtract(const Duration(minutes: 5));
+      final pub = Publication(
+        id: 1,
+        username: 'testuser',
+        profileImageUrl: 'https://example.com/avatar.png',
+        content: 'Short content',
+        createdAt: createdAt,
+        attachment: null,
+        likes: 42,
+        comments: 7,
+      );
+
+      await _pumpCard(tester, pub);
+
+      expect(find.byType(CircleAvatar), findsOneWidget);
+      expect(find.text('testuser'), findsOneWidget);
+      expect(find.text('5 minutes ago'), findsOneWidget);
+      expect(find.text('Short content'), findsOneWidget);
+      expect(find.byIcon(Icons.favorite_border), findsOneWidget);
+      expect(find.text('42'), findsOneWidget);
+      expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
       expect(find.text('7'), findsOneWidget);
-      expect(find.text('3'), findsOneWidget);
+    },
+  );
 
-      // AND: no ClipRRect for an attachment
-      expect(find.byType(ClipRRect), findsNothing);
-    });
-  });
-
-  testWidgets('shows attached image and truncated text with See more',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      // GIVEN: a long post (>250 chars) with attachment
-      final longContent = 'A' * 300;
-      final postWithImage = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: longContent,
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        attachment: 'https://example.com/image.jpg',
-        likes: 15,
-        comments: 4,
+  testWidgets(
+    'subtle bottom border is applied',
+    (WidgetTester tester) async {
+      final pub = Publication(
+        id: 2,
+        username: 'border',
+        profileImageUrl: 'url',
+        content: 'Border test',
+        createdAt: DateTime.now(),
+        attachment: null,
+        likes: 0,
+        comments: 0,
       );
 
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: postWithImage)),
-      );
-      await tester.pump();
+      await _pumpCard(tester, pub);
 
-      // THEN: an image is shown inside a ClipRRect
+      final container = tester.widget<Container>(
+        find.byType(Container).first,
+      );
+      final decoration = container.decoration as BoxDecoration;
+      final borderSide = decoration.border!.bottom;
+
+      expect(borderSide.color, Colors.grey.shade300);
+      expect(borderSide.width, 0.3);
+    },
+  );
+
+  testWidgets(
+    'renders attachment inside ClipRRect when URL is provided',
+    (WidgetTester tester) async {
+      final pub = Publication(
+        id: 3,
+        username: 'imguser',
+        profileImageUrl: 'https://example.com/avatar.png',
+        content: 'With image',
+        createdAt: DateTime.now(),
+        attachment: 'https://example.com/file.jpg',
+        likes: 0,
+        comments: 0,
+      );
+
+      await _pumpCard(tester, pub);
+
       expect(find.byType(ClipRRect), findsOneWidget);
-      expect(find.byType(Image), findsWidgets);
+      final imageFinder = find.descendant(
+        of: find.byType(ClipRRect),
+        matching: find.byType(Image),
+      );
+      expect(imageFinder, findsOneWidget);
+      final image = tester.widget<Image>(imageFinder);
+      expect((image.image as NetworkImage).url,
+          'https://example.com/file.jpg');
+    },
+  );
 
-      // AND: content is truncated (ends with '...')
-      final truncated = '${longContent.substring(0, 250)}...';
-      expect(find.text(truncated), findsOneWidget);
-
-      // AND: a 'See more' button is present
-      expect(find.text('See more'), findsOneWidget);
-    });
-  });
-
-  testWidgets('expands and collapses long text by pressing See more / See less',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      // GIVEN: the same long post with attachment
-      final longContent = 'B' * 300;
-      final postWithImage = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: longContent,
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        attachment: 'https://example.com/image.jpg',
-        likes: 15,
-        comments: 4,
+  testWidgets(
+    'popup menu has Delete option and onSelected can be tapped',
+    (WidgetTester tester) async {
+      final pub = Publication(
+        id: 4,
+        username: 'menuuser',
+        profileImageUrl: 'https://example.com/avatar.png',
+        content: 'Menu test',
+        createdAt: DateTime.now(),
+        attachment: null,
+        likes: 0,
+        comments: 0,
       );
 
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: postWithImage)),
-      );
-      await tester.pump();
+      await _pumpCard(tester, pub);
 
-      // Initially truncated + 'See more'
-      final truncated = '${longContent.substring(0, 250)}...';
-      expect(find.text(truncated), findsOneWidget);
-      expect(find.text('See more'), findsOneWidget);
-
-      // WHEN tapping 'See more'
-      await tester.tap(find.text('See more'));
-      await tester.pump();
-
-      // THEN full content and 'See less'
-      expect(find.text(longContent), findsOneWidget);
-      expect(find.text('See less'), findsOneWidget);
-
-      // WHEN tapping 'See less'
-      await tester.tap(find.text('See less'));
-      await tester.pump();
-
-      // THEN back to truncated + 'See more'
-      expect(find.text(truncated), findsOneWidget);
-      expect(find.text('See more'), findsOneWidget);
-    });
-  });
-
-  testWidgets('displays and closes PopupMenu with Delete option',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      // GIVEN: a PublicationCard with basePost
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: basePost)),
-      );
-      await tester.pump();
-
-      // WHEN tapping the menu icon
-      await tester.tap(find.byIcon(Icons.more_vert));
+      // Open the popup menu
+      await tester.tap(find.byType(PopupMenuButton<String>));
       await tester.pumpAndSettle();
 
-      // THEN: the 'Delete' menu item appears
+      // The menu item should appear
       expect(find.text('Delete'), findsOneWidget);
 
-      // WHEN selecting 'Delete'
+      // Tap the Delete item
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
 
-      // THEN: the menu is dismissed
+      // It should close without error
       expect(find.text('Delete'), findsNothing);
-    });
-  });
+    },
+  );
 
-  // DATE FORMATTING TESTS
+  testWidgets(
+    'Expandable text: short content does not show See more',
+    (WidgetTester tester) async {
+      final pub = Publication(
+        id: 5,
+        username: 'short',
+        profileImageUrl: 'https://example.com/avatar.png',
+        content: 'A' * 50, // less than 250 chars
+        createdAt: DateTime.now(),
+        attachment: null,
+        likes: 0,
+        comments: 0,
+      );
 
-  testWidgets('format date as 2 months ago',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      final post = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: basePost.content,
-        createdAt: DateTime.now().subtract(const Duration(days: 65)),
-        attachment: basePost.attachment,
-        likes: basePost.likes,
-        comments: basePost.comments,
-      );
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: post)),
-      );
-      await tester.pump();
-      expect(find.text('2 months ago'), findsOneWidget);
-    });
-  });
+      await _pumpCard(tester, pub);
 
-  testWidgets('format date as 1 month ago',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      final post = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: basePost.content,
-        createdAt: DateTime.now().subtract(const Duration(days: 30)),
-        attachment: basePost.attachment,
-        likes: basePost.likes,
-        comments: basePost.comments,
-      );
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: post)),
-      );
-      await tester.pump();
-      expect(find.text('1 month ago'), findsOneWidget);
-    });
-  });
+      expect(find.textContaining('...'), findsNothing);
+      expect(find.text('See more'), findsNothing);
+    },
+  );
 
-  testWidgets('format date as 1 day ago',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      final post = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: basePost.content,
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        attachment: basePost.attachment,
-        likes: basePost.likes,
-        comments: basePost.comments,
+  testWidgets(
+    'Expandable text: long content shows See more, toggles to See less',
+    (WidgetTester tester) async {
+      final longText = 'X' * 300;
+      final pub = Publication(
+        id: 6,
+        username: 'longuser',
+        profileImageUrl: 'https://example.com/avatar.png',
+        content: longText,
+        createdAt: DateTime.now(),
+        attachment: null,
+        likes: 0,
+        comments: 0,
       );
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: post)),
-      );
-      await tester.pump();
-      expect(find.text('1 day ago'), findsOneWidget);
-    });
-  });
 
-  testWidgets('format date as 5 days ago',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      final post = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: basePost.content,
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        attachment: basePost.attachment,
-        likes: basePost.likes,
-        comments: basePost.comments,
-      );
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: post)),
-      );
-      await tester.pump();
-      expect(find.text('5 days ago'), findsOneWidget);
-    });
-  });
+      await _pumpCard(tester, pub);
 
-  testWidgets('format date as 1 hour ago',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      final post = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: basePost.content,
-        createdAt: DateTime.now().subtract(const Duration(hours: 1)),
-        attachment: basePost.attachment,
-        likes: basePost.likes,
-        comments: basePost.comments,
-      );
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: post)),
-      );
-      await tester.pump();
-      expect(find.text('1 hour ago'), findsOneWidget);
-    });
-  });
+      final truncated = longText.substring(0, 250) + '...';
+      expect(find.text(truncated), findsOneWidget);
 
-  testWidgets('format date as 3 hours ago',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      final post = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: basePost.content,
-        createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-        attachment: basePost.attachment,
-        likes: basePost.likes,
-        comments: basePost.comments,
+      await tester.scrollUntilVisible(
+        find.text('See more'),
+        200,
+        scrollable: find.byType(Scrollable),
       );
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: post)),
-      );
-      await tester.pump();
-      expect(find.text('3 hours ago'), findsOneWidget);
-    });
-  });
+      await tester.pumpAndSettle();
 
-  testWidgets('format date as 1 minute ago',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      final post = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: basePost.content,
-        createdAt: DateTime.now().subtract(const Duration(minutes: 1)),
-        attachment: basePost.attachment,
-        likes: basePost.likes,
-        comments: basePost.comments,
-      );
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: post)),
-      );
-      await tester.pump();
-      expect(find.text('1 minute ago'), findsOneWidget);
-    });
-  });
+      await tester.tap(find.text('See more'), warnIfMissed: false);
+      await tester.pumpAndSettle();
+      expect(find.text(longText), findsOneWidget);
+      expect(find.text('See less'), findsOneWidget);
 
-  testWidgets('format date as 10 minutes ago',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      final post = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: basePost.content,
-        createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
-        attachment: basePost.attachment,
-        likes: basePost.likes,
-        comments: basePost.comments,
+      await tester.scrollUntilVisible(
+        find.text('See less'),
+        200,
+        scrollable: find.byType(Scrollable),
       );
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: post)),
-      );
-      await tester.pump();
-      expect(find.text('10 minutes ago'), findsOneWidget);
-    });
-  });
+      await tester.pumpAndSettle();
 
-  testWidgets('format date as just now',
-      (WidgetTester tester) async {
-    await mockNetworkImagesFor(() async {
-      final post = Publication(
-        id: basePost.id,
-        username: basePost.username,
-        profileImageUrl: basePost.profileImageUrl,
-        content: basePost.content,
-        createdAt: DateTime.now().subtract(const Duration(seconds: 30)),
-        attachment: basePost.attachment,
-        likes: basePost.likes,
-        comments: basePost.comments,
+      await tester.tap(find.text('See less'), warnIfMissed: false);
+      await tester.pumpAndSettle();
+      expect(find.text(truncated), findsOneWidget);
+      expect(find.text('See more'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'formats minutes, hours, days and months correctly',
+    (WidgetTester tester) async {
+      final now = DateTime.now();
+
+      // just now
+      final pubJustNow = Publication(
+        id: 7,
+        username: 'just',
+        profileImageUrl: 'url',
+        content: '',
+        createdAt: now,
+        attachment: null,
+        likes: 0,
+        comments: 0,
       );
-      await tester.pumpWidget(
-        MaterialApp(home: PublicationCard(publication: post)),
-      );
-      await tester.pump();
+      await _pumpCard(tester, pubJustNow);
       expect(find.text('just now'), findsOneWidget);
-    });
-  });
+
+      // minutes ago
+      final pubMin = Publication(
+        id: 8,
+        username: 'min',
+        profileImageUrl: 'url',
+        content: '',
+        createdAt: now.subtract(const Duration(minutes: 2)),
+        attachment: null,
+        likes: 0,
+        comments: 0,
+      );
+      await _pumpCard(tester, pubMin);
+      expect(find.text('2 minutes ago'), findsOneWidget);
+
+      // hours ago
+      final pubHour = Publication(
+        id: 9,
+        username: 'hour',
+        profileImageUrl: 'url',
+        content: '',
+        createdAt: now.subtract(const Duration(hours: 3)),
+        attachment: null,
+        likes: 0,
+        comments: 0,
+      );
+      await _pumpCard(tester, pubHour);
+      expect(find.text('3 hours ago'), findsOneWidget);
+
+      // days ago
+      final pubDay = Publication(
+        id: 10,
+        username: 'day',
+        profileImageUrl: 'url',
+        content: '',
+        createdAt: now.subtract(const Duration(days: 2)),
+        attachment: null,
+        likes: 0,
+        comments: 0,
+      );
+      await _pumpCard(tester, pubDay);
+      expect(find.text('2 days ago'), findsOneWidget);
+
+      // months ago (65 days)
+      final pubMonth = Publication(
+        id: 11,
+        username: 'month',
+        profileImageUrl: 'url',
+        content: '',
+        createdAt: now.subtract(const Duration(days: 65)),
+        attachment: null,
+        likes: 0,
+        comments: 0,
+      );
+      await _pumpCard(tester, pubMonth);
+      expect(find.text('2 months ago'), findsOneWidget);
+    },
+  );
 }

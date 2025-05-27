@@ -8,7 +8,7 @@ class MockPublicationRepository extends Mock implements PublicationRepository {}
 
 void main() {
   late PublicationBloc bloc;
-  late PublicationRepository repository;
+  late MockPublicationRepository repository;
 
   final samplePub1 = Publication(
     id: 1,
@@ -40,18 +40,17 @@ void main() {
     bloc.close();
   });
 
-  group('Initial load of publications', () {
+  group('Initial loading of publications', () {
     blocTest<PublicationBloc, PublicationState>(
       'emits [Loading, Success] when fetchPublications returns a single page',
       build: () {
-        when(() => repository.fetchPublications(page: 1, limit: 10)).thenAnswer(
-          (_) async => PublicationResponse(
-            publications: [samplePub1, samplePub2],
-            totalPosts: 2,
-            totalPages: 1,
-            currentPage: 1,
-          ),
-        );
+        when(() => repository.fetchPublications(page: 1, limit: 10))
+            .thenAnswer((_) async => PublicationResponse(
+                  publications: [samplePub1, samplePub2],
+                  totalPosts: 2,
+                  totalPages: 1,
+                  currentPage: 1,
+                ));
         return bloc;
       },
       act: (b) => b.add(LoadPublications()),
@@ -65,7 +64,8 @@ void main() {
         ),
       ],
       verify: (_) {
-        verify(() => repository.fetchPublications(page: 1, limit: 10)).called(1);
+        verify(() => repository.fetchPublications(page: 1, limit: 10))
+            .called(1);
       },
     );
 
@@ -86,14 +86,15 @@ void main() {
 
   group('Pagination of publications', () {
     blocTest<PublicationBloc, PublicationState>(
-      'does not emit anything when LoadMorePublications and state is not Success',
+      'does not output anything when LoadMorePublications and status is not Success',
       build: () => bloc,
       act: (b) => b.add(LoadMorePublications()),
+      wait: const Duration(milliseconds: 350),
       expect: () => <PublicationState>[],
     );
 
     blocTest<PublicationBloc, PublicationState>(
-      'does not emit anything when already reachedMax == true',
+      'does not output anything when reachedMax == true',
       build: () => bloc,
       seed: () => PublicationSuccess(
         publications: [samplePub1],
@@ -102,21 +103,20 @@ void main() {
         currentPage: 1,
       ),
       act: (b) => b.add(LoadMorePublications()),
+      wait: const Duration(milliseconds: 350),
       expect: () => <PublicationState>[],
     );
 
     blocTest<PublicationBloc, PublicationState>(
-      'emits new list with next page and Success',
+      'issues new list with next page and Success',
       build: () {
         when(() => repository.fetchPublications(page: 2, limit: 10))
-            .thenAnswer(
-          (_) async => PublicationResponse(
-            publications: [samplePub2],
-            totalPosts: 2,
-            totalPages: 2,
-            currentPage: 2,
-          ),
-        );
+            .thenAnswer((_) async => PublicationResponse(
+                  publications: [samplePub2],
+                  totalPosts: 2,
+                  totalPages: 2,
+                  currentPage: 2,
+                ));
         return bloc;
       },
       seed: () => PublicationSuccess(
@@ -126,6 +126,7 @@ void main() {
         currentPage: 1,
       ),
       act: (b) => b.add(LoadMorePublications()),
+      wait: const Duration(milliseconds: 350),
       expect: () => [
         PublicationSuccess(
           publications: [samplePub1, samplePub2],
@@ -135,7 +136,8 @@ void main() {
         ),
       ],
       verify: (_) {
-        verify(() => repository.fetchPublications(page: 2, limit: 10)).called(1);
+        verify(() => repository.fetchPublications(page: 2, limit: 10))
+            .called(1);
       },
     );
 
@@ -153,13 +155,14 @@ void main() {
         currentPage: 1,
       ),
       act: (b) => b.add(LoadMorePublications()),
+      wait: const Duration(milliseconds: 350),
       expect: () => [
         PublicationFailure(),
       ],
     );
   });
 
-  group('Equatable events', () {
+  group('Equatables events', () {
     test('LoadPublications equality', () {
       expect(LoadPublications(), equals(LoadPublications()));
     });

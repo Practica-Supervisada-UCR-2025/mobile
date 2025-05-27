@@ -206,6 +206,32 @@ class MockApiService extends _i1.Mock implements _i4.ApiService {
             ),
           )
           as _i5.Future<_i2.Response>);
+
+  @override
+  _i5.Future<_i2.Response> postMultipart(
+    String? endpoint,
+    Map<String, String>? fields,
+    List<_i2.MultipartFile>? files, {
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #postMultipart,
+              [endpoint, fields, files],
+              {#authenticated: authenticated},
+            ),
+            returnValue: _i5.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #postMultipart,
+                  [endpoint, fields, files],
+                  {#authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i5.Future<_i2.Response>);
 }
 
 /// A class which mocks [File].
