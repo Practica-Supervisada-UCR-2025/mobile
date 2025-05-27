@@ -1,5 +1,3 @@
-// test/src/profile/_children/show_own_publications/presenter/widgets/publication_card_test.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network_image_mock/network_image_mock.dart';
@@ -8,8 +6,7 @@ import 'package:mobile/src/profile/profile.dart'
     show Publication, PublicationCard;
 
 void main() {
-  /// Pumps the PublicationCard inside a scrollable Scaffold.
-  Future<void> _pumpCard(
+  Future<void> pumpCard(
       WidgetTester tester, Publication publication) async {
     await mockNetworkImagesFor(() async {
       await tester.pumpWidget(
@@ -41,7 +38,7 @@ void main() {
         comments: 7,
       );
 
-      await _pumpCard(tester, pub);
+      await pumpCard(tester, pub);
 
       expect(find.byType(CircleAvatar), findsOneWidget);
       expect(find.text('testuser'), findsOneWidget);
@@ -68,7 +65,7 @@ void main() {
         comments: 0,
       );
 
-      await _pumpCard(tester, pub);
+      await pumpCard(tester, pub);
 
       final container = tester.widget<Container>(
         find.byType(Container).first,
@@ -95,7 +92,7 @@ void main() {
         comments: 0,
       );
 
-      await _pumpCard(tester, pub);
+      await pumpCard(tester, pub);
 
       expect(find.byType(ClipRRect), findsOneWidget);
       final imageFinder = find.descendant(
@@ -123,7 +120,7 @@ void main() {
         comments: 0,
       );
 
-      await _pumpCard(tester, pub);
+      await pumpCard(tester, pub);
 
       // Open the popup menu
       await tester.tap(find.byType(PopupMenuButton<String>));
@@ -155,7 +152,7 @@ void main() {
         comments: 0,
       );
 
-      await _pumpCard(tester, pub);
+      await pumpCard(tester, pub);
 
       expect(find.textContaining('...'), findsNothing);
       expect(find.text('See more'), findsNothing);
@@ -177,9 +174,9 @@ void main() {
         comments: 0,
       );
 
-      await _pumpCard(tester, pub);
+      await pumpCard(tester, pub);
 
-      final truncated = longText.substring(0, 250) + '...';
+      final truncated = '${longText.substring(0, 250)}...';
       expect(find.text(truncated), findsOneWidget);
 
       await tester.scrollUntilVisible(
@@ -224,7 +221,7 @@ void main() {
         likes: 0,
         comments: 0,
       );
-      await _pumpCard(tester, pubJustNow);
+      await pumpCard(tester, pubJustNow);
       expect(find.text('just now'), findsOneWidget);
 
       // minutes ago
@@ -238,7 +235,7 @@ void main() {
         likes: 0,
         comments: 0,
       );
-      await _pumpCard(tester, pubMin);
+      await pumpCard(tester, pubMin);
       expect(find.text('2 minutes ago'), findsOneWidget);
 
       // hours ago
@@ -252,7 +249,7 @@ void main() {
         likes: 0,
         comments: 0,
       );
-      await _pumpCard(tester, pubHour);
+      await pumpCard(tester, pubHour);
       expect(find.text('3 hours ago'), findsOneWidget);
 
       // days ago
@@ -266,7 +263,7 @@ void main() {
         likes: 0,
         comments: 0,
       );
-      await _pumpCard(tester, pubDay);
+      await pumpCard(tester, pubDay);
       expect(find.text('2 days ago'), findsOneWidget);
 
       // months ago (65 days)
@@ -280,7 +277,7 @@ void main() {
         likes: 0,
         comments: 0,
       );
-      await _pumpCard(tester, pubMonth);
+      await pumpCard(tester, pubMonth);
       expect(find.text('2 months ago'), findsOneWidget);
     },
   );
