@@ -2,7 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
+import 'package:mobile/core/globals/publications/publications.dart';
 
 class MockPublicationRepository extends Mock implements PublicationRepository {}
 

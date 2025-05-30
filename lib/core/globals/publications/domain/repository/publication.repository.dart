@@ -1,6 +1,5 @@
-import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
+import 'package:mobile/core/globals/publications/publications.dart';
 
-/// Response wrapper carrying a page of [Publication] plus metadata.
 class PublicationResponse {
   final List<Publication> publications;
   final int totalPosts;
@@ -15,7 +14,6 @@ class PublicationResponse {
   });
 }
 
-/// Repository interface now uses page & limit instead of skip.
 abstract class PublicationRepository {
   Future<PublicationResponse> fetchPublications({
     required int page,

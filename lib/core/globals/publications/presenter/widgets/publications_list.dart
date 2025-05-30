@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile/src/profile/profile.dart';
+import 'package:mobile/core/globals/publications/publications.dart';
 
 class PublicationsList extends StatefulWidget {
   const PublicationsList({super.key});

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mobile/src/profile/profile.dart';
-import 'package:mobile/core/globals/widgets/secondary_button.dart';
+import 'package:mobile/core/core.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';

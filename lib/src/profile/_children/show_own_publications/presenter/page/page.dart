@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
+import 'package:mobile/core/core.dart';
 
 class ShowOwnPublicationsPage extends StatelessWidget {
   const ShowOwnPublicationsPage({super.key});
@@ -9,7 +9,7 @@ class ShowOwnPublicationsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PublicationBloc(
-        publicationRepository: PublicationRepositoryAPI(),
+        publicationRepository: PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS),
       )..add(LoadPublications()),
       child: const PublicationsList(),
     );

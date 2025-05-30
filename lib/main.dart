@@ -45,9 +45,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),
         ),
-        RepositoryProvider<PublicationRepository>(
-          create: (context) => PublicationRepositoryAPI(),
-        ),
         RepositoryProvider<ApiService>(create: (_) => ApiServiceImpl()),
 
         RepositoryProvider<EditProfileRepository>(
@@ -94,12 +91,6 @@ class MyApp extends StatelessWidget {
           BlocProvider<CreatePostBloc>(create: (context) => CreatePostBloc(
             createPostRepository: context.read<CreatePostRepository>(),
           )),
-          BlocProvider<PublicationBloc>(
-            create:
-                (context) => PublicationBloc(
-                  publicationRepository: context.read<PublicationRepository>(),
-                )..add(LoadPublications()),
-          ),
           BlocProvider<EditProfileBloc>(
             create:
                 (context) => EditProfileBloc(

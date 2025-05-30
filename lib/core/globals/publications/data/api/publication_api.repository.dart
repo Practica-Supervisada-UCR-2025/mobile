@@ -2,14 +2,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile/core/constants/constants.dart';
 import 'package:mobile/core/storage/storage.dart';
-import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
+import 'package:mobile/core/globals/publications/publications.dart';
 
 class PublicationRepositoryAPI implements PublicationRepository {
   final http.Client client;
   static const _baseUrl = API_POST_BASE_URL;
+  final String endpoint;
 
-  PublicationRepositoryAPI({http.Client? client})
-      : client = client ?? http.Client();
+  PublicationRepositoryAPI({
+    http.Client? client,
+    required this.endpoint,
+    }) : client = client ?? http.Client();
 
  
   Future<String> _getJwtToken() async {
@@ -29,7 +32,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
 
     
     final uri = Uri.parse(
-      '${_baseUrl}user/posts/mine?page=$page&limit=$limit',
+      '$_baseUrl$endpoint?page=$page&limit=$limit',
     );
     final resp = await client.get(
       uri,
