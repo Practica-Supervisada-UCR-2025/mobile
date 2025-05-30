@@ -17,7 +17,7 @@ import 'package:device_info_plus_platform_interface/device_info_plus_platform_in
 import 'package:flutter/foundation.dart' as _i10;
 import 'package:flutter/src/widgets/framework.dart' as _i9;
 import 'package:flutter/src/widgets/notification_listener.dart' as _i16;
-import 'package:mobile/core/permissions/data/api/permissions_service.dart'
+import 'package:mobile/core/permissions/domain/repository/permissions_service.dart'
     as _i11;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i15;

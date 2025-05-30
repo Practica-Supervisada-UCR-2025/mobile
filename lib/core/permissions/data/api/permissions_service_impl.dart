@@ -1,6 +1,5 @@
-
+import 'package:mobile/core/core.dart' show PermissionService;
 import 'package:permission_handler/permission_handler.dart';
-import 'api.dart';
 
 class PermissionServiceImpl implements PermissionService {
   @override
