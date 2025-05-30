@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network_image_mock/network_image_mock.dart';
-
+import 'package:mobile/core/core.dart' show DEFAULT_PROFILE_PIC;
 import 'package:mobile/core/globals/publications/publications.dart'
     show Publication, PublicationCard;
 
 void main() {
   Future<void> pumpCard(
-      WidgetTester tester, Publication publication) async {
+    WidgetTester tester,
+    Publication pub, {
+    ThemeData? theme,
+  }) async {
     await mockNetworkImagesFor(() async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: PublicationCard(publication: publication),
-            ),
-          ),
+          theme: theme ?? ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          home: Scaffold(body: PublicationCard(publication: pub)),
         ),
       );
       await tester.pumpAndSettle();
@@ -25,8 +26,7 @@ void main() {
   testWidgets(
     'displays avatar, username, relative minutes ago, likes & comments',
     (WidgetTester tester) async {
-      final createdAt =
-          DateTime.now().subtract(const Duration(minutes: 5));
+      final createdAt = DateTime.now().subtract(const Duration(minutes: 5));
       final pub = Publication(
         id: 1,
         username: 'testuser',
@@ -51,113 +51,123 @@ void main() {
     },
   );
 
-  testWidgets(
-    'subtle bottom border is applied',
-    (WidgetTester tester) async {
-      final pub = Publication(
-        id: 2,
-        username: 'border',
-        profileImageUrl: 'url',
-        content: 'Border test',
-        createdAt: DateTime.now(),
-        attachment: null,
-        likes: 0,
-        comments: 0,
-      );
+  testWidgets('subtle bottom border is applied', (WidgetTester tester) async {
+    final pub = Publication(
+      id: 2,
+      username: 'border',
+      profileImageUrl: '',
+      content: 'Border test',
+      createdAt: DateTime.now(),
+      attachment: null,
+      likes: 0,
+      comments: 0,
+    );
 
-      await pumpCard(tester, pub);
+    final lightTheme = ThemeData.light();
+    await pumpCard(tester, pub, theme: lightTheme);
 
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
-      final decoration = container.decoration as BoxDecoration;
-      final borderSide = decoration.border!.bottom;
+    final container = tester.widget<Container>(find.byType(Container).first);
+    final decoration = container.decoration as BoxDecoration;
+    final borderSide = decoration.border!.bottom;
 
-      expect(borderSide.color, Colors.grey.shade300);
-      expect(borderSide.width, 0.3);
-    },
-  );
+    expect(borderSide.width, 0.3);
+    expect(borderSide.color, lightTheme.colorScheme.outline);
+  });
 
-  testWidgets(
-    'renders attachment inside ClipRRect when URL is provided',
-    (WidgetTester tester) async {
-      final pub = Publication(
-        id: 3,
-        username: 'imguser',
-        profileImageUrl: 'https://example.com/avatar.png',
-        content: 'With image',
-        createdAt: DateTime.now(),
-        attachment: 'https://example.com/file.jpg',
-        likes: 0,
-        comments: 0,
-      );
+  testWidgets('CircleAvatar uses default + foreground images',
+      (WidgetTester tester) async {
+    const avatarUrl = 'https://example.com/user.png';
+    final pub = Publication(
+      id: 99,
+      username: 'avataruser',
+      profileImageUrl: avatarUrl,
+      content: 'Irrelevant',
+      createdAt: DateTime.now(),
+      attachment: null,
+      likes: 0,
+      comments: 0,
+    );
 
-      await pumpCard(tester, pub);
+    await pumpCard(tester, pub);
 
-      expect(find.byType(ClipRRect), findsOneWidget);
-      final imageFinder = find.descendant(
-        of: find.byType(ClipRRect),
-        matching: find.byType(Image),
-      );
-      expect(imageFinder, findsOneWidget);
-      final image = tester.widget<Image>(imageFinder);
-      expect((image.image as NetworkImage).url,
-          'https://example.com/file.jpg');
-    },
-  );
+    final avatar = tester.widget<CircleAvatar>(find.byType(CircleAvatar));
+    final bg = avatar.backgroundImage as NetworkImage;
+    expect(bg.url, DEFAULT_PROFILE_PIC);
 
-  testWidgets(
-    'popup menu has Delete option and onSelected can be tapped',
-    (WidgetTester tester) async {
-      final pub = Publication(
-        id: 4,
-        username: 'menuuser',
-        profileImageUrl: 'https://example.com/avatar.png',
-        content: 'Menu test',
-        createdAt: DateTime.now(),
-        attachment: null,
-        likes: 0,
-        comments: 0,
-      );
+    final fg = avatar.foregroundImage as NetworkImage;
+    expect(fg.url, avatarUrl);
+  });
 
-      await pumpCard(tester, pub);
+  testWidgets('renders attachment inside ClipRRect when URL is provided',
+      (WidgetTester tester) async {
+    const fileUrl = 'https://example.com/file.jpg';
+    final pub = Publication(
+      id: 3,
+      username: 'imguser',
+      profileImageUrl: '',
+      content: 'With image',
+      createdAt: DateTime.now(),
+      attachment: fileUrl,
+      likes: 0,
+      comments: 0,
+    );
 
-      // Open the popup menu
-      await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+    await pumpCard(tester, pub);
 
-      // The menu item should appear
-      expect(find.text('Delete'), findsOneWidget);
+    expect(find.byType(ClipRRect), findsOneWidget);
+    final imageFinder = find.descendant(
+      of: find.byType(ClipRRect),
+      matching: find.byType(Image),
+    );
+    expect(imageFinder, findsOneWidget);
 
-      // Tap the Delete item
-      await tester.tap(find.text('Delete'));
-      await tester.pumpAndSettle();
+    final image = tester.widget<Image>(imageFinder);
+    final network = image.image as NetworkImage;
+    expect(network.url, fileUrl);
+  });
 
-      // It should close without error
-      expect(find.text('Delete'), findsNothing);
-    },
-  );
+  testWidgets('popup menu has Delete option and can be tapped',
+      (WidgetTester tester) async {
+    final pub = Publication(
+      id: 4,
+      username: 'menuuser',
+      profileImageUrl: '',
+      content: 'Menu test',
+      createdAt: DateTime.now(),
+      attachment: null,
+      likes: 0,
+      comments: 0,
+    );
 
-  testWidgets(
-    'Expandable text: short content does not show See more',
-    (WidgetTester tester) async {
-      final pub = Publication(
-        id: 5,
-        username: 'short',
-        profileImageUrl: 'https://example.com/avatar.png',
-        content: 'A' * 50, // less than 250 chars
-        createdAt: DateTime.now(),
-        attachment: null,
-        likes: 0,
-        comments: 0,
-      );
+    await pumpCard(tester, pub);
 
-      await pumpCard(tester, pub);
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete'), findsOneWidget);
 
-      expect(find.textContaining('...'), findsNothing);
-      expect(find.text('See more'), findsNothing);
-    },
-  );
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete'), findsNothing);
+  });
+
+  testWidgets('Expandable text: short content does not show See more',
+      (WidgetTester tester) async {
+    final pub = Publication(
+      id: 5,
+      username: 'short',
+      profileImageUrl: '',
+      content: 'A' * 50,
+      createdAt: DateTime.now(),
+      attachment: null,
+      likes: 0,
+      comments: 0,
+    );
+
+    await pumpCard(tester, pub);
+
+    expect(find.textContaining('...'), findsNothing);
+    expect(find.text('See more'), findsNothing);
+  });
 
   testWidgets(
     'Expandable text: long content shows See more, toggles to See less',
@@ -166,7 +176,7 @@ void main() {
       final pub = Publication(
         id: 6,
         username: 'longuser',
-        profileImageUrl: 'https://example.com/avatar.png',
+        profileImageUrl: '',
         content: longText,
         createdAt: DateTime.now(),
         attachment: null,
@@ -178,25 +188,12 @@ void main() {
 
       final truncated = '${longText.substring(0, 250)}...';
       expect(find.text(truncated), findsOneWidget);
-
-      await tester.scrollUntilVisible(
-        find.text('See more'),
-        200,
-        scrollable: find.byType(Scrollable),
-      );
-      await tester.pumpAndSettle();
+      expect(find.text('See more'), findsOneWidget);
 
       await tester.tap(find.text('See more'), warnIfMissed: false);
       await tester.pumpAndSettle();
       expect(find.text(longText), findsOneWidget);
       expect(find.text('See less'), findsOneWidget);
-
-      await tester.scrollUntilVisible(
-        find.text('See less'),
-        200,
-        scrollable: find.byType(Scrollable),
-      );
-      await tester.pumpAndSettle();
 
       await tester.tap(find.text('See less'), warnIfMissed: false);
       await tester.pumpAndSettle();
@@ -210,25 +207,23 @@ void main() {
     (WidgetTester tester) async {
       final now = DateTime.now();
 
-      // just now
-      final pubJustNow = Publication(
+      final pubJust = Publication(
         id: 7,
         username: 'just',
-        profileImageUrl: 'url',
+        profileImageUrl: '',
         content: '',
         createdAt: now,
         attachment: null,
         likes: 0,
         comments: 0,
       );
-      await pumpCard(tester, pubJustNow);
+      await pumpCard(tester, pubJust);
       expect(find.text('just now'), findsOneWidget);
 
-      // minutes ago
       final pubMin = Publication(
         id: 8,
         username: 'min',
-        profileImageUrl: 'url',
+        profileImageUrl: '',
         content: '',
         createdAt: now.subtract(const Duration(minutes: 2)),
         attachment: null,
@@ -238,11 +233,10 @@ void main() {
       await pumpCard(tester, pubMin);
       expect(find.text('2 minutes ago'), findsOneWidget);
 
-      // hours ago
       final pubHour = Publication(
         id: 9,
         username: 'hour',
-        profileImageUrl: 'url',
+        profileImageUrl: '',
         content: '',
         createdAt: now.subtract(const Duration(hours: 3)),
         attachment: null,
@@ -252,11 +246,10 @@ void main() {
       await pumpCard(tester, pubHour);
       expect(find.text('3 hours ago'), findsOneWidget);
 
-      // days ago
       final pubDay = Publication(
         id: 10,
         username: 'day',
-        profileImageUrl: 'url',
+        profileImageUrl: '',
         content: '',
         createdAt: now.subtract(const Duration(days: 2)),
         attachment: null,
@@ -266,18 +259,17 @@ void main() {
       await pumpCard(tester, pubDay);
       expect(find.text('2 days ago'), findsOneWidget);
 
-      // months ago (65 days)
-      final pubMonth = Publication(
+      final pubMon = Publication(
         id: 11,
         username: 'month',
-        profileImageUrl: 'url',
+        profileImageUrl: '',
         content: '',
         createdAt: now.subtract(const Duration(days: 65)),
         attachment: null,
         likes: 0,
         comments: 0,
       );
-      await pumpCard(tester, pubMonth);
+      await pumpCard(tester, pubMon);
       expect(find.text('2 months ago'), findsOneWidget);
     },
   );

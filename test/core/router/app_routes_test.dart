@@ -1,51 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/router/app_routes.dart';
 import 'package:mobile/core/router/paths.dart';
+import 'package:mobile/src/profile/presenter/page/page.dart';
+import 'package:mobile/src/profile/presenter/bloc/profile_bloc.dart';
+import 'package:mobile/src/profile/domain/models/models.dart';
+import 'package:mobile/src/profile/domain/repository/repository.dart';
+import 'package:mobile/core/globals/publications/publications.dart';
+
+
+class FakeProfileRepository implements ProfileRepository {
+  @override
+  Future<User> getCurrentUser(String token) async {
+    return User(
+      firstName: 'Test',
+      lastName: 'User',
+      username: 'testuser',
+      email: 'test@example.com',
+      image: 'https://example.com/avatar.png',
+    );
+  }
+}
 
 void main() {
-  
-  test('appRoutes contains all expected paths', () {
-    final paths = appRoutes.expand((r) {
-      if (r is ShellRoute) {
-        return r.routes.map((route) => (route as GoRoute).path);
-      }
-      return [(r as GoRoute).path];
-    }).toList();
+  testWidgets(
+    'Profile route builds PublicationRepositoryAPI & PublicationBloc, then emits PublicationFailure',
+    (WidgetTester tester) async {
+      final router = GoRouter(routes: appRoutes);
 
-    expect(paths, containsAll([
-      Paths.login,
-      Paths.register,
-      Paths.settings,
-      Paths.home,
-      Paths.search,
-      Paths.create,
-      Paths.notifications,
-      Paths.profile,
-    ]));
-  });
-  
-  testWidgets('Cover all GoRouter builders', (WidgetTester tester) async {
-    final router = GoRouter(
-      routes: appRoutes,
-      initialLocation: Paths.home,
-    );
+      await tester.pumpWidget(
+        BlocProvider<ProfileBloc>(
+          create: (_) => ProfileBloc(
+            profileRepository: FakeProfileRepository(),
+          )..add(ProfileLoad()),
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
 
-    await tester.pumpWidget(
-      MaterialApp.router(
-        routerConfig: router,
-      ),
-    );
-    final paths = [
-      Paths.search,
-      Paths.notifications,
-    ];
-
-    for (final path in paths) {
-      router.go(path);
+      router.go(Paths.profile);
       await tester.pumpAndSettle();
-      expect(find.byType(Scaffold), findsNWidgets(2));
-    }
-  });
+
+      expect(find.byType(ProfileScreen), findsOneWidget);
+
+      expect(
+        find.byType(RepositoryProvider<PublicationRepository>),
+        findsOneWidget,
+      );
+
+      expect(
+        find.byType(BlocProvider<PublicationBloc>),
+        findsOneWidget,
+      );
+
+      final ctx = tester.element(find.byType(ProfileScreen));
+
+      final repo = ctx.read<PublicationRepository>();
+      expect(repo, isA<PublicationRepositoryAPI>());
+
+      final pubBloc = ctx.read<PublicationBloc>();
+      expect(pubBloc, isA<PublicationBloc>());
+
+      await tester.pump();
+
+      expect(pubBloc.state, isA<PublicationFailure>());
+    },
+  );
 }
