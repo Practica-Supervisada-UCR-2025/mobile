@@ -27,5 +27,13 @@ class PermissionServiceImpl implements PermissionService {
   Future<PermissionStatus> requestPhotos() => Permission.photos.request();
 
   @override
+  Future<PermissionStatus> getNotificationsStatus() =>
+      Permission.notification.status;
+
+  @override
+  Future<PermissionStatus> requestNotifications() =>
+      Permission.notification.request();
+
+  @override
   Future<bool> openSettings() => openAppSettings();
 }
