@@ -13,8 +13,15 @@ class PublicationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border (
+            bottom: BorderSide(
+              color: Colors.grey.shade300,
+              width: 0.3,
+            ),
+          )
+        ),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
