@@ -58,6 +58,13 @@ final List<RouteBase> appRoutes = [
         path: Paths.profile,
         builder: (context, state) => const ProfileScreen(),
       ),
+      GoRoute(
+        path: Paths.externProfile,
+        builder: (context, state) {
+          final userId = state.pathParameters['userId'];
+          return ProfileScreen(userId: userId);
+        },
+      ),
     ],
   ),
 ];
