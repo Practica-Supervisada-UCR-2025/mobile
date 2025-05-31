@@ -31,4 +31,27 @@ class ProfileRepositoryAPI implements ProfileRepository {
       throw Exception('Error getting user profile: $e');
     }
   }
+
+  @override
+  Future<User> getUserProfile(String userId, String? token) async {
+    try {
+      final response = await client.get(
+        Uri.parse('$API_BASE_URL/user/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
+        return User.fromJson(data);
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to load user');
+      }
+    } catch (e) {
+      throw Exception('Error getting user profile: $e');
+    }
+  }
 }

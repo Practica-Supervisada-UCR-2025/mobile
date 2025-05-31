@@ -6,7 +6,9 @@ import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String? userId;
+
+  const ProfileScreen({super.key,this.userId});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -25,11 +27,12 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   void _loadProfile() {
-    context.read<ProfileBloc>().add(ProfileLoad());
+    context.read<ProfileBloc>().add(ProfileLoad(userId: widget.userId));
   }
 
   @override
   Widget build(BuildContext context) {
+    final isOwnProfile = widget.userId == null;
     super.build(context);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -74,14 +77,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 ),
                               ),
                               const SizedBox(height: 18),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Flexible(child: _buildCreatePostButton()),
-                                  const SizedBox(width: 8),
-                                  Flexible(child: _buildModifyButton(user)),
-                                ],
-                              ),
+                              if (isOwnProfile)
+                                Row(
+                                  children: [
+                                    Flexible(child: _buildCreatePostButton()),
+                                    const SizedBox(width: 8),
+                                    Flexible(child: _buildModifyButton(user)),
+                                  ],
+                                ),
                             ],
                           ),
                         ),
