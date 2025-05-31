@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/profile/profile.dart';
@@ -10,11 +11,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/core.dart';
 import 'firebase_options.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // This method will be called when the app is in the background or terminated
+  //  handle the message here if needed.
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await LocalStorage.init();
   await dotenv.load(fileName: ".env");
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   runApp(MyApp());
 }
 
@@ -35,9 +43,10 @@ class MyApp extends StatelessWidget {
           create: (_) => LogoutLocalRepository(LocalStorage()),
         ),
         RepositoryProvider<PermissionsRepository>(
-          create: (_) => PermissionsRepositoryImpl(
-            permissionService: PermissionServiceImpl(),
-          ),
+          create:
+              (_) => PermissionsRepositoryImpl(
+                permissionService: PermissionServiceImpl(),
+              ),
         ),
         RepositoryProvider<ProfileRepository>(
           create: (context) => ProfileRepositoryAPI(),
@@ -55,11 +64,12 @@ class MyApp extends StatelessWidget {
               (context) => EditProfileRepositoryImpl(
                 apiService: context.read<ApiService>(),
               ),
-        ),        
+        ),
         RepositoryProvider<CreatePostRepository>(
-          create: (context) => CreatePostRepositoryImpl(
-            apiService: context.read<ApiService>(),
-          ),
+          create:
+              (context) => CreatePostRepositoryImpl(
+                apiService: context.read<ApiService>(),
+              ),
         ),
       ],
       child: MultiBlocProvider(
@@ -91,9 +101,12 @@ class MyApp extends StatelessWidget {
                   profileRepository: context.read<ProfileRepository>(),
                 ),
           ),
-          BlocProvider<CreatePostBloc>(create: (context) => CreatePostBloc(
-            createPostRepository: context.read<CreatePostRepository>(),
-          )),
+          BlocProvider<CreatePostBloc>(
+            create:
+                (context) => CreatePostBloc(
+                  createPostRepository: context.read<CreatePostRepository>(),
+                ),
+          ),
           BlocProvider<PublicationBloc>(
             create:
                 (context) => PublicationBloc(
