@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:mobile/core/storage/user_session.storage.dart';
+import 'package:mobile/core/core.dart';
 import 'package:mobile/src/auth/auth.dart';
 
 part 'login_event.dart';
@@ -10,6 +10,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final LoginRepository loginRepository;
   final LocalStorage localStorage;
   final TokensRepository tokensRepository;
+  final NotificationsService notificationsService;
 
   // Constructor
   // The LoginBloc takes a LoginRepository as a dependency
@@ -18,6 +19,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     required this.loginRepository,
     required this.localStorage,
     required this.tokensRepository,
+    required this.notificationsService,
   }) : super(LoginInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
     on<LoginReset>(_onLoginReset);
@@ -42,6 +44,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       localStorage.userId = user.id;
       localStorage.userEmail = user.email;
       localStorage.accessToken = tokens.accessToken;
+
+      final notificationResult =
+          await notificationsService.setupNotificationsSilently();
+
+      print(
+        'Notifications setup: ${notificationResult.isComplete ? 'Complete' : 'Incomplete'}',
+      );
 
       emit(LoginSuccess(user: user));
     } on AuthException catch (e) {

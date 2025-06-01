@@ -71,6 +71,22 @@ class MyApp extends StatelessWidget {
                 apiService: context.read<ApiService>(),
               ),
         ),
+
+        RepositoryProvider<FCMService>(
+          create:
+              (context) => FCMServiceImpl(
+                localStorage: LocalStorage(),
+                apiService: context.read<ApiService>(),
+              ),
+        ),
+        RepositoryProvider<NotificationsService>(
+          create:
+              (context) => NotificationsServiceImpl(
+                permissionsRepository: context.read<PermissionsRepository>(),
+                fcmService: context.read<FCMService>(),
+                localStorage: LocalStorage(),
+              ),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -87,6 +103,7 @@ class MyApp extends StatelessWidget {
                   loginRepository: context.read<LoginRepository>(),
                   localStorage: LocalStorage(),
                   tokensRepository: TokensRepositoryAPI(),
+                  notificationsService: context.read<NotificationsService>(),
                 ),
           ),
           BlocProvider<LogoutBloc>(
