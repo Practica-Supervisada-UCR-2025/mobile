@@ -20,10 +20,8 @@ class FCMServiceImpl implements FCMService {
       String? token = await firebaseMessaging.getToken();
 
       if (token != null) {
-        _localStorage.fcmToken = token;
         _configureTokenRefresh();
       }
-
       return token;
     } catch (e) {
       debugPrint('Error getting FCM token: $e');
@@ -46,6 +44,8 @@ class FCMServiceImpl implements FCMService {
 
       if (response.statusCode != 201) {
         debugPrint('Failed to send FCM token to server: ${response.body}');
+      } else {
+        _localStorage.fcmToken = token;
       }
     } catch (e) {
       debugPrint('Error sending FCM token to server: $e');
