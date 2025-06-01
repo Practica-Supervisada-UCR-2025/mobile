@@ -20,6 +20,11 @@ class ApiServiceImpl implements ApiService {
     if (endpoint != null && endpoint.startsWith('posts/newPost')) {
       return baseUrl == API_BASE_URL ? API_POST_BASE_URL : baseUrl;
     }
+
+    if (endpoint != null && endpoint.startsWith('push-notifications')) {
+      return baseUrl == API_BASE_URL ? API_FCM_BASE_URL : baseUrl;
+    }
+
     return baseUrl;
   }
 
