@@ -66,7 +66,10 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
   }
 
   @override
-  Future<bool> checkNotificationPermission({BuildContext? context}) async {
+  Future<bool> checkNotificationPermission({
+    BuildContext? context,
+    showDialogIfDenied,
+  }) async {
     final androidInfo = await deviceInfoPlugin.androidInfo;
     final sdkInt = androidInfo.version.sdkInt;
 
@@ -77,7 +80,7 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
     if (status.isGranted) return true;
 
     if (status.isPermanentlyDenied) {
-      if (context != null && context.mounted) {
+      if (showDialogIfDenied && context != null && context.mounted) {
         PermissionSettingsDialog.show(context, 'notifications');
       }
       return false;
