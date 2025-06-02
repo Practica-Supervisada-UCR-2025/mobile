@@ -206,6 +206,26 @@ class MockPermissionService extends _i1.Mock implements _i11.PermissionService {
           as _i12.Future<_i13.PermissionStatus>);
 
   @override
+  _i12.Future<_i13.PermissionStatus> getNotificationsStatus() =>
+      (super.noSuchMethod(
+            Invocation.method(#getNotificationsStatus, []),
+            returnValue: _i12.Future<_i13.PermissionStatus>.value(
+              _i13.PermissionStatus.denied,
+            ),
+          )
+          as _i12.Future<_i13.PermissionStatus>);
+
+  @override
+  _i12.Future<_i13.PermissionStatus> requestNotifications() =>
+      (super.noSuchMethod(
+            Invocation.method(#requestNotifications, []),
+            returnValue: _i12.Future<_i13.PermissionStatus>.value(
+              _i13.PermissionStatus.denied,
+            ),
+          )
+          as _i12.Future<_i13.PermissionStatus>);
+
+  @override
   _i12.Future<bool> openSettings() =>
       (super.noSuchMethod(
             Invocation.method(#openSettings, []),

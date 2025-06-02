@@ -45,12 +45,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       localStorage.userEmail = user.email;
       localStorage.accessToken = tokens.accessToken;
 
-      final notificationResult =
-          await notificationsService.setupNotificationsSilently();
-
-      print(
-        'Notifications setup: ${notificationResult.isComplete ? 'Complete' : 'Incomplete'}',
-      );
+      await notificationsService.setupNotificationsSilently();
 
       emit(LoginSuccess(user: user));
     } on AuthException catch (e) {
