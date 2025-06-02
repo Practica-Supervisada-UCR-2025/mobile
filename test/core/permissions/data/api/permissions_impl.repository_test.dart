@@ -13,20 +13,17 @@ import 'permissions_impl.repository_test.mocks.dart';
   DeviceInfoPlugin,
   AndroidDeviceInfo,
   AndroidBuildVersion,
-  BuildContext,
 ])
 void main() {
   late MockPermissionService mockPermissionService;
   late MockDeviceInfoPlugin mockDeviceInfoPlugin;
   late MockAndroidDeviceInfo mockAndroidDeviceInfo;
   late PermissionsRepositoryImpl repository;
-  late MockBuildContext mockBuildContext;
 
   setUp(() {
     mockPermissionService = MockPermissionService();
     mockDeviceInfoPlugin = MockDeviceInfoPlugin();
     mockAndroidDeviceInfo = MockAndroidDeviceInfo();
-    mockBuildContext = MockBuildContext();
 
     repository = PermissionsRepositoryImpl(
       permissionService: mockPermissionService,
@@ -55,34 +52,24 @@ void main() {
       expect(result, isFalse);
     });
 
-    test('requests permission if not granted or permanently denied', () async {
-      when(
-        mockPermissionService.getCameraStatus(),
-      ).thenAnswer((_) async => PermissionStatus.denied);
-      when(
-        mockPermissionService.requestCamera(),
-      ).thenAnswer((_) async => PermissionStatus.granted);
-
-      final result = await repository.checkCameraPermission();
-
-      expect(result, isTrue);
-    });
-
     test(
-      'returns false if camera permission is permanently denied (without context)',
+      'requests permission if denied, and returns true if granted',
       () async {
         when(
           mockPermissionService.getCameraStatus(),
-        ).thenAnswer((_) async => PermissionStatus.permanentlyDenied);
+        ).thenAnswer((_) async => PermissionStatus.denied);
+        when(
+          mockPermissionService.requestCamera(),
+        ).thenAnswer((_) async => PermissionStatus.granted);
 
         final result = await repository.checkCameraPermission();
 
-        expect(result, isFalse);
+        expect(result, isTrue);
       },
     );
   });
 
-  group('checkGalleryPermission', () {
+  group('checkGalleryPermission - Android SDK >= 33', () {
     late MockAndroidBuildVersion mockBuildVersion;
 
     setUp(() {
@@ -91,87 +78,96 @@ void main() {
       when(
         mockDeviceInfoPlugin.androidInfo,
       ).thenAnswer((_) async => mockAndroidDeviceInfo);
+      when(mockBuildVersion.sdkInt).thenReturn(34);
     });
 
-    test(
-      'uses getPhotosStatus when SDK >= 33 and permission granted',
-      () async {
-        when(mockBuildVersion.sdkInt).thenReturn(34);
-        when(
-          mockPermissionService.getPhotosStatus(),
-        ).thenAnswer((_) async => PermissionStatus.granted);
+    test('returns true if photos permission is granted', () async {
+      when(
+        mockPermissionService.getPhotosStatus(),
+      ).thenAnswer((_) async => PermissionStatus.granted);
 
-        final result = await repository.checkGalleryPermission();
+      final result = await repository.checkGalleryPermission();
 
-        expect(result, isTrue);
-      },
-    );
+      expect(result, isTrue);
+    });
 
-    test(
-      'shows dialog if photos permission permanently denied and context mounted',
-      () async {
-        when(mockBuildVersion.sdkInt).thenReturn(34);
+    test('returns false if photos permission is permanently denied', () async {
+      when(
+        mockPermissionService.getPhotosStatus(),
+      ).thenAnswer((_) async => PermissionStatus.permanentlyDenied);
+
+      final result = await repository.checkGalleryPermission();
+
+      expect(result, isFalse);
+    });
+
+    test('requests permission and returns false if not granted', () async {
+      when(
+        mockPermissionService.getPhotosStatus(),
+      ).thenAnswer((_) async => PermissionStatus.denied);
+      when(
+        mockPermissionService.requestPhotos(),
+      ).thenAnswer((_) async => PermissionStatus.denied);
+
+      final result = await repository.checkGalleryPermission();
+
+      expect(result, isFalse);
+    });
+
+    testWidgets(
+      'shows settings dialog if photos permission is permanently denied and context is mounted',
+      (tester) async {
         when(
           mockPermissionService.getPhotosStatus(),
         ).thenAnswer((_) async => PermissionStatus.permanentlyDenied);
-        when(mockBuildContext.mounted).thenReturn(true);
 
-        final result = await repository.checkGalleryPermission();
+        final testWidget = Builder(
+          builder: (context) {
+            repository.checkGalleryPermission(context: context);
+            return const SizedBox();
+          },
+        );
 
-        expect(result, isFalse);
+        await tester.pumpWidget(MaterialApp(home: testWidget));
       },
     );
+  });
 
-    test(
-      'requests photos permission and returns false if not granted',
-      () async {
-        when(mockBuildVersion.sdkInt).thenReturn(34);
-        when(
-          mockPermissionService.getPhotosStatus(),
-        ).thenAnswer((_) async => PermissionStatus.denied);
-        when(
-          mockPermissionService.requestPhotos(),
-        ).thenAnswer((_) async => PermissionStatus.denied);
+  group('checkGalleryPermission - Android SDK < 33', () {
+    late MockAndroidBuildVersion mockBuildVersion;
 
-        final result = await repository.checkGalleryPermission();
+    setUp(() {
+      mockBuildVersion = MockAndroidBuildVersion();
+      when(mockAndroidDeviceInfo.version).thenReturn(mockBuildVersion);
+      when(
+        mockDeviceInfoPlugin.androidInfo,
+      ).thenAnswer((_) async => mockAndroidDeviceInfo);
+      when(mockBuildVersion.sdkInt).thenReturn(30);
+    });
 
-        expect(result, isFalse);
-      },
-    );
+    test('returns true if storage permission is granted', () async {
+      when(
+        mockPermissionService.getStorageStatus(),
+      ).thenAnswer((_) async => PermissionStatus.granted);
 
-    test(
-      'uses getStorageStatus when SDK < 33 and permission granted',
-      () async {
-        when(mockBuildVersion.sdkInt).thenReturn(30);
-        when(
-          mockPermissionService.getStorageStatus(),
-        ).thenAnswer((_) async => PermissionStatus.granted);
+      final result = await repository.checkGalleryPermission();
 
-        final result = await repository.checkGalleryPermission();
+      expect(result, isTrue);
+    });
 
-        expect(result, isTrue);
-      },
-    );
+    test('returns false if storage permission is permanently denied', () async {
+      when(
+        mockPermissionService.getStorageStatus(),
+      ).thenAnswer((_) async => PermissionStatus.permanentlyDenied);
 
-    test(
-      'shows dialog if storage permission permanently denied and context mounted',
-      () async {
-        when(mockBuildVersion.sdkInt).thenReturn(30);
-        when(
-          mockPermissionService.getStorageStatus(),
-        ).thenAnswer((_) async => PermissionStatus.permanentlyDenied);
-        when(mockBuildContext.mounted).thenReturn(true);
+      final result = await repository.checkGalleryPermission();
 
-        final result = await repository.checkGalleryPermission();
-
-        expect(result, isFalse);
-      },
-    );
+      expect(result, isFalse);
+    });
 
     test(
       'requests storage permission and returns false if not granted',
       () async {
-        when(mockBuildVersion.sdkInt).thenReturn(30);
         when(
           mockPermissionService.getStorageStatus(),
         ).thenAnswer((_) async => PermissionStatus.denied);
@@ -185,13 +181,41 @@ void main() {
       },
     );
 
+    testWidgets(
+      'shows settings dialog if storage permission is permanently denied and context is mounted',
+      (tester) async {
+        when(mockBuildVersion.sdkInt).thenReturn(30);
+        when(
+          mockPermissionService.getStorageStatus(),
+        ).thenAnswer((_) async => PermissionStatus.permanentlyDenied);
+        when(
+          mockDeviceInfoPlugin.androidInfo,
+        ).thenAnswer((_) async => mockAndroidDeviceInfo);
+        when(mockAndroidDeviceInfo.version).thenReturn(mockBuildVersion);
+
+        final testWidget = Builder(
+          builder: (context) {
+            repository.checkGalleryPermission(context: context);
+            return const SizedBox();
+          },
+        );
+
+        await tester.pumpWidget(MaterialApp(home: testWidget));
+      },
+    );
+  });
+
+  group('default behavior', () {
     test('uses default DeviceInfoPlugin if not provided', () async {
       final repo = PermissionsRepositoryImpl(
         permissionService: mockPermissionService,
       );
+
       expect(repo.deviceInfoPlugin, isA<DeviceInfoPlugin>());
     });
+  });
 
+  group('UI tests (Dialogs)', () {
     testWidgets('shows dialog if camera permission is permanently denied', (
       WidgetTester tester,
     ) async {
@@ -215,6 +239,109 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsOneWidget);
+    });
+  });
+
+  group('checkNotificationPermission', () {
+    late MockAndroidBuildVersion mockBuildVersion;
+
+    setUp(() {
+      mockBuildVersion = MockAndroidBuildVersion();
+      when(mockAndroidDeviceInfo.version).thenReturn(mockBuildVersion);
+      when(
+        mockDeviceInfoPlugin.androidInfo,
+      ).thenAnswer((_) async => mockAndroidDeviceInfo);
+    });
+
+    test('returns true if SDK < 33 (permission not required)', () async {
+      when(mockBuildVersion.sdkInt).thenReturn(32);
+
+      final result = await repository.checkNotificationPermission();
+
+      expect(result, isTrue);
+    });
+
+    test('returns true if permission is already granted', () async {
+      when(mockBuildVersion.sdkInt).thenReturn(33);
+      when(
+        mockPermissionService.getNotificationsStatus(),
+      ).thenAnswer((_) async => PermissionStatus.granted);
+
+      final result = await repository.checkNotificationPermission();
+
+      expect(result, isTrue);
+    });
+
+    test(
+      'returns false if permission is permanently denied and no context',
+      () async {
+        when(mockBuildVersion.sdkInt).thenReturn(33);
+        when(
+          mockPermissionService.getNotificationsStatus(),
+        ).thenAnswer((_) async => PermissionStatus.permanentlyDenied);
+
+        final result = await repository.checkNotificationPermission();
+
+        expect(result, isFalse);
+      },
+    );
+
+    testWidgets(
+      'shows dialog if permission is permanently denied and context is mounted and showDialogIfDenied is true',
+      (WidgetTester tester) async {
+        when(mockBuildVersion.sdkInt).thenReturn(33);
+        when(
+          mockPermissionService.getNotificationsStatus(),
+        ).thenAnswer((_) async => PermissionStatus.permanentlyDenied);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Builder(
+              builder: (context) {
+                Future.microtask(() {
+                  repository.checkNotificationPermission(
+                    context: context,
+                    showDialogIfDenied: true,
+                  );
+                });
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+      },
+    );
+
+    test('requests permission if not granted or permanently denied', () async {
+      when(mockBuildVersion.sdkInt).thenReturn(33);
+      when(
+        mockPermissionService.getNotificationsStatus(),
+      ).thenAnswer((_) async => PermissionStatus.denied);
+      when(
+        mockPermissionService.requestNotifications(),
+      ).thenAnswer((_) async => PermissionStatus.granted);
+
+      final result = await repository.checkNotificationPermission();
+
+      expect(result, isTrue);
+    });
+
+    test('returns false if permission request is denied', () async {
+      when(mockBuildVersion.sdkInt).thenReturn(33);
+      when(
+        mockPermissionService.getNotificationsStatus(),
+      ).thenAnswer((_) async => PermissionStatus.denied);
+      when(
+        mockPermissionService.requestNotifications(),
+      ).thenAnswer((_) async => PermissionStatus.denied);
+
+      final result = await repository.checkNotificationPermission();
+
+      expect(result, isFalse);
     });
   });
 

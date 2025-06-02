@@ -19,8 +19,8 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
     if (status.isGranted) return true;
 
     if (status.isPermanentlyDenied) {
-      if (context != null && context.mounted) {
-        PermissionSettingsDialog.show(context, 'camera');
+      if (context?.mounted == true) {
+        PermissionSettingsDialog.show(context!, 'camera');
       }
       return false;
     }
@@ -40,8 +40,8 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
       if (status.isGranted) return true;
 
       if (status.isPermanentlyDenied) {
-        if (context != null && context.mounted) {
-          PermissionSettingsDialog.show(context, 'gallery');
+        if (context?.mounted == true) {
+          PermissionSettingsDialog.show(context!, 'gallery');
         }
         return false;
       }
@@ -54,8 +54,8 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
       if (status.isGranted) return true;
 
       if (status.isPermanentlyDenied) {
-        if (context != null && context.mounted) {
-          PermissionSettingsDialog.show(context, 'storage');
+        if (context?.mounted == true) {
+          PermissionSettingsDialog.show(context!, 'storage');
         }
         return false;
       }
@@ -80,9 +80,10 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
     if (status.isGranted) return true;
 
     if (status.isPermanentlyDenied) {
-      if (showDialogIfDenied && context != null && context.mounted) {
-        PermissionSettingsDialog.show(context, 'notifications');
+      if (showDialogIfDenied == true && context?.mounted == true) {
+        PermissionSettingsDialog.show(context!, 'notifications');
       }
+
       return false;
     }
 
