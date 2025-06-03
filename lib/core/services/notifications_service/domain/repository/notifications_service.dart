@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/core.dart';
 
 abstract class NotificationsService {
   Future<NotificationSetupResult> setupNotifications({
@@ -12,18 +13,4 @@ abstract class NotificationsService {
   Future<NotificationSetupResult> setupNotificationsInteractive(
     BuildContext context,
   );
-}
-
-class NotificationSetupResult {
-  final bool hasPermission;
-  final bool hasFCMToken;
-  final bool success;
-
-  const NotificationSetupResult({
-    required this.hasPermission,
-    required this.hasFCMToken,
-    required this.success,
-  });
-
-  bool get isComplete => hasPermission && hasFCMToken && success;
 }
