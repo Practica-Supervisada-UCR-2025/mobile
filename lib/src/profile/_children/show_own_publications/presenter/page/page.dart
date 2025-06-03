@@ -11,7 +11,7 @@ class ShowOwnPublicationsPage extends StatelessWidget {
       create: (_) => PublicationBloc(
         publicationRepository: PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS),
       )..add(LoadPublications()),
-      child: const PublicationsList(),
+      child: const PublicationsList(scrollKey: "ownPosts"),
     );
   }
 }

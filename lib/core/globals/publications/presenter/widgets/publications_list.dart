@@ -4,7 +4,12 @@ import 'package:mobile/core/globals/publications/publications.dart';
 import 'package:mobile/core/storage/storage.dart';
 
 class PublicationsList extends StatefulWidget {
-  const PublicationsList({super.key});
+  final String scrollKey;
+
+  const PublicationsList({
+    super.key,
+    required this.scrollKey,
+    });
 
   @override
   State<PublicationsList> createState() => _PublicationsListState();
@@ -18,7 +23,7 @@ class _PublicationsListState extends State<PublicationsList> with AutomaticKeepA
     super.initState();
 
     _scrollController = ScrollController(
-      initialScrollOffset: ScrollStorage.ownPublicationsOffset,
+      initialScrollOffset: ScrollStorage.getOffset(widget.scrollKey),
     );
     _scrollController.addListener(_onScroll);
   }
@@ -31,7 +36,7 @@ class _PublicationsListState extends State<PublicationsList> with AutomaticKeepA
   }
 
   void _onScroll() {
-    ScrollStorage.ownPublicationsOffset = _scrollController.offset;
+    ScrollStorage.setOffset(widget.scrollKey, _scrollController.offset);
     if (!_scrollController.hasClients) return;
 
     final thresholdReached = _scrollController.position.pixels >=
@@ -76,7 +81,6 @@ class _PublicationsListState extends State<PublicationsList> with AutomaticKeepA
           }
 
           return ListView.builder(
-            key: const PageStorageKey('publicationsList'),
             controller: _scrollController,
             shrinkWrap: true,
             physics: const AlwaysScrollableScrollPhysics(),

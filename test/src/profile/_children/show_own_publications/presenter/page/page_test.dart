@@ -28,7 +28,7 @@ void main() {
         MaterialApp(
           home: BlocProvider<PublicationBloc>.value(
             value: failureBloc,
-            child: const PublicationsList(),
+            child: const PublicationsList(scrollKey: "homePage",),
           ),
         ),
       );

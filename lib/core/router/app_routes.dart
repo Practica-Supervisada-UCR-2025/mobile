@@ -44,7 +44,19 @@ final List<RouteBase> appRoutes = [
     routes: [
       GoRoute(
         path: Paths.home,
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) {
+          return RepositoryProvider<PublicationRepository>(
+            create: (context) => PublicationRepositoryAPI(
+              endpoint: ENDPOINT_OWN_PUBLICATIONS,
+            ),
+            child: BlocProvider<PublicationBloc>(
+              create: (context) => PublicationBloc(
+                publicationRepository: context.read<PublicationRepository>(),
+              )..add(LoadPublications()),
+              child: const HomeScreen(),
+            ),
+          );
+        },
       ),
       GoRoute(
         path: Paths.search,

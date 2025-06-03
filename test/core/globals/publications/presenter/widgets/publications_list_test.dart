@@ -49,7 +49,7 @@ void main() {
     return MaterialApp(
       home: BlocProvider<PublicationBloc>.value(
         value: mockBloc,
-        child: const PublicationsList(),
+        child: const PublicationsList(scrollKey: "ownPublications"),
       ),
     );
   }
