@@ -12,7 +12,7 @@ class TopActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        TextButton(
+        IconButton(
           onPressed: () {
             final bloc = context.read<CreatePostBloc>();
             final state = bloc.state;
@@ -30,12 +30,9 @@ class TopActions extends StatelessWidget {
               context.pop();
             }
           },
-          child: Text(
-            'Cancel',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontSize: 14,
-            ),
+          icon: Icon(
+            Icons.close,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const Spacer(),
