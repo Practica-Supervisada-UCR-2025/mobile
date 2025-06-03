@@ -40,12 +40,10 @@ class CancelConfirmation extends StatelessWidget {
               width: double.infinity,
               child: TextButton(
                 onPressed: () {
-                  context.pop(); // Close the modal
-                  Future.delayed(const Duration(milliseconds: 150), () {
-                    if (context.mounted) {
-                      context.pop(); // Navigate back
-                    }
-                  });
+                  context.pop();
+                  if (context.mounted) {
+                    context.pop();
+                  }
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.red,
@@ -62,7 +60,7 @@ class CancelConfirmation extends StatelessWidget {
               width: double.infinity,
               child: TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close the modal
+                  Navigator.of(context).pop();
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.blue,
