@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/globals/publications/publications.dart';
+import 'package:mobile/core/storage/storage.dart';
 
 class PublicationsList extends StatefulWidget {
   const PublicationsList({super.key});
@@ -9,22 +10,28 @@ class PublicationsList extends StatefulWidget {
   State<PublicationsList> createState() => _PublicationsListState();
 }
 
-class _PublicationsListState extends State<PublicationsList> {
-  final ScrollController _scrollController = ScrollController();
+class _PublicationsListState extends State<PublicationsList> with AutomaticKeepAliveClientMixin {
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+
+    _scrollController = ScrollController(
+      initialScrollOffset: ScrollStorage.ownPublicationsOffset,
+    );
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
   void _onScroll() {
+    ScrollStorage.ownPublicationsOffset = _scrollController.offset;
     if (!_scrollController.hasClients) return;
 
     final thresholdReached = _scrollController.position.pixels >=
@@ -38,6 +45,7 @@ class _PublicationsListState extends State<PublicationsList> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Ensure the state is kept alive
     return BlocBuilder<PublicationBloc, PublicationState>(
       builder: (context, state) {
         if (state is PublicationLoading) {
@@ -68,6 +76,7 @@ class _PublicationsListState extends State<PublicationsList> {
           }
 
           return ListView.builder(
+            key: const PageStorageKey('publicationsList'),
             controller: _scrollController,
             shrinkWrap: true,
             physics: const AlwaysScrollableScrollPhysics(),
@@ -94,4 +103,7 @@ class _PublicationsListState extends State<PublicationsList> {
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
