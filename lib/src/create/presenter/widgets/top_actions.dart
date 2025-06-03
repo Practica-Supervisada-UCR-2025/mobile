@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/src/create/presenter/bloc/bloc.dart';
+import 'widgets.dart';
 
 class TopActions extends StatelessWidget {
   const TopActions({super.key});
@@ -13,13 +14,21 @@ class TopActions extends StatelessWidget {
       children: [
         TextButton(
           onPressed: () {
-            FocusScope.of(context).unfocus();
+            final bloc = context.read<CreatePostBloc>();
+            final state = bloc.state;
 
-            Future.delayed(Duration(milliseconds: 150), () {
-              if (context.mounted) {
-                context.pop();
-              }
-            });
+            final hasContent = state.text.isNotEmpty || state.image != null || state.selectedGif != null;
+
+            if (hasContent) {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return const CancelConfirmation();
+                },
+              );
+            } else {
+              context.pop();
+            }
           },
           child: Text(
             'Cancel',
