@@ -101,7 +101,7 @@ void main() {
       router.push('/create');
       await tester.pumpAndSettle();
 
-      final cancelButton = find.text('Cancel');
+      final cancelButton = find.byIcon(Icons.close);
       expect(cancelButton, findsOneWidget);
 
       await tester.tap(cancelButton);
