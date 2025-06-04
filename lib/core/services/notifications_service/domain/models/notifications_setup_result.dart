@@ -8,6 +8,4 @@ class NotificationSetupResult {
     required this.hasFCMToken,
     required this.success,
   });
-
-  bool get isComplete => hasPermission && hasFCMToken && success;
 }
