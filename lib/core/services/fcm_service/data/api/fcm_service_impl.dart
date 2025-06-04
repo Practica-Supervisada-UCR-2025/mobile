@@ -5,19 +5,20 @@ import 'package:mobile/core/core.dart';
 class FCMServiceImpl implements FCMService {
   final LocalStorage _localStorage;
   final ApiService _apiService;
+  final FirebaseMessaging _firebaseMessaging;
 
   FCMServiceImpl({
     required LocalStorage localStorage,
     required ApiService apiService,
+    FirebaseMessaging? firebaseMessaging,
   }) : _localStorage = localStorage,
-       _apiService = apiService;
+       _apiService = apiService,
+       _firebaseMessaging = firebaseMessaging ?? FirebaseMessaging.instance;
 
   @override
   Future<String?> createFCMToken() async {
-    final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-
     try {
-      String? token = await firebaseMessaging.getToken();
+      String? token = await _firebaseMessaging.getToken();
 
       if (token != null) {
         _configureTokenRefresh();
@@ -53,7 +54,7 @@ class FCMServiceImpl implements FCMService {
   }
 
   void _configureTokenRefresh() {
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    _firebaseMessaging.onTokenRefresh.listen((newToken) async {
       _localStorage.fcmToken = newToken;
 
       if (_localStorage.isLoggedIn) {
