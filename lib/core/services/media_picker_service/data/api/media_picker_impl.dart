@@ -37,7 +37,7 @@ class MediaPickerRepositoryImpl implements MediaPickerRepository {
   }
 
   @override
-  Future<File?> pickImageFromGallery({
+  Future<PickerResult> pickImageFromGallery({
     required BuildContext context,
     required MediaPickerConfig config,
   }) async {
@@ -46,21 +46,25 @@ class MediaPickerRepositoryImpl implements MediaPickerRepository {
       context: context,
     );
 
-    if (hasPermission) {
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: null,
-      );
-
-      if (image != null) {
-        final isValid = await validateFile(file: image, config: config);
-        if (isValid) {
-          return File(image.path);
-        }
-      }
+    if (!hasPermission) {
+      return PickerResult(errorMessage: 'Permission denied');
     }
 
-    return null;
+    final XFile? image = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: null,
+    );
+
+    if (image == null) {
+      return PickerResult(); // User canceled the picker
+    }
+
+    final validationResult = await validateFile(file: image, config: config);
+    if (validationResult.isValid) {
+      return PickerResult(file: File(image.path));
+    } else {
+      return PickerResult(errorMessage: validationResult.errorMessage);
+    }
   }
 
   @override
@@ -80,9 +84,14 @@ class MediaPickerRepositoryImpl implements MediaPickerRepository {
       );
 
       if (image != null) {
-        final isValid = await validateFile(file: image, config: config);
-        if (isValid) {
+        final validationResult = await validateFile(
+          file: image,
+          config: config,
+        );
+        if (validationResult.isValid) {
           return File(image.path);
+        } else {
+          config.onInvalidFile?.call(validationResult.errorMessage!);
         }
       }
     }
@@ -90,29 +99,31 @@ class MediaPickerRepositoryImpl implements MediaPickerRepository {
   }
 
   @override
-  Future<bool> validateFile({
+  Future<ValidationResult> validateFile({
     required XFile file,
     required MediaPickerConfig config,
   }) async {
     final String extension = file.path.split('.').last.toLowerCase();
 
     if (!config.allowedExtensions.contains(extension)) {
-      config.onInvalidFile?.call(
-        'File type not allowed. Use ${config.allowedExtensions.join(', ')}.',
+      return ValidationResult(
+        isValid: false,
+        errorMessage:
+            'File type not allowed. Use ${config.allowedExtensions.join(', ')}.',
       );
-      return false;
     }
 
     final File fileObj = File(file.path);
     final int fileSize = await fileObj.length();
 
     if (fileSize > config.maxSizeInBytes) {
-      config.onInvalidFile?.call(
-        'File exceeds the ${config.maxSizeInBytes ~/ (1024 * 1024)}MB limit.',
+      return ValidationResult(
+        isValid: false,
+        errorMessage:
+            'File exceeds the ${config.maxSizeInBytes ~/ (1024 * 1024)}MB limit.',
       );
-      return false;
     }
 
-    return true;
+    return ValidationResult(isValid: true);
   }
 }
