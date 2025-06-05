@@ -1,5 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile/core/services/media_picker_service/data/api/media_picker_impl.dart';
+import 'package:mobile/core/services/media_picker_service/domain/repository/media_picker_repository.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'src/create/create.dart';
@@ -86,6 +88,9 @@ class MyApp extends StatelessWidget {
                 fcmService: context.read<FCMService>(),
                 localStorage: LocalStorage(),
               ),
+        ),
+        RepositoryProvider<MediaPickerRepository>(
+          create: (_) => MediaPickerRepositoryImpl(),
         ),
       ],
       child: MultiBlocProvider(

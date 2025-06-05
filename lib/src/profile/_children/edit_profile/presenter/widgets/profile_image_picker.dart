@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
 
@@ -39,16 +40,19 @@ class ProfileImagePicker extends StatelessWidget {
                     title: const Text('Gallery'),
                     onTap: () async {
                       context.pop();
-                      final image =
-                          await MediaPickerService.pickImageFromGallery(
+                      final image = await context
+                          .read<MediaPickerRepository>()
+                          .pickImageFromGallery(
                             context: context,
-                            onInvalidFile: (error) {
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(SnackBar(content: Text(error)));
-                            },
-                            allowedExtensions: IMAGES_ALLOWED,
-                            maxSizeInBytes: MAX_IMAGE_SIZE,
+                            config: MediaPickerConfig(
+                              allowedExtensions: IMAGES_ALLOWED,
+                              maxSizeInBytes: MAX_IMAGE_SIZE,
+                              onInvalidFile: (error) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(error)));
+                              },
+                            ),
                           );
 
                       if (image != null) {
@@ -61,16 +65,20 @@ class ProfileImagePicker extends StatelessWidget {
                     title: const Text('Camera'),
                     onTap: () async {
                       context.pop();
-                      final photo = await MediaPickerService.takePhoto(
-                        context: context,
-                        onInvalidFile: (error) {
-                          ScaffoldMessenger.of(
-                            context,
-                          ).showSnackBar(SnackBar(content: Text(error)));
-                        },
-                        allowedExtensions: IMAGES_ALLOWED,
-                        maxSizeInBytes: MAX_IMAGE_SIZE,
-                      );
+                      final photo = await context
+                          .read<MediaPickerRepository>()
+                          .takePhoto(
+                            context: context,
+                            config: MediaPickerConfig(
+                              allowedExtensions: IMAGES_ALLOWED,
+                              maxSizeInBytes: MAX_IMAGE_SIZE,
+                              onInvalidFile: (error) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(error)));
+                              },
+                            ),
+                          );
 
                       if (photo != null) {
                         onImageSelected(photo);
