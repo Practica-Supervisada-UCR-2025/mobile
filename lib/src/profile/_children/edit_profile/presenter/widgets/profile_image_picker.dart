@@ -133,15 +133,8 @@ class ProfileImagePicker extends StatelessWidget {
                     ? FileImage(selectedImage!) as ImageProvider
                     : currentImage.isNotEmpty
                     ? NetworkImage(currentImage)
-                    : null,
-            child:
-                currentImage.isEmpty && selectedImage == null
-                    ? Icon(
-                      Icons.person,
-                      size: 50,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
-                    : null,
+                    : const NetworkImage(DEFAULT_PROFILE_PIC_2),
+            child: null,
           ),
           Container(
             padding: const EdgeInsets.all(8),
