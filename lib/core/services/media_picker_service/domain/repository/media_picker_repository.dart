@@ -12,7 +12,7 @@ abstract class MediaPickerRepository {
     TenorGifService? gifService,
   });
 
-  Future<PickerResult> pickImageFromGallery({
+  Future<File?> pickImageFromGallery({
     required BuildContext context,
     required MediaPickerConfig config,
   });

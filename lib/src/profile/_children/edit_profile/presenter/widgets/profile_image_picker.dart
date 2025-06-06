@@ -39,25 +39,30 @@ class ProfileImagePicker extends StatelessWidget {
                     leading: const Icon(Icons.photo_library),
                     title: const Text('Gallery'),
                     onTap: () async {
+                      final navigatorContext = Navigator.of(context).context;
                       context.pop();
 
-                      final result = await context
+                      String? errorMessage;
+                      final image = await context
                           .read<MediaPickerRepository>()
                           .pickImageFromGallery(
                             context: context,
                             config: MediaPickerConfig(
                               allowedExtensions: IMAGES_ALLOWED,
                               maxSizeInBytes: MAX_IMAGE_SIZE,
+                              onInvalidFile: (error) {
+                                errorMessage = error;
+                              },
                             ),
                           );
 
-                      if (result.file != null) {
-                        onImageSelected(result.file!);
-                      } else if (result.errorMessage != null &&
-                          context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(result.errorMessage!)),
-                        );
+                      if (image != null) {
+                        onImageSelected(image);
+                      } else if (errorMessage != null &&
+                          navigatorContext.mounted) {
+                        ScaffoldMessenger.of(
+                          navigatorContext,
+                        ).showSnackBar(SnackBar(content: Text(errorMessage!)));
                       }
                     },
                   ),
@@ -65,7 +70,9 @@ class ProfileImagePicker extends StatelessWidget {
                     leading: const Icon(Icons.camera_alt),
                     title: const Text('Camera'),
                     onTap: () async {
+                      final navigatorContext = Navigator.of(context).context;
                       context.pop();
+                      String? errorMessage;
                       final photo = await context
                           .read<MediaPickerRepository>()
                           .takePhoto(
@@ -74,15 +81,18 @@ class ProfileImagePicker extends StatelessWidget {
                               allowedExtensions: IMAGES_ALLOWED,
                               maxSizeInBytes: MAX_IMAGE_SIZE,
                               onInvalidFile: (error) {
-                                ScaffoldMessenger.of(
-                                  context,
-                                ).showSnackBar(SnackBar(content: Text(error)));
+                                errorMessage = error;
                               },
                             ),
                           );
 
                       if (photo != null) {
                         onImageSelected(photo);
+                      } else if (errorMessage != null &&
+                          navigatorContext.mounted) {
+                        ScaffoldMessenger.of(
+                          navigatorContext,
+                        ).showSnackBar(SnackBar(content: Text(errorMessage!)));
                       }
                     },
                   ),

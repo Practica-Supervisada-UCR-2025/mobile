@@ -37,7 +37,7 @@ class MediaPickerRepositoryImpl implements MediaPickerRepository {
   }
 
   @override
-  Future<PickerResult> pickImageFromGallery({
+  Future<File?> pickImageFromGallery({
     required BuildContext context,
     required MediaPickerConfig config,
   }) async {
@@ -46,25 +46,25 @@ class MediaPickerRepositoryImpl implements MediaPickerRepository {
       context: context,
     );
 
-    if (!hasPermission) {
-      return PickerResult(errorMessage: 'Permission denied');
-    }
+    if (hasPermission) {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: config.imageQuality,
+      );
 
-    final XFile? image = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: null,
-    );
-
-    if (image == null) {
-      return PickerResult(); // User canceled the picker
+      if (image != null) {
+        final validationResult = await validateFile(
+          file: image,
+          config: config,
+        );
+        if (validationResult.isValid) {
+          return File(image.path);
+        } else {
+          config.onInvalidFile?.call(validationResult.errorMessage!);
+        }
+      }
     }
-
-    final validationResult = await validateFile(file: image, config: config);
-    if (validationResult.isValid) {
-      return PickerResult(file: File(image.path));
-    } else {
-      return PickerResult(errorMessage: validationResult.errorMessage);
-    }
+    return null;
   }
 
   @override
