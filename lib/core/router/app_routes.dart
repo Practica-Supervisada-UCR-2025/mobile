@@ -1,8 +1,8 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/core/core.dart';
 import 'package:mobile/src/profile/_children/_children.dart';
 import '../../src/profile/domain/domain.dart';
-import 'paths.dart';
-import 'router_utils.dart';
 import '../../core/globals/main_scaffold.dart';
 import '../../src/auth/_children/login/presenter/presenter.dart';
 import '../../src/auth/_children/register/presenter/presenter.dart';
@@ -44,7 +44,19 @@ final List<RouteBase> appRoutes = [
     routes: [
       GoRoute(
         path: Paths.home,
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) {
+          return RepositoryProvider<PublicationRepository>(
+            create: (context) => PublicationRepositoryAPI(
+              endpoint: ENDPOINT_OWN_PUBLICATIONS,
+            ),
+            child: BlocProvider<PublicationBloc>(
+              create: (context) => PublicationBloc(
+                publicationRepository: context.read<PublicationRepository>(),
+              )..add(LoadPublications()),
+              child: const HomeScreen(),
+            ),
+          );
+        },
       ),
       GoRoute(
         path: Paths.search,
@@ -56,7 +68,19 @@ final List<RouteBase> appRoutes = [
       ),
       GoRoute(
         path: Paths.profile,
-        builder: (context, state) => const ProfileScreen(),
+        builder: (context, state) {
+          return RepositoryProvider<PublicationRepository>(
+            create: (context) => PublicationRepositoryAPI(
+              endpoint: ENDPOINT_OWN_PUBLICATIONS,
+            ),
+            child: BlocProvider<PublicationBloc>(
+              create: (context) => PublicationBloc(
+                publicationRepository: context.read<PublicationRepository>(),
+              )..add(LoadPublications()),
+              child: const ProfileScreen(),
+            ),
+          );
+        },
       ),
     ],
   ),

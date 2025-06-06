@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
+import 'package:mobile/core/globals/publications/publications.dart';
+import 'package:mobile/src/profile/_children/_children.dart';
 
 void main() {
   testWidgets(
@@ -27,7 +28,7 @@ void main() {
         MaterialApp(
           home: BlocProvider<PublicationBloc>.value(
             value: failureBloc,
-            child: const PublicationsList(),
+            child: const PublicationsList(scrollKey: "homePage",),
           ),
         ),
       );

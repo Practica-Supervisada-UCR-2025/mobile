@@ -5,7 +5,7 @@ import 'package:network_image_mock/network_image_mock.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:mobile/src/profile/profile.dart'
+import 'package:mobile/core/globals/publications/publications.dart'
     show
         PublicationBloc,
         PublicationEvent,
@@ -49,7 +49,7 @@ void main() {
     return MaterialApp(
       home: BlocProvider<PublicationBloc>.value(
         value: mockBloc,
-        child: const PublicationsList(),
+        child: const PublicationsList(scrollKey: "ownPublications"),
       ),
     );
   }

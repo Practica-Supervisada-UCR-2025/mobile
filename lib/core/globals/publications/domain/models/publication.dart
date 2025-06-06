@@ -4,7 +4,7 @@ class Publication {
   final String profileImageUrl;
   final String content;
   final DateTime createdAt;
-  final String? attachment; // Solo un adjunto máximo
+  final String? attachment;
   final int likes;
   final int comments;
 

@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
+import 'package:mobile/core/globals/publications/publications.dart';
 
 part 'publication_event.dart';
 part 'publication_state.dart';

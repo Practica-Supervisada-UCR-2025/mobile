@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:mobile/core/constants/constants.dart';
 import 'package:mobile/core/storage/storage.dart';
-import 'package:mobile/src/profile/_children/show_own_publications/show_own_publications.dart';
+import 'package:mobile/core/globals/publications/publications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -22,7 +23,7 @@ void main() {
     });
 
     test('uses default http.Client if none is provided', () {
-      final repo = PublicationRepositoryAPI(); // should trigger line 11
+      final repo = PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS); // should trigger line 11
       expect(repo, isA<PublicationRepositoryAPI>());
     });
 
@@ -46,6 +47,7 @@ void main() {
       };
 
       repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
         client: MockClient((request) async {
           return http.Response(jsonEncode(mockResponse), 200);
         }),
@@ -69,6 +71,7 @@ void main() {
       };
 
       repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
         client: MockClient((request) async {
           return http.Response(jsonEncode(mockResponse), 200);
         }),
@@ -84,6 +87,7 @@ void main() {
       };
 
       repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
         client: MockClient((request) async {
           return http.Response(jsonEncode(mockResponse), 200);
         }),
@@ -95,6 +99,7 @@ void main() {
 
     test('throws exception on non-200 response', () async {
       repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
         client: MockClient((request) async {
           return http.Response('Unauthorized', 401);
         }),
@@ -113,7 +118,7 @@ void main() {
       });
       await LocalStorage.init();
 
-      repository = PublicationRepositoryAPI();
+      repository = PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS);
 
       await expectLater(
         () async => await repository.fetchPublications(page: 1, limit: 10),
@@ -141,6 +146,7 @@ void main() {
       };
 
       repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
         client: MockClient((request) async {
           return http.Response(jsonEncode(mockResponse), 200);
         }),
