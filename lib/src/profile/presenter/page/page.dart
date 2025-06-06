@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/core/globals/widgets/secondary_button.dart';
-import 'package:mobile/core/router/paths.dart';
+import 'package:mobile/core/core.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -91,7 +90,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                         const SizedBox(width: 16),
                         CircleAvatar(
                           radius: 35,
-                          backgroundImage: NetworkImage(user.image),
+                          backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
+                          foregroundImage: NetworkImage(user.image),
                           backgroundColor:
                               Theme.of(context).colorScheme.onPrimary,
                         ),

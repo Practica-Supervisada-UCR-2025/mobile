@@ -9,13 +9,26 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/core.dart';
 import 'firebase_options.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await LocalStorage.init();
   await dotenv.load(fileName: ".env");
-  runApp(MyApp());
+
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = dotenv.env['SENTRY_DSN'];
+      options.sendDefaultPii = true;
+    },
+    appRunner: () => runApp(
+      SentryWidget(
+        child: MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -44,9 +57,6 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),
-        ),
-        RepositoryProvider<PublicationRepository>(
-          create: (context) => PublicationRepositoryAPI(),
         ),
         RepositoryProvider<ApiService>(create: (_) => ApiServiceImpl()),
 
@@ -94,12 +104,6 @@ class MyApp extends StatelessWidget {
           BlocProvider<CreatePostBloc>(create: (context) => CreatePostBloc(
             createPostRepository: context.read<CreatePostRepository>(),
           )),
-          BlocProvider<PublicationBloc>(
-            create:
-                (context) => PublicationBloc(
-                  publicationRepository: context.read<PublicationRepository>(),
-                )..add(LoadPublications()),
-          ),
           BlocProvider<EditProfileBloc>(
             create:
                 (context) => EditProfileBloc(

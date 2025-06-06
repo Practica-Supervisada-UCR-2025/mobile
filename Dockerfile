@@ -4,11 +4,11 @@ FROM instrumentisto/flutter:latest
 WORKDIR /app
 
 # We only need to copy the entrypoint script to the image to run the tests, we dont need to copy the code since we will use bind mounts to make this container have the entire project
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY coverage.sh /coverage.sh
+RUN chmod +x /coverage.sh
 
 # Activate coverage package globally
 RUN flutter pub global activate coverage
 
 # Run tests and generate coverage
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/coverage.sh"]
