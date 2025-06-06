@@ -7,11 +7,15 @@ class PostsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => PublicationBloc(
-        publicationRepository: PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS),
-      )..add(LoadPublications()),
-      child: const PublicationsList(scrollKey: "allPosts"),
+    return 
+    Container(
+      color: Theme.of(context).colorScheme.surface,
+      child: BlocProvider(
+        create: (_) => PublicationBloc(
+          publicationRepository: PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS),
+        )..add(LoadPublications()),
+        child: const PublicationsList(scrollKey: "allPosts"),
+      ),
     );
   }
 }
