@@ -99,7 +99,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     const SizedBox(height: 20),
                     Divider(color: Theme.of(context).colorScheme.outline),
-                    Expanded(child: ShowOwnPublicationsPage()),
+                    if(isOwnProfile)
+                      Expanded(child: ShowOwnPublicationsPage()),
+                    if(!isOwnProfile)
+                      Expanded(child: ShowPostFromOthersPage(userId: state.user.email)),
                   ],
                 );
               } else if (state is ProfileFailure) {
