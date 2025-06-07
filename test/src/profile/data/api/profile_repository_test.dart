@@ -32,7 +32,7 @@ void main() {
     const token = '1';
     final url = Uri.parse('$API_BASE_URL/user/auth/profile');
 
-    test('should return User when API call is successful', () async {
+    test('should return User when getCurrentUser API call is successful', () async {
       final mockUserData = {
         'message': 'User profile retrieved successfully',
         'data': {
@@ -42,7 +42,7 @@ void main() {
           'profile_picture': 'https://dummyjson.com/icon/emilys/128',
         },
       };
-      
+
       when(
         mockClient.get(
           url,
@@ -61,12 +61,86 @@ void main() {
       expect(result.image, equals('https://dummyjson.com/icon/emilys/128'));
     });
 
-    test('should throw Exception when API call fails', () async {
-      when(
-        mockClient.get(url),
-      ).thenAnswer((_) async => http.Response('Not found', 404));
+    test('should throw Exception when getCurrentUser API call fails', () async {
+      when(mockClient.get(url)).thenAnswer((_) async => http.Response('Not found', 404));
 
       expect(() => repository.getCurrentUser(token), throwsException);
+    });
+
+    group('getUserProfile', () {
+      const userId = '123';
+      final userProfileUrl = Uri.parse('$API_BASE_URL/user/$userId');
+
+      test('should return User when getUserProfile API call is successful', () async {
+         final mockUserData = {
+        'message': 'User profile retrieved successfully',
+        'data': {
+          'email': 'test@ucr.ac.cr',
+          'username': 'test',
+          'full_name': 'Test User',
+          'profile_picture': 'https://dummyjson.com/icon/emilys/128',
+        },
+      };
+
+        when(
+          mockClient.get(
+            userProfileUrl,
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          ),
+        ).thenAnswer((_) async => http.Response(jsonEncode(mockUserData), 201));
+
+        final result = await repository.getUserProfile(userId, token);
+
+        expect(result.email, equals('test@ucr.ac.cr'));
+        expect(result.username, equals('test'));
+        expect(result.firstName, equals('Test'));
+        expect(result.image, equals('https://dummyjson.com/icon/emilys/128'));
+      });
+
+      test('should throw Exception when getUserProfile API call fails with 404', () async {
+        final errorResponse = {
+          'message': 'User not found',
+        };
+
+        when(
+          mockClient.get(
+            userProfileUrl,
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          ),
+        ).thenAnswer((_) async => http.Response(jsonEncode(errorResponse), 404));
+
+        expect(
+          () => repository.getUserProfile(userId, token),
+          throwsA(predicate((e) =>
+              e is Exception &&
+              e.toString().contains('User not found'))),
+        );
+      });
+
+      test('should throw Exception when getUserProfile API call throws network error', () async {
+        when(
+          mockClient.get(
+            userProfileUrl,
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          ),
+        ).thenThrow(SocketException('No Internet connection'));
+
+        expect(
+          () => repository.getUserProfile(userId, token),
+          throwsA(predicate((e) =>
+              e is Exception &&
+              e.toString().contains('Error getting user profile'))),
+        );
+      });
     });
   });
 }
