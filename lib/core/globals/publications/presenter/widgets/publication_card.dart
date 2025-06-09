@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/core.dart';
+import 'package:mobile/src/comments/presenter/page/comments_page.dart';
+import 'package:mobile/src/comments/presenter/widgets/comments_modal.dart';
+
 
 class PublicationCard extends StatelessWidget {
   final Publication publication;
@@ -87,16 +90,41 @@ class PublicationCard extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              /// Reactions & Comments
               Row(
                 children: [
-                  const Icon(Icons.favorite_border, size: 20),
-                  const SizedBox(width: 4),
+                  IconButton(
+                    icon: const Icon(Icons.favorite_border, size: 20),
+                    onPressed: () {
+                    },
+                  ),
                   Text(publication.likes.toString()),
                   const SizedBox(width: 16),
-                  const Icon(Icons.chat_bubble_outline, size: 20),
-                  const SizedBox(width: 4),
+                  IconButton(
+                    icon: const Icon(Icons.chat_bubble_outline, size: 20),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => CommentsPage(publication: publication),
+                        ),
+                      );
+                    },
+                  ),
                   Text(publication.comments.toString()),
+                ],
+              ),
+
+              const SizedBox(height: 8),
+
+              /// Share button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.share, size: 20),
+                    onPressed: () {
+                      // futuro: manejar compartir
+                    },
+                  ),
                 ],
               ),
             ],
