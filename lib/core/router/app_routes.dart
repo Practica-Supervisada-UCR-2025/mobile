@@ -2,13 +2,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/profile/_children/_children.dart';
+import 'package:mobile/src/search/presenter/page/page.dart';
 import '../../src/profile/domain/domain.dart';
 import '../../core/globals/main_scaffold.dart';
 import '../../src/auth/_children/login/presenter/presenter.dart';
 import '../../src/auth/_children/register/presenter/presenter.dart';
 import '../../src/auth/_children/forgot-password/presenter/presenter.dart';
 import '../../src/home/presenter/presenter.dart';
-import '../../src/search/presenter/presenter.dart';
 import '../../src/create/presenter/presenter.dart';
 import '../../src/notifications/presenter/presenter.dart';
 import '../../src/profile/presenter/presenter.dart';
@@ -46,13 +46,16 @@ final List<RouteBase> appRoutes = [
         path: Paths.home,
         builder: (context, state) {
           return RepositoryProvider<PublicationRepository>(
-            create: (context) => PublicationRepositoryAPI(
-              endpoint: ENDPOINT_OWN_PUBLICATIONS,
-            ),
+            create:
+                (context) => PublicationRepositoryAPI(
+                  endpoint: ENDPOINT_OWN_PUBLICATIONS,
+                ),
             child: BlocProvider<PublicationBloc>(
-              create: (context) => PublicationBloc(
-                publicationRepository: context.read<PublicationRepository>(),
-              )..add(LoadPublications()),
+              create:
+                  (context) => PublicationBloc(
+                    publicationRepository:
+                        context.read<PublicationRepository>(),
+                  )..add(LoadPublications()),
               child: const HomeScreen(),
             ),
           );
@@ -70,13 +73,16 @@ final List<RouteBase> appRoutes = [
         path: Paths.profile,
         builder: (context, state) {
           return RepositoryProvider<PublicationRepository>(
-            create: (context) => PublicationRepositoryAPI(
-              endpoint: ENDPOINT_OWN_PUBLICATIONS,
-            ),
+            create:
+                (context) => PublicationRepositoryAPI(
+                  endpoint: ENDPOINT_OWN_PUBLICATIONS,
+                ),
             child: BlocProvider<PublicationBloc>(
-              create: (context) => PublicationBloc(
-                publicationRepository: context.read<PublicationRepository>(),
-              )..add(LoadPublications()),
+              create:
+                  (context) => PublicationBloc(
+                    publicationRepository:
+                        context.read<PublicationRepository>(),
+                  )..add(LoadPublications()),
               child: const ProfileScreen(),
             ),
           );
