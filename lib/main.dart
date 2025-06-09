@@ -1,7 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile/core/services/media_picker_service/data/api/media_picker_impl.dart';
-import 'package:mobile/core/services/media_picker_service/domain/repository/media_picker_repository.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'src/create/create.dart';
@@ -13,9 +11,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/core.dart';
 import 'firebase_options.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // This method will be called when the app is in the background or terminated
   //  handle the message here if needed.
+  print('🔔 Handling a background message: ${message.messageId}');
 }
 
 void main() async {
@@ -24,6 +25,31 @@ void main() async {
   await LocalStorage.init();
   await dotenv.load(fileName: ".env");
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    // todo: Delete this when the notification ui is implemented
+    print('📩 Notification received');
+    print('Title: ${message.notification?.title}');
+    print('Body: ${message.notification?.body}');
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${message.notification?.title ?? 'Notificación'}: ${message.notification?.body ?? ''}',
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    });
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    print('🔔 The user opened the app from a notification');
+  });
 
   runApp(MyApp());
 }
