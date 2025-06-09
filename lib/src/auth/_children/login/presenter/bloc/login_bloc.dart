@@ -42,6 +42,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       localStorage.userId = user.id;
       localStorage.userEmail = user.email;
       localStorage.accessToken = tokens.accessToken;
+      print(localStorage.accessToken);
 
       emit(LoginSuccess(user: user));
     } on AuthException catch (e) {

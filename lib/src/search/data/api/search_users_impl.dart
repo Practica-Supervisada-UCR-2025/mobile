@@ -17,7 +17,7 @@ class SearchUsersRepositoryImpl implements SearchUsersRepository {
 
       final response = await apiService.get(
         '/user/search/?name=${Uri.encodeComponent(name)}',
-        authenticated: false,
+        authenticated: true,
       );
 
       if (response.statusCode == 200) {

@@ -33,27 +33,40 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     }
 
     // if the query is less than 2 characters, emit initial state
-    if (query.length < 3) {
+    if (query.length < 2) {
       emit(const SearchInitial());
       return;
     }
 
+    final completer = Completer<void>();
+
     // Debounce
     _debounceTimer = Timer(_debounceDuration, () async {
       try {
-        emit(const SearchLoading());
+        if (!emit.isDone) {
+          emit(const SearchLoading());
+        }
 
         final users = await searchUsersRepository.searchUsers(query);
 
-        if (users.isEmpty) {
-          emit(SearchEmpty(query: query));
-        } else {
-          emit(SearchSuccess(users: users, query: query));
+        if (!emit.isDone) {
+          if (users.isEmpty) {
+            emit(SearchEmpty(query: query));
+          } else {
+            emit(SearchSuccess(users: users, query: query));
+          }
         }
       } catch (e) {
-        emit(SearchError(message: e.toString(), query: query));
+        if (!emit.isDone) {
+          emit(SearchError(message: e.toString(), query: query));
+        }
+      } finally {
+        completer.complete();
       }
     });
+
+    // Wait for the debounce timer to complete
+    await completer.future;
   }
 
   void _onClearSearch(ClearSearchEvent event, Emitter<SearchState> emit) {
