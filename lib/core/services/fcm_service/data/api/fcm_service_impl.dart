@@ -18,6 +18,22 @@ class FCMServiceImpl implements FCMService {
   @override
   Future<String?> createFCMToken() async {
     try {
+      NotificationSettings settings = await _firebaseMessaging
+          .requestPermission(
+            alert: true,
+            badge: true,
+            sound: true,
+            announcement: false,
+            carPlay: false,
+            criticalAlert: false,
+            provisional: false,
+          );
+
+      if (settings.authorizationStatus == AuthorizationStatus.denied) {
+        debugPrint('Notification permission denied');
+        return null;
+      }
+
       String? token = await _firebaseMessaging.getToken();
 
       if (token != null) {
