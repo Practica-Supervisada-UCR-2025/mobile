@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile/src/search/presenter/bloc/search_event.dart';
-import 'package:mobile/src/search/presenter/bloc/search_state.dart';
 import 'package:mobile/src/search/search.dart';
 
 class SearchScreen extends StatefulWidget {

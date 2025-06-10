@@ -1,5 +1,4 @@
-import 'package:equatable/equatable.dart';
-import 'package:mobile/src/search/search.dart';
+part of 'search_bloc.dart';
 
 abstract class SearchState extends Equatable {
   const SearchState();
