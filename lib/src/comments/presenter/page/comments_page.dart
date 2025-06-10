@@ -9,8 +9,13 @@ class CommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
         title: const Text("Comentarios"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -19,9 +24,17 @@ class CommentsPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          _PostPreview(publication: publication),
           const Divider(height: 1),
-          const Expanded(child: CommentsList()),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _PostPreview(publication: publication),
+                const Divider(height: 1),
+                const CommentsList(),
+              ],
+            ),
+          ),
           const CommentInputBox(),
         ],
       ),
@@ -36,21 +49,39 @@ class _PostPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage(publication.profileImageUrl),
-      ),
-      title: Text(publication.username, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Column(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Container(
+      color: colorScheme.surface,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage(publication.profileImageUrl),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  publication.username,
+                  style: textTheme.titleMedium,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Text(
             publication.content,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+            ),
           ),
-          if (publication.attachment != null && publication.attachment!.isNotEmpty)
+          if (publication.attachment != null &&
+              publication.attachment!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: ClipRRect(
@@ -74,18 +105,39 @@ class CommentsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Luego lo conectamos a bloc
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: 5,
-      separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (_, index) {
-        return const ListTile(
-          leading: CircleAvatar(),
-          title: Text("Usuario123"),
-          subtitle: Text("Este es un comentario de prueba"),
-        );
-      },
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      color: colorScheme.surface,
+      child: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 5,
+        separatorBuilder: (_, __) =>
+            Divider(height: 1, color: colorScheme.outline),
+        itemBuilder: (_, index) {
+          return Container(
+            color: colorScheme.surface, 
+            child: ListTile(
+              leading: const CircleAvatar(),
+              title: Text(
+                "Usuario123",
+                style: textTheme.bodyMedium,
+              ),
+              subtitle: Text(
+                "Este es un comentario de prueba",
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.outline,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
+
+
