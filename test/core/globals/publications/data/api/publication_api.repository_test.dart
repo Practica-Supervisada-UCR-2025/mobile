@@ -23,7 +23,9 @@ void main() {
     });
 
     test('uses default http.Client if none is provided', () {
-      final repo = PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS); // should trigger line 11
+      final repo = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+      ); // should trigger line 11
       expect(repo, isA<PublicationRepositoryAPI>());
     });
 
@@ -31,19 +33,15 @@ void main() {
       final mockResponse = {
         'data': [
           {
-            'id': 1,
+            'id': '1',
             'content': 'Test content',
             'created_at': '2024-01-01T12:00:00Z',
             'file_url': 'https://example.com/image.png',
             'likes': 5,
             'comments': 3,
-          }
+          },
         ],
-        'metadata': {
-          'totalPosts': 1,
-          'totalPages': 1,
-          'currentPage': 1,
-        },
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
       };
 
       repository = PublicationRepositoryAPI(
@@ -56,18 +54,14 @@ void main() {
       final result = await repository.fetchPublications(page: 1, limit: 10);
 
       expect(result.publications.length, 1);
-      expect(result.publications.first.id, 1);
+      expect(result.publications.first.id, '1');
       expect(result.totalPosts, 1);
     });
 
     test('returns empty list if data is empty', () async {
       final mockResponse = {
         'data': [],
-        'metadata': {
-          'totalPosts': 0,
-          'totalPages': 0,
-          'currentPage': 1,
-        },
+        'metadata': {'totalPosts': 0, 'totalPages': 0, 'currentPage': 1},
       };
 
       repository = PublicationRepositoryAPI(
@@ -82,9 +76,7 @@ void main() {
     });
 
     test('returns default metadata values if metadata is missing', () async {
-      final mockResponse = {
-        'data': [],
-      };
+      final mockResponse = {'data': []};
 
       repository = PublicationRepositoryAPI(
         endpoint: ENDPOINT_OWN_PUBLICATIONS,
@@ -118,7 +110,9 @@ void main() {
       });
       await LocalStorage.init();
 
-      repository = PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS);
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+      );
 
       await expectLater(
         () async => await repository.fetchPublications(page: 1, limit: 10),
@@ -130,19 +124,15 @@ void main() {
       final mockResponse = {
         'data': [
           {
-            'id': 1,
+            'id': '1',
             'content': 'Broken date',
             'created_at': 'invalid-date',
             'file_url': '',
             'likes': 0,
             'comments': 0,
-          }
+          },
         ],
-        'metadata': {
-          'totalPosts': 1,
-          'totalPages': 1,
-          'currentPage': 1,
-        },
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
       };
 
       repository = PublicationRepositoryAPI(
@@ -154,6 +144,6 @@ void main() {
 
       final result = await repository.fetchPublications(page: 1, limit: 10);
       expect(result.publications.first.createdAt, isA<DateTime>());
-    });    
+    });
   });
 }
