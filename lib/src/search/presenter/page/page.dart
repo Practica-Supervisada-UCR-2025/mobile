@@ -144,42 +144,20 @@ class _SearchScreenState extends State<SearchScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.error_outline_rounded,
-                size: 64,
-                color: colorScheme.error,
-              ),
-              const SizedBox(height: 16),
               Text(
-                'Failed to load results',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.error,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Something went wrong. Try again later.',
+                'Something went wrong. Try again.',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.outline,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
-              FilledButton.icon(
+              const SizedBox(height: 16),
+              TextButton.icon(
                 onPressed: () {
                   context.read<SearchBloc>().add(SearchUsersEvent(state.query));
                 },
-                icon: const Icon(Icons.refresh_rounded),
+                icon: const Icon(Icons.refresh_rounded, size: 18),
                 label: const Text('Retry'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
             ],
           ),
