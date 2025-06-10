@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/core/core.dart'; // para Publication
+import 'package:mobile/core/core.dart';
 import 'package:mobile/src/comments/presenter/widgets/comment_input_box.dart';
 
 class CommentsModal extends StatelessWidget {
@@ -58,7 +58,6 @@ class CommentsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Pronto: BLoC builder + scroll infinito
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: 5,

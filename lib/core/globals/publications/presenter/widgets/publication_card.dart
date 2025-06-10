@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/comments/presenter/page/comments_page.dart';
-import 'package:mobile/src/comments/presenter/widgets/comments_modal.dart';
-
 
 class PublicationCard extends StatelessWidget {
   final Publication publication;
@@ -30,7 +28,6 @@ class PublicationCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Header
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -57,7 +54,6 @@ class PublicationCard extends StatelessWidget {
                   ),
                   PopupMenuButton<String>(
                     onSelected: (value) {
-                      // No action for now
                     },
                     itemBuilder: (context) => [
                       const PopupMenuItem<String>(
@@ -71,12 +67,9 @@ class PublicationCard extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              /// Content text with "See more"
               _ExpandableText(content: publication.content),
 
               const SizedBox(height: 8),
-
-              /// Attachment
               if (publication.attachment != null && publication.attachment!.isNotEmpty)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
@@ -114,15 +107,12 @@ class PublicationCard extends StatelessWidget {
               ),
 
               const SizedBox(height: 8),
-
-              /// Share button
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
                     icon: const Icon(Icons.share, size: 20),
                     onPressed: () {
-                      // futuro: manejar compartir
                     },
                   ),
                 ],
