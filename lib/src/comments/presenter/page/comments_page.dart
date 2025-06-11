@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/core.dart';
+import 'package:mobile/src/comments/domain/repository/comments_repository.dart';
+import 'package:mobile/src/comments/presenter/bloc/comments_bloc.dart';
 import 'package:mobile/src/comments/presenter/widgets/comment_input_box.dart';
+import 'package:mobile/src/comments/presenter/widgets/comment_list.dart';
 
 class CommentsPage extends StatelessWidget {
   final Publication publication;
@@ -31,7 +35,14 @@ class CommentsPage extends StatelessWidget {
               children: [
                 _PostPreview(publication: publication),
                 const Divider(height: 1),
-                const CommentsList(),
+
+                BlocProvider(
+                  create: (_) => CommentsBloc(
+                    repository: CommentsRepository(),
+                    postId: publication.id.toString(),
+                  ),
+                  child: CommentsList(postId: publication.id.toString()),
+                ),
               ],
             ),
           ),
@@ -99,45 +110,3 @@ class _PostPreview extends StatelessWidget {
     );
   }
 }
-
-class CommentsList extends StatelessWidget {
-  const CommentsList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-      color: colorScheme.surface,
-      child: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: 5,
-        separatorBuilder: (_, __) =>
-            Divider(height: 1, color: colorScheme.outline),
-        itemBuilder: (_, index) {
-          return Container(
-            color: colorScheme.surface, 
-            child: ListTile(
-              leading: const CircleAvatar(),
-              title: Text(
-                "Usuario123",
-                style: textTheme.bodyMedium,
-              ),
-              subtitle: Text(
-                "Este es un comentario de prueba",
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.outline,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-
