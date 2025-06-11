@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/globals/publications/domain/models/publication.dart';
-import 'package:mobile/src/comments/presenter/bloc/comments_bloc.dart';
-import 'package:mobile/src/comments/presenter/bloc/comments_event.dart';
-import 'package:mobile/src/comments/presenter/bloc/comments_state.dart';
-import 'package:mobile/src/comments/presenter/page/comments_page.dart';
+import 'package:mobile/src/comments/comments.dart';
 
 class CommentsList extends StatefulWidget {
   final Publication publication;
@@ -33,7 +30,7 @@ class _CommentsListState extends State<CommentsList> {
 
   void _onScroll() {
     if (_isBottom) {
-      context.read<CommentsBloc>().add(FetchMoreComments());
+      context.read<CommentsLoadBloc>().add(FetchMoreComments());
     }
   }
   
@@ -48,9 +45,9 @@ class _CommentsListState extends State<CommentsList> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return BlocBuilder<CommentsBloc, CommentsState>(
+    return BlocBuilder<CommentsLoadBloc, CommentsLoadState>(
       builder: (context, state) {
-        if (state is CommentsInitial || (state is CommentsLoading && state.isInitialFetch)) {
+        if (state is CommentsLoadInitial || (state is CommentsLoading && state.isInitialFetch)) {
           return const Center(child: CircularProgressIndicator());
         }
         

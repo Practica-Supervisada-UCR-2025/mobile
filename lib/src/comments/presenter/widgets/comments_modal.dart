@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/core.dart';
-import 'package:mobile/src/comments/presenter/widgets/comment_input_box.dart';
 
 class CommentsModal extends StatelessWidget {
   final Publication post;
@@ -28,7 +27,6 @@ class CommentsModal extends StatelessWidget {
           _PostPreview(post: post),
           const Divider(height: 1),
           const Expanded(child: CommentsList()),
-          const CommentInputBox(),
         ],
       ),
     );

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/core.dart';
-import 'package:mobile/src/comments/domain/repository/comments_repository.dart';
-import 'package:mobile/src/comments/presenter/bloc/comments_bloc.dart';
-import 'package:mobile/src/comments/presenter/bloc/comments_event.dart';
-import 'package:mobile/src/comments/presenter/widgets/comment_input_box.dart';
-import 'package:mobile/src/comments/presenter/widgets/comment_list.dart';
+import 'package:mobile/src/comments/comments.dart';
 
 class CommentsPage extends StatelessWidget {
   final Publication publication;
@@ -14,6 +10,7 @@ class CommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textController = TextEditingController();
     final unifiedBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return Scaffold(
@@ -29,7 +26,7 @@ class CommentsPage extends StatelessWidget {
         ),
       ),
       body: BlocProvider(
-        create: (context) => CommentsBloc(
+        create: (context) => CommentsLoadBloc(
           repository: CommentsRepository(),
           postId: publication.id.toString(),
         )..add(FetchInitialComments()),
@@ -38,7 +35,10 @@ class CommentsPage extends StatelessWidget {
             Expanded(
               child: CommentsList(publication: publication),
             ),
-            const CommentInputBox(),
+            BlocProvider(
+              create: (context) => CommentsCreateBloc(),
+              child: CommentInputBox(textController: textController),
+            ),
           ],
         ),
       ),
