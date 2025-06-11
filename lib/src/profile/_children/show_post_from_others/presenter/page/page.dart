@@ -15,7 +15,7 @@ class ShowPostFromOthersPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PublicationBloc(
-        publicationRepository: PublicationRepositoryAPI(endpoint: ENDPOINT_PUBLICATIONS_FROM_OTHERS + userId ),
+        publicationRepository: PublicationRepositoryAPI(endpoint: '$ENDPOINT_PUBLICATIONS_FROM_OTHERS$userId' ),
       )..add(LoadPublications()),
       child: const PublicationsList(scrollKey: "otherPosts"),
     );

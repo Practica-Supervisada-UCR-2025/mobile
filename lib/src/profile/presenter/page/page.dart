@@ -102,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     if(isOwnProfile)
                       Expanded(child: ShowOwnPublicationsPage()),
                     if(!isOwnProfile)
-                      Expanded(child: ShowPostFromOthersPage(userId: state.user.email)),
+                      Expanded(child: ShowPostFromOthersPage(userId: widget.userId!)),
                   ],
                 );
               } else if (state is ProfileFailure) {
