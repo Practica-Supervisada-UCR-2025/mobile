@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/src/search/search.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -249,6 +251,7 @@ class _UserTile extends StatelessWidget {
       onTap: () {
         // todo: User profile navigation,
         //todo: use user, it contains all necessary information
+        context.go(Paths.externProfile(user.id));
       },
     );
   }
