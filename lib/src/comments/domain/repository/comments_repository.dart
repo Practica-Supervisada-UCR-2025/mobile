@@ -11,22 +11,17 @@ class CommentsRepository {
     required String postId,
     required DateTime startTime,
   }) async {
-    // final uri = Uri.parse(
-    //   'http://192.168.137.1:3000/api/posts/$postId/comments?startTime=${startTime.toUtc().toIso8601String()}',
-    // );
-
-    // final response = await client.get(uri);
-
-    // if (response.statusCode == 200) {
-    //   final data = json.decode(response.body);
-    //   return CommentsResponse.fromJson(data);
-    // } else {
-    //   throw Exception("Error loading comments");
-    // }
-    return CommentsResponse(
-      comments: [],
-      totalItems: 0,
-      currentIndex: 0,
+    final uri = Uri.parse(
+      'http://192.168.100.17:3000/api/posts/$postId/comments?startTime=${startTime.toUtc().toIso8601String()}',
     );
+
+    final response = await client.get(uri);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return CommentsResponse.fromJson(data);
+    } else {
+      throw Exception("Error loading comments");
+    }
   }
 }
