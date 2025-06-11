@@ -13,7 +13,12 @@ class CommentsInitial extends CommentsState {
 }
 
 class CommentsLoading extends CommentsState {
-  const CommentsLoading();
+  final bool isInitialFetch;
+
+  const CommentsLoading({this.isInitialFetch = false});
+
+  @override
+  List<Object?> get props => [isInitialFetch];
 }
 
 class CommentsLoaded extends CommentsState {
