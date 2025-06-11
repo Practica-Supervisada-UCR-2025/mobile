@@ -14,8 +14,7 @@ class CommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Brightness brightness = Theme.of(context).brightness;
-    final unifiedBackgroundColor = AppColors.getSurfaceColor(brightness);
+    final unifiedBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return Scaffold(
       backgroundColor: unifiedBackgroundColor,
