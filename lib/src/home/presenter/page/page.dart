@@ -46,8 +46,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             indicatorSize: TabBarIndicatorSize.tab,
             dividerColor: Colors.transparent,
             tabs: const [
-              Tab(text: 'News'),
               Tab(text: 'Posts'),
+              Tab(text: 'News'),
             ],
           ),
         ),
@@ -55,8 +55,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           child: TabBarView(
             controller: _tabController,
             children: const [
-              NewsPage(),
               PostsPage(),
+              NewsPage(),
             ],
           ),
         ),
