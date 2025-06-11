@@ -1,16 +1,65 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/comments/comments.dart';
+import 'package:mobile/src/comments/data/api/comments_Impl.repository.dart';
+import 'package:mobile/src/shared/models/gif_model.dart';
 
-class CommentsPage extends StatelessWidget {
+class CommentsPageController {
+  final CommentsCreateBloc bloc;
+
+  CommentsPageController({
+    required this.bloc,
+  });
+
+  void handleCommentSubmitted({String? text, File? image, GifModel? selectedGif}) {
+    bloc.add(CommentSubmitted(text: text, image: image, selectedGif: selectedGif));
+  }
+}
+
+class CommentsPage extends StatefulWidget {
   final Publication publication;
 
   const CommentsPage({super.key, required this.publication});
 
   @override
+  State<CommentsPage> createState() => _CommentsPageState();
+}
+
+class _CommentsPageState extends State<CommentsPage> {
+  final _textController = TextEditingController();
+  late final CommentsCreateBloc _createBloc;
+  late final CommentsLoadBloc _loadBloc;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final commentsRepository = CommentsRepositoryImpl(apiService: apiService);
+
+    _loadBloc = CommentsLoadBloc(
+      repository: commentsRepository,
+      postId: widget.publication.id.toString(),
+    )..add(FetchInitialComments());
+
+    _createBloc = CommentsCreateBloc();
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _loadBloc.close();
+    _createBloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final textController = TextEditingController();
     final unifiedBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return Scaffold(
@@ -19,25 +68,31 @@ class CommentsPage extends StatelessWidget {
         backgroundColor: unifiedBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text("Comentarios"),
+        title: const Text("Comments"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: BlocProvider(
-        create: (context) => CommentsLoadBloc(
-          repository: CommentsRepository(),
-          postId: publication.id.toString(),
-        )..add(FetchInitialComments()),
+      body: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: _loadBloc),
+          BlocProvider.value(value: _createBloc),
+        ],
         child: Column(
           children: [
             Expanded(
-              child: CommentsList(publication: publication),
+              child: CommentsList(publication: widget.publication),
             ),
-            BlocProvider(
-              create: (context) => CommentsCreateBloc(),
-              child: CommentInputBox(textController: textController),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: TextField(
+                controller: _textController,
+                onChanged: (text) {
+                  _createBloc.add(CommentTextChanged(text));
+                },
+                maxLines: null,
+              ),
             ),
           ],
         ),
@@ -48,7 +103,7 @@ class CommentsPage extends StatelessWidget {
 
 class PostPreview extends StatelessWidget {
   final Publication publication;
-  const PostPreview({required this.publication});
+  const PostPreview({super.key, required this.publication});
   
   @override
   Widget build(BuildContext context) {
