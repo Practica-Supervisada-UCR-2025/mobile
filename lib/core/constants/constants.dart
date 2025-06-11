@@ -12,4 +12,4 @@ const DEFAULT_PROFILE_PIC = 'https://i.pinimg.com/736x/7b/8c/d8/7b8cd8b068e4b9f8
 
 const ENDPOINT_OWN_PUBLICATIONS = 'user/posts/mine';
 
-const ENDPOINT_PUBLICATIONS_FROM_OTHERS = '/api/posts/user/';
+const ENDPOINT_PUBLICATIONS_FROM_OTHERS = 'posts/user/';

@@ -34,16 +34,15 @@ class ProfileRepositoryAPI implements ProfileRepository {
 
   @override
   Future<User> getUserProfile(String userId, String? token) async {
+    final uri = Uri.parse('$API_BASE_URL' 'user/profile/$userId');
     try {
-      final response = await client.get(
-        Uri.parse('$API_BASE_URL/user/$userId'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
+        final headers = <String, String>{
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+      final response = await client.get(uri, headers: headers);
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         final data = json.decode(response.body);
         return User.fromJson(data);
       } else {

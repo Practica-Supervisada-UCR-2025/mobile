@@ -83,7 +83,7 @@ final List<RouteBase> appRoutes = [
         },
       ),
       GoRoute(
-        path: Paths.externProfile,
+        path: Paths.externProfile(':userId'),
         builder: (context, state) {
           final userId = state.pathParameters['userId'];
           return ProfileScreen(userId: userId);
