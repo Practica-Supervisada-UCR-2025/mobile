@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
               ),
         ),
         RepositoryProvider<ProfileRepository>(
-          create: (context) => ProfileRepositoryAPI(),
+          create: (context) => ProfileRepositoryAPI(apiService: ApiServiceImpl()),
         ),
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),

@@ -1,23 +1,18 @@
 import 'dart:convert';
 import 'package:mobile/core/core.dart';
-import 'package:http/http.dart' as http;
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileRepositoryAPI implements ProfileRepository {
-  final http.Client client;
+  final ApiService apiService;
 
-  ProfileRepositoryAPI({http.Client? client})
-    : client = client ?? http.Client();
+  ProfileRepositoryAPI({required this.apiService});
 
   @override
   Future<User> getCurrentUser(String token) async {
     try {
-      final response = await client.get(
-        Uri.parse('$API_BASE_URL/user/auth/profile'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        '/user/auth/profile',
+        authenticated: true,
       );
 
       if (response.statusCode == 201) {
@@ -34,13 +29,11 @@ class ProfileRepositoryAPI implements ProfileRepository {
 
   @override
   Future<User> getUserProfile(String userId, String? token) async {
-    final uri = Uri.parse('$API_BASE_URL' 'user/profile/$userId');
     try {
-        final headers = <String, String>{
-        'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      };
-      final response = await client.get(uri, headers: headers);
+        final response = await apiService.get(
+          'user/profile/${Uri.encodeComponent(userId)}',
+          authenticated: true,
+        );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
