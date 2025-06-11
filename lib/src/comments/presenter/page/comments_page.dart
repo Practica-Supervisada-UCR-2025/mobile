@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/comments/domain/repository/comments_repository.dart';
 import 'package:mobile/src/comments/presenter/bloc/comments_bloc.dart';
+import 'package:mobile/src/comments/presenter/bloc/comments_event.dart';
 import 'package:mobile/src/comments/presenter/widgets/comment_input_box.dart';
 import 'package:mobile/src/comments/presenter/widgets/comment_list.dart';
 
@@ -13,51 +14,43 @@ class CommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final Brightness brightness = Theme.of(context).brightness;
+    final unifiedBackgroundColor = AppColors.getSurfaceColor(brightness);
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: unifiedBackgroundColor,
       appBar: AppBar(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: unifiedBackgroundColor,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: const Text("Comentarios"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Column(
-        children: [
-          const Divider(height: 1),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _PostPreview(publication: publication),
-                const Divider(height: 1),
-
-                BlocProvider(
-                  create: (_) => CommentsBloc(
-                    repository: CommentsRepository(),
-                    postId: publication.id.toString(),
-                  ),
-                  child: CommentsList(postId: publication.id.toString()),
-                ),
-              ],
+      body: BlocProvider(
+        create: (context) => CommentsBloc(
+          repository: CommentsRepository(),
+          postId: publication.id.toString(),
+        )..add(FetchInitialComments()),
+        child: Column(
+          children: [
+            Expanded(
+              child: CommentsList(publication: publication),
             ),
-          ),
-          const CommentInputBox(),
-        ],
+            const CommentInputBox(),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _PostPreview extends StatelessWidget {
+class PostPreview extends StatelessWidget {
   final Publication publication;
-
-  const _PostPreview({required this.publication});
-
+  const PostPreview({required this.publication});
+  
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
