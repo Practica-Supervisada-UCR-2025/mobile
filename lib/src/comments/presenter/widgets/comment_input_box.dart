@@ -1,34 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/src/comments/comments.dart';
+
 
 class CommentInputBox extends StatelessWidget {
-  const CommentInputBox({super.key});
+  final TextEditingController textController;
+
+  const CommentInputBox({super.key, required this.textController});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: textController,
+        onChanged: (text) {
+          context.read<CommentsCreateBloc>().add(CommentTextChanged(text));
+        },
+        maxLines: null,
+        autofocus: true,
+        decoration: const InputDecoration(
+          hintText: 'Post your reply...',
+          border: InputBorder.none,
+          counterText: '',
+          hintStyle: TextStyle(
+            color: Colors.grey,
+          ),
         ),
-        child: Row(
-          children: [
-            const Expanded(
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Escribe un comentario...',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: () {
-              },
-            )
-          ],
-        ),
+        style: Theme.of(context).textTheme.bodyLarge,
       ),
     );
   }
