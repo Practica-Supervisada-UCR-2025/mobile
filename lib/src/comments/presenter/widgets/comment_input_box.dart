@@ -25,7 +25,6 @@ class CommentInputBox extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.send),
               onPressed: () {
-                // Enviar comentario pronto
               },
             )
           ],
