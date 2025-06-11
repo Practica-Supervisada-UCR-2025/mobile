@@ -20,10 +20,34 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     FetchInitialComments event,
     Emitter<CommentsState> emit,
   ) async {
-    emit(const CommentsLoading());
+    emit(const CommentsLoading(isInitialFetch: true));
+    
+    await Future.delayed(const Duration(seconds: 1));
+
+    final now = DateTime.now();
+    final mockComments = List.generate(10, (index) {
+      return CommentModel(
+        id: '${index + 1}',
+        username: 'Usuario${index + 1}',
+        content: 'Este es el comentario de prueba número ${index + 1}. El scroll debería funcionar correctamente con esta cantidad de datos.',
+        createdAt: now.subtract(Duration(minutes: (10 - index) * 5)),
+      );
+    });
+
+    emit(CommentsLoaded(
+      comments: mockComments,
+      hasReachedEnd: true, 
+      currentIndex: 0,
+    ));
+
+
+
+    /*// --- CÓDIGO ORIGINAL
     try {
-      final response = await repository.fetchComments(postId: postId, 
-      startTime: DateTime.fromMillisecondsSinceEpoch(0),);
+      final response = await repository.fetchComments(
+        postId: postId,
+        startTime: DateTime.fromMillisecondsSinceEpoch(0),
+      );
       emit(CommentsLoaded(
         comments: response.comments,
         hasReachedEnd: response.comments.length >= response.totalItems,
@@ -32,6 +56,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     } catch (e) {
       emit(CommentsError(message: e.toString()));
     }
+    */
   }
 
   Future<void> _onFetchMoreComments(
@@ -48,8 +73,8 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
         startTime: currentState.comments.last.createdAt,
       );
 
-
-      final updatedComments = List<CommentModel>.from(currentState.comments)..addAll(response.comments);
+      final updatedComments = List<CommentModel>.from(currentState.comments)
+        ..addAll(response.comments);
 
       emit(currentState.copyWith(
         comments: updatedComments,
