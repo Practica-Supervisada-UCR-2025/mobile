@@ -14,8 +14,27 @@ class CommentInput extends StatefulWidget {
 
 class _CommentInputState extends State<CommentInput> {
   final _textController = TextEditingController();
+  final _focusNode = FocusNode();
   File? _selectedImage;
   GifModel? _selectedGif;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _textController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    setState(() {});
+  }
 
   void _onImageSelected(File? image) {
     setState(() {
@@ -54,8 +73,12 @@ class _CommentInputState extends State<CommentInput> {
               }
             },
           ),
-        CommentTextField(textController: _textController),
-        CommentBottomBar(onImageSelected: _onImageSelected),
+        CommentTextField(
+          textController: _textController,
+          focusNode: _focusNode,
+        ),
+        if (_focusNode.hasFocus)
+          CommentBottomBar(onImageSelected: _onImageSelected),
       ],
     );
   }
