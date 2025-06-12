@@ -27,7 +27,7 @@ class AppColors {
 
   static const Color textFieldFillLight = Color.fromARGB(255, 238, 238, 238); 
 
-  static const Color textFieldFillDark = Color.fromARGB(255, 28, 33, 43);
+  static const Color textFieldFillDark = Color.fromARGB(255, 24, 28, 37);
 
   static Color getSurfaceColor(Brightness brightness) {
     return brightness == Brightness.dark ? Color(0xFF2D3446) : Colors.white;

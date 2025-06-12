@@ -61,24 +61,20 @@ class _CommentInputState extends State<CommentInput> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (_selectedImage != null || _selectedGif != null)
-          CommentImage(
-            image: _selectedImage,
-            gifData: _selectedGif,
-            onRemove: () {
-              if (_selectedImage != null) {
-                _onRemoveImage();
-              } else if (_selectedGif != null) {
-                _onRemoveGif();
-              }
-            },
-          ),
         CommentTextField(
           textController: _textController,
           focusNode: _focusNode,
+          selectedImage: _selectedImage,
+          selectedGif: _selectedGif,
+          onRemove: () {
+            _onRemoveImage();
+            _onRemoveGif();
+          },
         ),
         if (_focusNode.hasFocus)
-          CommentBottomBar(onImageSelected: _onImageSelected),
+          CommentBottomBar(
+            onImageSelected: _onImageSelected,
+          ),
       ],
     );
   }
