@@ -25,6 +25,10 @@ class AppColors {
 
   static const Color buttonBackgroundDark = Color(0xFF445473);
 
+  static const Color textFieldFillLight = Color.fromARGB(255, 238, 238, 238); 
+
+  static const Color textFieldFillDark = Color.fromARGB(255, 28, 33, 43);
+
   static Color getSurfaceColor(Brightness brightness) {
     return brightness == Brightness.dark ? Color(0xFF2D3446) : Colors.white;
   }
