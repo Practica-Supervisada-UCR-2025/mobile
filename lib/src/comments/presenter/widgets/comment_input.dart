@@ -6,7 +6,9 @@ import 'package:mobile/src/comments/comments.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
 
 class CommentInput extends StatefulWidget {
-  const CommentInput({super.key});
+  final String postId;
+  
+  const CommentInput({super.key, required this.postId});
 
   @override
   State<CommentInput> createState() => _CommentInputState();
@@ -79,7 +81,6 @@ class _CommentInputState extends State<CommentInput> {
   Widget build(BuildContext context) {
     return BlocListener<CommentsCreateBloc, CommentsCreateState>(
       listener: (context, state) {
-        // Actualizar el estado local cuando el BLoC cambia
         if (state.selectedGif != _selectedGif) {
           setState(() {
             _selectedGif = state.selectedGif;
@@ -87,6 +88,18 @@ class _CommentInputState extends State<CommentInput> {
               _isSelectingGif = false;
             }
           });
+        }
+        
+        if (state is CommentSuccess) {
+          _textController.clear();
+          setState(() {
+            _selectedImage = null;
+            _selectedGif = null;
+            _isSelectingGif = false;
+          });
+          _focusNode.unfocus();
+          
+          context.read<CommentsLoadBloc>().add(FetchInitialComments());
         }
       },
       child: Column(
@@ -103,6 +116,7 @@ class _CommentInputState extends State<CommentInput> {
           ),
           if (_focusNode.hasFocus || _isSelectingGif)
             CommentBottomBar(
+              postId: widget.postId,
               onImageSelected: _onImageSelected,
               onGifSelected: _onGifSelected,
               onGifPickerOpened: _onGifPickerOpened,

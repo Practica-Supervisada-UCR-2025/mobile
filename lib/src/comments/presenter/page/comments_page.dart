@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/comments/comments.dart';
-import 'package:mobile/src/comments/data/api/comments_Impl.repository.dart';
-import 'package:mobile/src/comments/presenter/widgets/comment_input.dart';
 
 class CommentsPage extends StatelessWidget {
   final Publication publication;
@@ -39,7 +36,11 @@ class CommentsPage extends StatelessWidget {
             )..add(FetchInitialComments()),
           ),
           BlocProvider(
-            create: (context) => CommentsCreateBloc(),
+            create: (context) => CommentsCreateBloc(
+              commentsRepository: CommentsRepositoryImpl(
+                apiService: Provider.of<ApiService>(context, listen: false),
+              ),
+            ),
           ),
         ],
         child: Column(
@@ -47,7 +48,7 @@ class CommentsPage extends StatelessWidget {
             Expanded(
               child: CommentsList(publication: publication),
             ),
-            const CommentInput(),
+            CommentInput(postId: publication.id),
           ],
         ),
       ),
