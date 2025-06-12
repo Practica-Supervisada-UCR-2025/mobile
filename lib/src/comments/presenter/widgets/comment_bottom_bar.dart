@@ -8,8 +8,15 @@ import 'package:mobile/src/shared/models/gif_model.dart';
 
 class CommentBottomBar extends StatefulWidget {
   final Function(File?) onImageSelected;
+  final Function(GifModel?)? onGifSelected;
+  final VoidCallback? onGifPickerOpened;
 
-  const CommentBottomBar({super.key, required this.onImageSelected});
+  const CommentBottomBar({
+    super.key, 
+    required this.onImageSelected,
+    this.onGifSelected,
+    this.onGifPickerOpened,
+  });
 
   @override
   State<CommentBottomBar> createState() => _CommentBottomBarState();
@@ -51,11 +58,22 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
   }
 
   Future<void> _pickGifFromMediaPicker() async {
+    widget.onGifPickerOpened?.call();
+    
     final GifModel? gif = await MediaPickerService.pickGifFromTenor(context: context);
 
     if (!mounted) return;
+    
     if (gif != null) {
-      context.read<CommentsCreateBloc>().add(CommentGifChanged(gif));
+      if (widget.onGifSelected != null) {
+        widget.onGifSelected!(gif);
+      } else {
+        context.read<CommentsCreateBloc>().add(CommentGifChanged(gif));
+      }
+    } else {
+      if (widget.onGifSelected != null) {
+        widget.onGifSelected!(null);
+      }
     }
   }
 

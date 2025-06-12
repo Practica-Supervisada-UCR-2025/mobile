@@ -17,6 +17,7 @@ class _CommentInputState extends State<CommentInput> {
   final _focusNode = FocusNode();
   File? _selectedImage;
   GifModel? _selectedGif;
+  bool _isSelectingGif = false;
 
   @override
   void initState() {
@@ -43,6 +44,22 @@ class _CommentInputState extends State<CommentInput> {
     context.read<CommentsCreateBloc>().add(CommentImageChanged(image));
   }
 
+  void _onGifSelected(GifModel? gif) {
+    setState(() {
+      _selectedGif = gif;
+      _isSelectingGif = false;
+    });
+    if (gif != null) {
+      context.read<CommentsCreateBloc>().add(CommentGifChanged(gif));
+    }
+  }
+
+  void _onGifPickerOpened() {
+    setState(() {
+      _isSelectingGif = true;
+    });
+  }
+
   void _onRemoveImage() {
     setState(() {
       _selectedImage = null;
@@ -53,29 +70,45 @@ class _CommentInputState extends State<CommentInput> {
   void _onRemoveGif() {
     setState(() {
       _selectedGif = null;
+      _isSelectingGif = false;
     });
     context.read<CommentsCreateBloc>().add(const CommentGifChanged(null));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CommentTextField(
-          textController: _textController,
-          focusNode: _focusNode,
-          selectedImage: _selectedImage,
-          selectedGif: _selectedGif,
-          onRemove: () {
-            _onRemoveImage();
-            _onRemoveGif();
-          },
-        ),
-        if (_focusNode.hasFocus)
-          CommentBottomBar(
-            onImageSelected: _onImageSelected,
+    return BlocListener<CommentsCreateBloc, CommentsCreateState>(
+      listener: (context, state) {
+        // Actualizar el estado local cuando el BLoC cambia
+        if (state.selectedGif != _selectedGif) {
+          setState(() {
+            _selectedGif = state.selectedGif;
+            if (state.selectedGif != null) {
+              _isSelectingGif = false;
+            }
+          });
+        }
+      },
+      child: Column(
+        children: [
+          CommentTextField(
+            textController: _textController,
+            focusNode: _focusNode,
+            selectedImage: _selectedImage,
+            selectedGif: _selectedGif,
+            onRemove: () {
+              _onRemoveImage();
+              _onRemoveGif();
+            },
           ),
-      ],
+          if (_focusNode.hasFocus || _isSelectingGif)
+            CommentBottomBar(
+              onImageSelected: _onImageSelected,
+              onGifSelected: _onGifSelected,
+              onGifPickerOpened: _onGifPickerOpened,
+            ),
+        ],
+      ),
     );
   }
 }

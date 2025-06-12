@@ -43,11 +43,18 @@ class CommentTextField extends StatelessWidget {
         ),
         child: Column(
           children: [
-            if (selectedImage != null || selectedGif != null)
+            if (selectedImage != null)
               Align(
                 alignment: Alignment.centerLeft,
                 child: CommentImage(
                   image: selectedImage,
+                  onRemove: onRemove,
+                ),
+              ),
+            if (selectedGif != null)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: CommentImage(
                   gifData: selectedGif,
                   onRemove: onRemove,
                 ),
