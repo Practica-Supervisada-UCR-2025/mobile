@@ -103,13 +103,7 @@ class PublicationCard extends StatelessWidget {
                     },
                   ),
                   Text(publication.comments.toString()),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
+                  const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.share, size: 20),
                     onPressed: () {
