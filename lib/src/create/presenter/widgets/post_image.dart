@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/core/globals/widgets/gif_viewer.dart';
 import 'package:mobile/src/create/create.dart';
 
 class PostImage extends StatefulWidget {
