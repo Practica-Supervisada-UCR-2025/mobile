@@ -82,7 +82,7 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
     return SafeArea(
       bottom: true,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0, top: 8),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
         ),
@@ -103,8 +103,8 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
             const Spacer(),
             BlocBuilder<CommentsCreateBloc, CommentsCreateState>(
               builder: (context, state) {
-                final textLength = state is CommentTextChanged ? state.text.runes.length : 0;
-                final isOverLimit = textLength > 300;
+                final textLength = state.text.runes.length;
+                final isOverLimit = state.isOverLimit;
 
                 return Text(
                   '$textLength/300',
@@ -114,6 +114,71 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
                     color: isOverLimit
                         ? Theme.of(context).colorScheme.error
                         : Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
+                );
+              },
+            ),
+            const SizedBox(width: 16),
+            BlocConsumer<CommentsCreateBloc, CommentsCreateState>(
+              listener: (context, state) {
+                if (state is CommentFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('There was an error creating the comment. Please try again.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } else if (state is CommentSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Comment successfully created!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              },
+              builder: (context, state) {
+                if (state is CommentSubmitting) {
+                  return const Padding(
+                    padding: EdgeInsets.only(right: 8.0),
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.0,
+                      ),
+                    ),
+                  );
+                }
+                
+                final isEnabled = state.isValid;
+
+                return TextButton(
+                  onPressed: isEnabled ? () {
+                    final bloc = context.read<CommentsCreateBloc>();
+                    bloc.add(CommentSubmitted(
+                      text: state.text,
+                      image: state.image,
+                      selectedGif: state.selectedGif,
+                    ));
+                  } : null,
+                  style: TextButton.styleFrom(
+                    backgroundColor: isEnabled ? AppColors.primary 
+                    : AppColors.getDisabledPostButtonColor(Theme.of(context).brightness),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    minimumSize: const Size(0, 0),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text(
+                    'Reply',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                   ),
                 );
               },
