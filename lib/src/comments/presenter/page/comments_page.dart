@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -7,56 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/comments/comments.dart';
 import 'package:mobile/src/comments/data/api/comments_Impl.repository.dart';
-import 'package:mobile/src/shared/models/gif_model.dart';
+import 'package:mobile/src/comments/presenter/widgets/comment_input.dart';
 
-class CommentsPageController {
-  final CommentsCreateBloc bloc;
-
-  CommentsPageController({
-    required this.bloc,
-  });
-
-  void handleCommentSubmitted({String? text, File? image, GifModel? selectedGif}) {
-    bloc.add(CommentSubmitted(text: text, image: image, selectedGif: selectedGif));
-  }
-}
-
-class CommentsPage extends StatefulWidget {
+class CommentsPage extends StatelessWidget {
   final Publication publication;
 
   const CommentsPage({super.key, required this.publication});
-
-  @override
-  State<CommentsPage> createState() => _CommentsPageState();
-}
-
-class _CommentsPageState extends State<CommentsPage> {
-  final _textController = TextEditingController();
-  late final CommentsCreateBloc _createBloc;
-  late final CommentsLoadBloc _loadBloc;
-
-  @override
-  void initState() {
-    super.initState();
-
-    final apiService = Provider.of<ApiService>(context, listen: false);
-    final commentsRepository = CommentsRepositoryImpl(apiService: apiService);
-
-    _loadBloc = CommentsLoadBloc(
-      repository: commentsRepository,
-      postId: widget.publication.id.toString(),
-    )..add(FetchInitialComments());
-
-    _createBloc = CommentsCreateBloc();
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    _loadBloc.close();
-    _createBloc.close();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,24 +30,24 @@ class _CommentsPageState extends State<CommentsPage> {
       ),
       body: MultiBlocProvider(
         providers: [
-          BlocProvider.value(value: _loadBloc),
-          BlocProvider.value(value: _createBloc),
+          BlocProvider(
+            create: (context) => CommentsLoadBloc(
+              repository: CommentsRepositoryImpl(
+                apiService: Provider.of<ApiService>(context, listen: false),
+              ),
+              postId: publication.id.toString(),
+            )..add(FetchInitialComments()),
+          ),
+          BlocProvider(
+            create: (context) => CommentsCreateBloc(),
+          ),
         ],
         child: Column(
           children: [
             Expanded(
-              child: CommentsList(publication: widget.publication),
+              child: CommentsList(publication: publication),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _textController,
-                onChanged: (text) {
-                  _createBloc.add(CommentTextChanged(text));
-                },
-                maxLines: null,
-              ),
-            ),
+            const CommentInput(),
           ],
         ),
       ),
