@@ -67,20 +67,6 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          border: Border(
-            top: BorderSide(
-              color: Theme.of(context).dividerColor,
-            ),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white10
-                  : Colors.black12,
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
         ),
         child: Row(
           children: [
