@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/src/comments/comments.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
-
 import 'package:mobile/core/storage/user_session.storage.dart';
-import 'package:mobile/core/theme/app_colors.dart';
-
 
 class CommentTextField extends StatelessWidget {
   final TextEditingController textController;
@@ -32,7 +29,7 @@ class CommentTextField extends StatelessWidget {
     return SafeArea(
       bottom: true,
       child: Container(
-        padding: const EdgeInsets.only(top: 10, bottom: 0, left: 16, right: 16),
+        padding: const EdgeInsets.only(top: 10, bottom: 10, left: 16, right: 16),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           border: Border(
@@ -91,8 +88,8 @@ class CommentTextField extends StatelessWidget {
                       ),
                       filled: true,
                       fillColor: Theme.of(context).brightness == Brightness.dark
-                          ? AppColors.textFieldFillDark
-                          : AppColors.textFieldFillLight,
+                          ? const Color.fromARGB(255, 32, 40, 54)
+                          : const Color.fromARGB(255, 209, 209, 209),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                       hintStyle: TextStyle(
                         color: Colors.grey,
