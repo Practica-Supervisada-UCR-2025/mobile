@@ -10,3 +10,5 @@ abstract class PublicationEvent extends Equatable {
 class LoadPublications extends PublicationEvent {}
 
 class LoadMorePublications extends PublicationEvent {}
+
+class RefreshPublications extends PublicationEvent {}
