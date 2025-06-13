@@ -102,11 +102,11 @@ class _CommentCreateState extends State<CommentImage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: SizedBox(
-              height: 120, // Cambiar de 200 a 120 para igualar las imágenes locales
-              width: 150,  // Agregar ancho fijo igual a las imágenes locales
+              height: 120, 
+              width: 150,
               child: Image.network(
                 widget.gifData!.tinyGifUrl,
-                fit: BoxFit.cover, // Cambiar de BoxFit.contain a BoxFit.cover
+                fit: BoxFit.cover,
                 loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Center(
