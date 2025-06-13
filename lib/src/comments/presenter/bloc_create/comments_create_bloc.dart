@@ -21,6 +21,7 @@ class CommentsCreateBloc extends Bloc<CommentsCreateEvent, CommentsCreateState> 
     on<CommentImageChanged>(_onCommentImageChanged);
     on<CommentGifChanged>(_onCommentGifChanged);
     on<CommentSubmitted>(_onCommentSubmitted);
+    on<CommentReset>(_onCommentReset);
   }
 
   void _onCommentTextChanged(CommentTextChanged event, Emitter<CommentsCreateState> emit) {
@@ -74,6 +75,16 @@ class CommentsCreateBloc extends Bloc<CommentsCreateEvent, CommentsCreateState> 
       isOverLimit: isOverLimit,
       isValid: isValid,
       selectedGif: newSelectedGif,
+    ));
+  }
+
+  void _onCommentReset(CommentReset event, Emitter<CommentsCreateState> emit) {
+    emit(const CommentChanged(
+      text: '',
+      image: null,
+      isOverLimit: false,
+      isValid: false,
+      selectedGif: null,
     ));
   }
 
