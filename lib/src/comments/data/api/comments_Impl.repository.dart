@@ -12,7 +12,9 @@ class CommentsRepositoryImpl implements CommentsRepository {
     required String postId,
     required DateTime startTime,
   }) async {
-    final endpoint = '/api/posts/$postId/comments?startTime=${startTime.toUtc().toIso8601String()}';
+    print('[Repository] Consultando comentarios para postId: $postId');
+    print('[Repository] startTime: ${startTime.toUtc().toIso8601String()}');
+    final endpoint = 'http://192.168.100.77:3000/api/posts/$postId/comments?startTime=${startTime.toUtc().toIso8601String()}';
 
     final response = await apiService.get(endpoint);
 
@@ -20,7 +22,7 @@ class CommentsRepositoryImpl implements CommentsRepository {
       final data = json.decode(response.body);
       return CommentsResponse.fromJson(data);
     } else {
-      throw Exception("Error loading comments");
+      return CommentsResponse(comments: [], totalItems: 0, currentIndex: 0);
     }
   }
 }

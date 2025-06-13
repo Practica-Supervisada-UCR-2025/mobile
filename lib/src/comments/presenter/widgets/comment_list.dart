@@ -33,7 +33,7 @@ class _CommentsListState extends State<CommentsList> {
       context.read<CommentsLoadBloc>().add(FetchMoreComments());
     }
   }
-  
+
   bool get _isBottom {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
@@ -41,34 +41,66 @@ class _CommentsListState extends State<CommentsList> {
     return currentScroll >= (maxScroll * 0.9);
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
     return BlocBuilder<CommentsLoadBloc, CommentsLoadState>(
       builder: (context, state) {
         if (state is CommentsLoadInitial || (state is CommentsLoading && state.isInitialFetch)) {
-          return const Center(child: CircularProgressIndicator());
+          return Column(
+            children: [
+              PostPreview(publication: widget.publication),
+              const Expanded(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ],
+          );
+        }
+
+        if (state is CommentsError) {
+          return Column(
+            children: [
+              PostPreview(publication: widget.publication),
+              Expanded(
+                child: Center(child: Text('Error: ${state.message}')),
+              ),
+            ],
+          );
         }
         
         if (state is CommentsLoaded) {
+          if (state.comments.isEmpty) {
+            return ListView( 
+              children: [
+                PostPreview(publication: widget.publication),
+                const Divider(height: 1, thickness: 1),
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 48.0),
+                    child: Text(
+                      'Aún no hay comentarios',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+
           return ListView.separated(
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            itemCount: state.hasReachedEnd
-                ? state.comments.length + 1 
-                : state.comments.length + 2,
+            itemCount: state.comments.length + (state.hasReachedEnd ? 1 : 2),
             
             separatorBuilder: (context, index) {
-              if (index < state.comments.length) { 
-                return Divider(
-                  height: 1, 
-                  thickness: 1, 
-                  indent: 16,
-                  endIndent: 16,
-                );
-              }
-              return const SizedBox.shrink(); 
+              if (index == 0) return const SizedBox.shrink();
+              return Divider(
+                height: 1, 
+                thickness: 1, 
+                indent: 16,
+                endIndent: 16,
+              );
             },
             
             itemBuilder: (_, index) {
@@ -76,14 +108,20 @@ class _CommentsListState extends State<CommentsList> {
                 return PostPreview(publication: widget.publication);
               }
 
-              if (index >= state.comments.length + 1) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
-                  child: Center(child: CircularProgressIndicator()),
-                );
+              final isLoaderIndex = index == state.comments.length + 1;
+              if (isLoaderIndex && !state.hasReachedEnd) {
+                 return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
               }
               
               final commentIndex = index - 1;
+
+              if(commentIndex >= state.comments.length) {
+                return const SizedBox.shrink(); 
+              }
+
               final comment = state.comments[commentIndex];
               
               return ListTile(
@@ -95,10 +133,6 @@ class _CommentsListState extends State<CommentsList> {
               );
             },
           );
-        }
-        
-        if (state is CommentsError) {
-          return Center(child: Text('Error: ${state.message}'));
         }
         
         return const SizedBox.shrink();

@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/comments/comments.dart';
-import 'package:mobile/src/comments/data/api/comments_Impl.repository.dart';
 import 'package:mobile/src/comments/presenter/widgets/comment_input.dart';
 
 class CommentsPage extends StatelessWidget {
@@ -14,6 +13,8 @@ class CommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    print("CommentsPage: publication.id = ${publication.id}");
     final unifiedBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return Scaffold(
@@ -31,12 +32,16 @@ class CommentsPage extends StatelessWidget {
       body: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => CommentsLoadBloc(
-              repository: CommentsRepositoryImpl(
-                apiService: Provider.of<ApiService>(context, listen: false),
+            
+            create: (context) {
+                print('[BlocProvider] postId enviado al Bloc: ${publication.id}');
+                return CommentsLoadBloc(
+                  repository: CommentsRepositoryImpl(
+                    apiService: Provider.of<ApiService>(context, listen: false),
               ),
               postId: publication.id.toString(),
-            )..add(FetchInitialComments()),
+            )..add(FetchInitialComments());
+            }
           ),
           BlocProvider(
             create: (context) => CommentsCreateBloc(),

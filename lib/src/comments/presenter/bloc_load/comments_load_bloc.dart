@@ -21,29 +21,7 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
     FetchInitialComments event,
     Emitter<CommentsLoadState> emit,
   ) async {
-    emit(const CommentsLoading(isInitialFetch: true));
-    
-    await Future.delayed(const Duration(seconds: 1));
 
-    final now = DateTime.now();
-    final mockComments = List.generate(10, (index) {
-      return CommentModel(
-        id: '${index + 1}',
-        username: 'Usuario${index + 1}',
-        content: 'Este es el comentario de prueba número ${index + 1}. El scroll debería funcionar correctamente con esta cantidad de datos.',
-        createdAt: now.subtract(Duration(minutes: (10 - index) * 5)),
-      );
-    });
-
-    emit(CommentsLoaded(
-      comments: mockComments,
-      hasReachedEnd: true, 
-      currentIndex: 0,
-    ));
-
-
-
-    /*// --- CÓDIGO ORIGINAL
     try {
       final response = await repository.fetchComments(
         postId: postId,
@@ -57,7 +35,7 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
     } catch (e) {
       emit(CommentsError(message: e.toString()));
     }
-    */
+    
   }
 
   Future<void> _onFetchMoreComments(
