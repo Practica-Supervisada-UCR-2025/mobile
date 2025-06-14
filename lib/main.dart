@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'package:mobile/src/search/search.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'src/create/create.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
 import 'package:provider/provider.dart';
@@ -18,11 +19,19 @@ void main() async {
   await LocalStorage.init();
   await dotenv.load(fileName: ".env");
 
+  const isRelease = bool.fromEnvironment('dart.vm.product');
+
+  final packageInfo = await PackageInfo.fromPlatform();
+  final releaseVersion = 'ucr-connect@${packageInfo.version}+${packageInfo.buildNumber}';
+
   await SentryFlutter.init((options) {
     options.dsn = dotenv.env['SENTRY_DSN'];
     options.sendDefaultPii = true;
+    options.environment = isRelease ? 'production' : 'debug';
+    options.release = releaseVersion;
   }, appRunner: () => runApp(SentryWidget(child: MyApp())));
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
