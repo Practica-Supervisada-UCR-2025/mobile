@@ -35,17 +35,19 @@ class CommentImageChanged extends CommentsCreateEvent {
 }
 
 class CommentSubmitted extends CommentsCreateEvent {
+  final String postId;
   final String? text;
   final File? image;
   final GifModel? selectedGif;
 
   const CommentSubmitted({
+    required this.postId,
     this.text,
     this.image,
     this.selectedGif,
   });
 
   @override
-  List<Object?> get props => [text, image, selectedGif];
+  List<Object?> get props => [postId, text, image, selectedGif];
 }
 

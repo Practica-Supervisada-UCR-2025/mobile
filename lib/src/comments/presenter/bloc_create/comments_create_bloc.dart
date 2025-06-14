@@ -2,14 +2,16 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
+import 'package:mobile/src/comments/domain/repository/comments_repository.dart';
 
 part 'comments_create_event.dart';
 part 'comments_create_state.dart';
 
 class CommentsCreateBloc extends Bloc<CommentsCreateEvent, CommentsCreateState> {
   static const int maxLength = 300;
+  final CommentsRepository? commentsRepository;
 
-  CommentsCreateBloc() : super(const CommentChanged(
+  CommentsCreateBloc({required this.commentsRepository}) : super(const CommentChanged(
           text: '',
           image: null,
           isOverLimit: false,
@@ -92,8 +94,12 @@ class CommentsCreateBloc extends Bloc<CommentsCreateEvent, CommentsCreateState> 
     ));
 
     try {
-      // Simulate a successful submission
-      await Future.delayed(const Duration(seconds: 2));
+      await commentsRepository!.sendComment(
+        postId: event.postId,
+        text: textToSubmit,
+        image: imageToSubmit,
+        selectedGif: gifToSubmit,
+      );
 
       emit(CommentSuccess(
         text: textToSubmit,

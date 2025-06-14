@@ -6,7 +6,9 @@ import 'package:mobile/src/comments/comments.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
 
 class CommentInput extends StatefulWidget {
-  const CommentInput({super.key});
+  final String postId;
+  
+  const CommentInput({super.key, required this.postId});
 
   @override
   State<CommentInput> createState() => _CommentInputState();
@@ -17,6 +19,7 @@ class _CommentInputState extends State<CommentInput> {
   final _focusNode = FocusNode();
   File? _selectedImage;
   GifModel? _selectedGif;
+  bool _isSelectingGif = false;
 
   @override
   void initState() {
@@ -43,6 +46,22 @@ class _CommentInputState extends State<CommentInput> {
     context.read<CommentsCreateBloc>().add(CommentImageChanged(image));
   }
 
+  void _onGifSelected(GifModel? gif) {
+    setState(() {
+      _selectedGif = gif;
+      _isSelectingGif = false;
+    });
+    if (gif != null) {
+      context.read<CommentsCreateBloc>().add(CommentGifChanged(gif));
+    }
+  }
+
+  void _onGifPickerOpened() {
+    setState(() {
+      _isSelectingGif = true;
+    });
+  }
+
   void _onRemoveImage() {
     setState(() {
       _selectedImage = null;
@@ -53,33 +72,57 @@ class _CommentInputState extends State<CommentInput> {
   void _onRemoveGif() {
     setState(() {
       _selectedGif = null;
+      _isSelectingGif = false;
     });
     context.read<CommentsCreateBloc>().add(const CommentGifChanged(null));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if (_selectedImage != null || _selectedGif != null)
-          CommentImage(
-            image: _selectedImage,
-            gifData: _selectedGif,
+    return BlocListener<CommentsCreateBloc, CommentsCreateState>(
+      listener: (context, state) {
+        if (state.selectedGif != _selectedGif) {
+          setState(() {
+            _selectedGif = state.selectedGif;
+            if (state.selectedGif != null) {
+              _isSelectingGif = false;
+            }
+          });
+        }
+        
+        if (state is CommentSuccess) {
+          _textController.clear();
+          setState(() {
+            _selectedImage = null;
+            _selectedGif = null;
+            _isSelectingGif = false;
+          });
+          _focusNode.unfocus();
+          
+          context.read<CommentsLoadBloc>().add(FetchInitialComments());
+        }
+      },
+      child: Column(
+        children: [
+          CommentTextField(
+            textController: _textController,
+            focusNode: _focusNode,
+            selectedImage: _selectedImage,
+            selectedGif: _selectedGif,
             onRemove: () {
-              if (_selectedImage != null) {
-                _onRemoveImage();
-              } else if (_selectedGif != null) {
-                _onRemoveGif();
-              }
+              _onRemoveImage();
+              _onRemoveGif();
             },
           ),
-        CommentTextField(
-          textController: _textController,
-          focusNode: _focusNode,
-        ),
-        if (_focusNode.hasFocus)
-          CommentBottomBar(onImageSelected: _onImageSelected),
-      ],
+          if (_focusNode.hasFocus || _isSelectingGif)
+            CommentBottomBar(
+              postId: widget.postId,
+              onImageSelected: _onImageSelected,
+              onGifSelected: _onGifSelected,
+              onGifPickerOpened: _onGifPickerOpened,
+            ),
+        ],
+      ),
     );
   }
 }

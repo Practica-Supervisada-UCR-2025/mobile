@@ -69,8 +69,8 @@ class _CommentCreateState extends State<CommentImage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: SizedBox(
-              height: 300,
-              width: double.infinity,
+              height: 120,
+              width: 150,
               child: _isLocalGif
                   ? GifImageViewer(
                       key: ValueKey<String>(widget.image!.path),
@@ -141,7 +141,7 @@ class _CommentCreateState extends State<CommentImage> {
   Widget _buildCloseButton(VoidCallback onTapCallbackFromParent) {
     return Positioned(
       top: 12,
-      right: 28,
+      right: 18,
       child: GestureDetector(
         onTap: onTapCallbackFromParent, 
         child: Container(
@@ -149,7 +149,7 @@ class _CommentCreateState extends State<CommentImage> {
             color: Colors.black,
             shape: BoxShape.circle,
           ),
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(4.0),
           child: const Icon(
             Icons.close,
             color: Colors.white,

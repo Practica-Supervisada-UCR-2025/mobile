@@ -125,15 +125,6 @@ class MyApp extends StatelessWidget {
                   searchUsersRepository: context.read<SearchUsersRepository>(),
                 ),
           ),
-          BlocProvider<CommentsCreateBloc>(
-            create: (context) => CommentsCreateBloc(),
-          ),
-          BlocProvider<CommentsLoadBloc>(
-            create: (context) => CommentsLoadBloc(
-              repository: context.read<CommentsRepository>(),
-              postId: '', // Puedes ajustar el postId según sea necesario
-            ),
-          ),
         ],
         child: Builder(
           builder: (context) {
