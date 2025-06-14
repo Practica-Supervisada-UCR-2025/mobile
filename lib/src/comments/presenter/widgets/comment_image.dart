@@ -2,14 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/globals/widgets/gif_viewer.dart';
-import 'package:mobile/src/create/create.dart';
+import 'package:mobile/src/comments/comments.dart';
 
-class PostImage extends StatefulWidget {
+class CommentImage extends StatefulWidget {
   final File? image;
   final dynamic gifData;
   final VoidCallback onRemove;
 
-  const PostImage({
+  const CommentImage({
     super.key,
     this.image,
     this.gifData,
@@ -17,10 +17,10 @@ class PostImage extends StatefulWidget {
   }) : assert(image != null || gifData != null);
 
   @override
-  State<PostImage> createState() => _PostImageState();
+  State<CommentImage> createState() => _CommentCreateState();
 }
 
-class _PostImageState extends State<PostImage> {
+class _CommentCreateState extends State<CommentImage> {
   bool _isLocalGif = false;
 
   @override
@@ -30,7 +30,7 @@ class _PostImageState extends State<PostImage> {
   }
 
   @override
-  void didUpdateWidget(PostImage oldWidget) {
+  void didUpdateWidget(CommentImage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.image != oldWidget.image && widget.image != null) {
       _checkIfGif();
@@ -69,8 +69,8 @@ class _PostImageState extends State<PostImage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: SizedBox(
-              height: 300,
-              width: double.infinity,
+              height: 120,
+              width: 150,
               child: _isLocalGif
                   ? GifImageViewer(
                       key: ValueKey<String>(widget.image!.path),
@@ -86,7 +86,7 @@ class _PostImageState extends State<PostImage> {
         ),
         _buildCloseButton(() {
           widget.onRemove();
-          context.read<CreatePostBloc>().add(const PostImageChanged(null));
+          context.read<CommentsCreateBloc>().add(const CommentImageChanged(null));
         }),
       ],
     );
@@ -102,41 +102,35 @@ class _PostImageState extends State<PostImage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: SizedBox(
-              height: 300,
-              width: double.infinity,
-              child: _isLocalGif
-                  ? GifImageViewer(
-                      key: ValueKey<String>(widget.gifData!.tinyGifUrl),
-                      imageFile: widget.image!,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.network(
-                      widget.gifData!.tinyGifUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                      },
-                      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                        return Container(
-                          color: Colors.grey[200],
-                          alignment: Alignment.center,
-                          child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
-                        );
-                      },
+              height: 120, 
+              width: 150,
+              child: Image.network(
+                widget.gifData!.tinyGifUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                          : null,
                     ),
+                  );
+                },
+                errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                  return Container(
+                    color: Colors.grey[200],
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
+                  );
+                },
+              ),
             ),
           ),
         ),
         _buildCloseButton(() {
           widget.onRemove();
-          context.read<CreatePostBloc>().add(const PostGifChanged(null));
+          context.read<CommentsCreateBloc>().add(const CommentGifChanged(null));
         }),
       ],
     );
@@ -144,8 +138,8 @@ class _PostImageState extends State<PostImage> {
 
   Widget _buildCloseButton(VoidCallback onTapCallbackFromParent) {
     return Positioned(
-      top: 20,
-      right: 24,
+      top: 12,
+      right: 18,
       child: GestureDetector(
         onTap: onTapCallbackFromParent, 
         child: Container(
@@ -153,7 +147,7 @@ class _PostImageState extends State<PostImage> {
             color: Colors.black,
             shape: BoxShape.circle,
           ),
-          padding: const EdgeInsets.all(6.0),
+          padding: const EdgeInsets.all(4.0),
           child: const Icon(
             Icons.close,
             color: Colors.white,

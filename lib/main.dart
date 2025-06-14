@@ -12,6 +12,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/core.dart';
 import 'firebase_options.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:mobile/src/comments/comments.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,6 +80,11 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<SearchUsersRepository>(
           create:
               (_) => SearchUsersRepositoryImpl(apiService: ApiServiceImpl()),
+        ),
+        RepositoryProvider<CommentsRepository>(
+          create: (context) => CommentsRepositoryImpl(
+            apiService: context.read<ApiService>(),
+          ),
         ),
       ],
       child: MultiBlocProvider(
