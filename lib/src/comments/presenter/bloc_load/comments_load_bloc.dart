@@ -25,7 +25,7 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
     try {
       final response = await repository.fetchComments(
         postId: postId,
-        startTime: DateTime.fromMillisecondsSinceEpoch(0),
+        startTime: DateTime.now(),
       );
       emit(CommentsLoaded(
         comments: response.comments,

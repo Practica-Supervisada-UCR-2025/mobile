@@ -11,7 +11,6 @@ class CommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     print("CommentsPage: publication.id = ${publication.id}");
     final unifiedBackgroundColor = Theme.of(context).colorScheme.surface;
 
@@ -24,22 +23,28 @@ class CommentsPage extends StatelessWidget {
         title: const Text("Comments"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            final loadState = context.read<CommentsLoadBloc>().state;
+            final count = (loadState is CommentsLoaded)
+                ? loadState.comments.length
+                : publication.comments;
+
+            Navigator.of(context).pop(count);
+          },
         ),
       ),
       body: MultiBlocProvider(
         providers: [
           BlocProvider(
-            
             create: (context) {
-                print('[BlocProvider] postId enviado al Bloc: ${publication.id}');
-                return CommentsLoadBloc(
-                  repository: CommentsRepositoryImpl(
-                    apiService: Provider.of<ApiService>(context, listen: false),
-              ),
-              postId: publication.id.toString(),
-            )..add(FetchInitialComments());
-            }
+              print('[BlocProvider] postId enviado al Bloc: ${publication.id}');
+              return CommentsLoadBloc(
+                repository: CommentsRepositoryImpl(
+                  apiService: Provider.of<ApiService>(context, listen: false),
+                ),
+                postId: publication.id.toString(),
+              )..add(FetchInitialComments());
+            },
           ),
           BlocProvider(
             create: (context) => CommentsCreateBloc(
@@ -49,18 +54,30 @@ class CommentsPage extends StatelessWidget {
             ),
           ),
         ],
-        child: Column(
-          children: [
-            Expanded(
-              child: CommentsList(publication: publication),
-            ),
-            CommentInput(postId: publication.id),
-          ],
+        child: BlocListener<CommentsCreateBloc, CommentsCreateState>(
+          listener: (context, state) {
+            if (state is CommentSuccess) {
+              context.read<CommentsLoadBloc>().add(FetchInitialComments());
+              context.read<CommentsCreateBloc>().add(CommentReset());
+            } else if (state is CommentFailure) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(SnackBar(content: Text('Error: ${state.error}')));
+            }
+          },
+          child: Column(
+            children: [
+              Expanded(child: CommentsList(publication: publication)),
+              CommentInput(postId: publication.id),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+
 
 class PostPreview extends StatelessWidget {
   final Publication publication;
