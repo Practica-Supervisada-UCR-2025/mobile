@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mobile/core/services/notifications_service/domain/repository/notifications_handler.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'src/create/create.dart';
@@ -11,65 +12,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/core.dart';
 import 'firebase_options.dart';
+import 'core/services/notifications_service/data/api/notifications_handler_impl.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
-
-const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  'high_importance_channel', // id
-  'High Importance Notifications', // title
-  description: 'This channel is used for important notifications.',
-  importance: Importance.high,
-);
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await _showLocalNotification(message);
-}
-
-Future<void> _showLocalNotification(RemoteMessage message) async {
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails(
-        'high_importance_channel',
-        'High Importance Notifications',
-        channelDescription: 'This channel is used for important notifications.',
-        importance: Importance.high,
-        priority: Priority.high,
-      );
-
-  const NotificationDetails platformChannelSpecifics = NotificationDetails(
-    android: androidPlatformChannelSpecifics,
-  );
-
-  await flutterLocalNotificationsPlugin.show(
-    message.hashCode,
-    message.notification?.title ?? 'New notification',
-    message.notification?.body ?? '',
-    platformChannelSpecifics,
-    payload: message.data.toString(),
-  );
-}
-
-Future<void> _initializeLocalNotifications() async {
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-
-  await flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
-    onDidReceiveNotificationResponse: (NotificationResponse response) {
-      // if the user is currently using the app and taps on a notification,
-    },
-  );
-
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin
-      >()
-      ?.createNotificationChannel(channel);
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,17 +23,12 @@ void main() async {
   await LocalStorage.init();
   await dotenv.load(fileName: ".env");
 
-  await _initializeLocalNotifications();
+  final NotificationHandler notificationHandler = NotificationHandlerImpl(
+    flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+    firebaseMessaging: FirebaseMessaging.instance,
+  );
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    await _showLocalNotification(message);
-  });
-
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    // if the app is minimized and the user taps on the notification,
-  });
+  await notificationHandler.initialize();
 
   runApp(MyApp());
 }
