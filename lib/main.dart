@@ -12,7 +12,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/core.dart';
 import 'firebase_options.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -24,10 +23,6 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 );
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // This method will be called when the app is in the background or terminated
-  //  handle the message here if needed.
-  print('🔔 Handling a background message: ${message.messageId}');
-
   await _showLocalNotification(message);
 }
 
@@ -39,24 +34,15 @@ Future<void> _showLocalNotification(RemoteMessage message) async {
         channelDescription: 'This channel is used for important notifications.',
         importance: Importance.high,
         priority: Priority.high,
-        showWhen: false,
-      );
-
-  const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-      DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
       );
 
   const NotificationDetails platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
-    iOS: iOSPlatformChannelSpecifics,
   );
 
   await flutterLocalNotificationsPlugin.show(
     message.hashCode,
-    message.notification?.title ?? 'Nueva notificación',
+    message.notification?.title ?? 'New notification',
     message.notification?.body ?? '',
     platformChannelSpecifics,
     payload: message.data.toString(),
@@ -64,29 +50,17 @@ Future<void> _showLocalNotification(RemoteMessage message) async {
 }
 
 Future<void> _initializeLocalNotifications() async {
-  // Configuración Android
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  // Configuración iOS
-  const DarwinInitializationSettings initializationSettingsIOS =
-      DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-      );
-
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
-    iOS: initializationSettingsIOS,
   );
 
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onDidReceiveNotificationResponse: (NotificationResponse response) {
-      // Manejar cuando el usuario toca la notificación
-      print('Notificación tocada: ${response.payload}');
-      // Aquí puedes navegar a una pantalla específica
+      // if the user is currently using the app and taps on a notification,
     },
   );
 
@@ -108,31 +82,11 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    // todo: Delete this when the notification ui is implemented
-    print('📩 Notification received');
-    print('Title: ${message.notification?.title}');
-    print('Body: ${message.notification?.body}');
-
     await _showLocalNotification(message);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final context = navigatorKey.currentContext;
-      if (context != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${message.notification?.title ?? 'Notificación'}: ${message.notification?.body ?? ''}',
-            ),
-            duration: Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    });
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    print('🔔 The user opened the app from a notification');
+    // if the app is minimized and the user taps on the notification,
   });
 
   runApp(MyApp());
