@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/comments/comments.dart';
-import 'package:mobile/src/comments/presenter/widgets/comment_input.dart';
 
 class CommentsPage extends StatelessWidget {
   final Publication publication;
