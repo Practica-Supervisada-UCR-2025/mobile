@@ -94,20 +94,14 @@ class PublicationCard extends StatelessWidget {
                   const SizedBox(width: 16),
                   IconButton(
                     icon: const Icon(Icons.chat_bubble_outline, size: 20),
-                    onPressed: () async {
-                      final updatedCount = await Navigator.of(context).push<int?>(
+                    onPressed: () {
+                      Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => CommentsPage(publication: publication),
                         ),
                       );
-
-                      if (updatedCount != null && updatedCount != publication.comments) {
-                        publication.comments = updatedCount;
-                        (context as Element).markNeedsBuild(); // fuerza redibujo
-                      }
                     },
                   ),
-
                   Text(publication.comments.toString()),
                   const Spacer(),
                   IconButton(

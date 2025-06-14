@@ -23,14 +23,7 @@ class CommentsPage extends StatelessWidget {
         title: const Text("Comments"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            final loadState = context.read<CommentsLoadBloc>().state;
-            final count = (loadState is CommentsLoaded)
-                ? loadState.comments.length
-                : publication.comments;
-
-            Navigator.of(context).pop(count);
-          },
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: MultiBlocProvider(
@@ -57,9 +50,12 @@ class CommentsPage extends StatelessWidget {
         child: BlocListener<CommentsCreateBloc, CommentsCreateState>(
           listener: (context, state) {
             if (state is CommentSuccess) {
+              // 🔁 Refrescar comentarios
               context.read<CommentsLoadBloc>().add(FetchInitialComments());
+              // 🧹 Limpiar input
               context.read<CommentsCreateBloc>().add(CommentReset());
             } else if (state is CommentFailure) {
+              // ⚠️ Mostrar error
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(SnackBar(content: Text('Error: ${state.error}')));
