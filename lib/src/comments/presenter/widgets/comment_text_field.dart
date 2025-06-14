@@ -40,19 +40,21 @@ class CommentTextField extends StatelessWidget {
         ),
         child: Column(
           children: [
-            if (selectedImage != null)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: CommentImage(
-                  image: selectedImage,
-                  onRemove: onRemove,
-                ),
-              ),
             if (selectedGif != null)
               Align(
                 alignment: Alignment.centerLeft,
                 child: CommentImage(
+                  key: ValueKey<String>('gif-${selectedGif!.tinyGifUrl}'),
                   gifData: selectedGif,
+                  onRemove: onRemove,
+                ),
+              )
+            else if (selectedImage != null)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: CommentImage(
+                  key: ValueKey<String>('image-${selectedImage!.path}'),
+                  image: selectedImage,
                   onRemove: onRemove,
                 ),
               ),
@@ -72,31 +74,39 @@ class CommentTextField extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: TextField(
-                    controller: textController,
-                    focusNode: focusNode,
-                    onChanged: (text) {
-                      context.read<CommentsCreateBloc>().add(CommentTextChanged(text));
-                    },
-                    maxLines: null,
-                    autofocus: false,
-                    decoration: InputDecoration(
-                      hintText: 'Post your reply...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Theme.of(context).brightness == Brightness.dark
-                          ? const Color.fromARGB(255, 32, 40, 54)
-                          : const Color.fromARGB(255, 209, 209, 209),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  child: Scrollbar(
+                    thickness: 4.0,
+                    radius: const Radius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: TextField(
+                        controller: textController,
+                        focusNode: focusNode,
+                        onChanged: (text) {
+                          context.read<CommentsCreateBloc>().add(CommentTextChanged(text));
+                        },
+                        maxLines: 4,
+                        minLines: 1,
+                        autofocus: false,
+                        decoration: InputDecoration(
+                          hintText: 'Post your reply...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context).brightness == Brightness.dark
+                              ? const Color.fromARGB(255, 42, 50, 63)
+                              : const Color.fromARGB(255, 224, 224, 224),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
+                        style: Theme.of(context).textTheme.bodyMedium,
                   ),
+                ),
+              ),
                 ),
               ],
             ),

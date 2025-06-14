@@ -38,6 +38,7 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
 
     if (!mounted) return;
     if (image != null) {
+      context.read<CommentsCreateBloc>().add(const CommentGifChanged(null));
       widget.onImageSelected(image);
     }
   }
@@ -55,6 +56,7 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
 
     if (!mounted) return;
     if (photo != null) {
+      context.read<CommentsCreateBloc>().add(const CommentGifChanged(null));
       widget.onImageSelected(photo);
     }
   }
@@ -67,6 +69,8 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
     if (!mounted) return;
     
     if (gif != null) {
+      widget.onImageSelected(null);
+      
       if (widget.onGifSelected != null) {
         widget.onGifSelected!(gif);
       } else {

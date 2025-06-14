@@ -18,5 +18,12 @@ void main() {
       final exception2 = CommentsException(errorMessage);
         expect(exception1.message, equals(exception2.message));
     });
+
+    test('toString should return the message', () {
+      const message = 'Test exception message';
+      final exception = CommentsException(message);
+
+      expect(exception.toString(), equals(message));
+    });
   });
 }

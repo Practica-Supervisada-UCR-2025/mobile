@@ -99,6 +99,7 @@ class _CommentInputState extends State<CommentInput> {
           });
           _focusNode.unfocus();
           
+          context.read<CommentsCreateBloc>().add(const CommentReset());
           context.read<CommentsLoadBloc>().add(FetchInitialComments());
         }
       },

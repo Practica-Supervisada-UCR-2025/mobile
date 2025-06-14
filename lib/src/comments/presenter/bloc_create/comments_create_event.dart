@@ -51,3 +51,7 @@ class CommentSubmitted extends CommentsCreateEvent {
   List<Object?> get props => [postId, text, image, selectedGif];
 }
 
+class CommentReset extends CommentsCreateEvent {
+  const CommentReset();
+}
+

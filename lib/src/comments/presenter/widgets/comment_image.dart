@@ -102,30 +102,28 @@ class _CommentCreateState extends State<CommentImage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: SizedBox(
-              height: 200,
-              width: double.infinity,
-              child: Center(
-                child: Image.network(
-                  widget.gifData!.tinyGifUrl,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
-                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                    return Container(
-                      color: Colors.grey[200],
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
-                    );
-                  },
-                ),
+              height: 120, 
+              width: 150,
+              child: Image.network(
+                widget.gifData!.tinyGifUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                  return Container(
+                    color: Colors.grey[200],
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
+                  );
+                },
               ),
             ),
           ),
