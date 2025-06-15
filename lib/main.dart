@@ -1,4 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mobile/core/services/notifications_service/domain/repository/notifications_handler.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'package:mobile/src/search/search.dart';
@@ -11,8 +14,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/core.dart';
 import 'firebase_options.dart';
+import 'core/services/notifications_service/data/api/notifications_handler_impl.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:mobile/src/comments/comments.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,10 +27,18 @@ void main() async {
   await LocalStorage.init();
   await dotenv.load(fileName: ".env");
 
+  final NotificationHandler notificationHandler = NotificationHandlerImpl(
+    flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+    firebaseMessaging: FirebaseMessaging.instance,
+  );
+
+  await notificationHandler.initialize();
+
   const isRelease = bool.fromEnvironment('dart.vm.product');
 
   final packageInfo = await PackageInfo.fromPlatform();
-  final releaseVersion = 'ucr-connect@${packageInfo.version}+${packageInfo.buildNumber}';
+  final releaseVersion =
+      'ucr-connect@${packageInfo.version}+${packageInfo.buildNumber}';
 
   await SentryFlutter.init((options) {
     options.dsn = dotenv.env['SENTRY_DSN'];
@@ -32,7 +47,6 @@ void main() async {
     options.release = releaseVersion;
   }, appRunner: () => runApp(SentryWidget(child: MyApp())));
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -77,14 +91,33 @@ class MyApp extends StatelessWidget {
               ),
         ),
 
+        RepositoryProvider<FCMService>(
+          create:
+              (context) => FCMServiceImpl(
+                localStorage: LocalStorage(),
+                apiService: context.read<ApiService>(),
+              ),
+        ),
+        RepositoryProvider<NotificationsService>(
+          create:
+              (context) => NotificationsServiceImpl(
+                permissionsRepository: context.read<PermissionsRepository>(),
+                fcmService: context.read<FCMService>(),
+                localStorage: LocalStorage(),
+              ),
+        ),
+        RepositoryProvider<MediaPickerRepository>(
+          create: (_) => MediaPickerRepositoryImpl(),
+        ),
         RepositoryProvider<SearchUsersRepository>(
           create:
               (_) => SearchUsersRepositoryImpl(apiService: ApiServiceImpl()),
         ),
         RepositoryProvider<CommentsRepository>(
-          create: (context) => CommentsRepositoryImpl(
-            apiService: context.read<ApiService>(),
-          ),
+          create:
+              (context) => CommentsRepositoryImpl(
+                apiService: context.read<ApiService>(),
+              ),
         ),
       ],
       child: MultiBlocProvider(
@@ -102,6 +135,7 @@ class MyApp extends StatelessWidget {
                   loginRepository: context.read<LoginRepository>(),
                   localStorage: LocalStorage(),
                   tokensRepository: TokensRepositoryAPI(),
+                  notificationsService: context.read<NotificationsService>(),
                 ),
           ),
           BlocProvider<LogoutBloc>(

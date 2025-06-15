@@ -1,6 +1,5 @@
-
+import 'package:mobile/core/core.dart' show PermissionService;
 import 'package:permission_handler/permission_handler.dart';
-import 'api.dart';
 
 class PermissionServiceImpl implements PermissionService {
   @override
@@ -26,6 +25,14 @@ class PermissionServiceImpl implements PermissionService {
 
   @override
   Future<PermissionStatus> requestPhotos() => Permission.photos.request();
+
+  @override
+  Future<PermissionStatus> getNotificationsStatus() =>
+      Permission.notification.status;
+
+  @override
+  Future<PermissionStatus> requestNotifications() =>
+      Permission.notification.request();
 
   @override
   Future<bool> openSettings() => openAppSettings();
