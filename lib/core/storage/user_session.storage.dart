@@ -62,11 +62,16 @@ class LocalStorage {
   String get userEmail => _prefs.getString('userEmail') ?? '';
 
   // User Profile Picture
-  set userProfilePicture(String picture) => _prefs.setString('userProfilePicture', picture);
+  set userProfilePicture(String picture) =>
+      _prefs.setString('userProfilePicture', picture);
   String get userProfilePicture => _prefs.getString('userProfilePicture') ?? '';
 
   // Check if user is logged in
   bool get isLoggedIn => accessToken.isNotEmpty && userId.isNotEmpty;
+
+  // FCM Token
+  set fcmToken(String token) => _prefs.setString('fcmToken', token);
+  String get fcmToken => _prefs.getString('fcmToken') ?? '';
 
   // Clear all stored data
   Future<void> clear() async {
