@@ -26,7 +26,12 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
         const Duration(milliseconds: 300),
       ),
     );
-    on<RefreshPublications>(_onRefreshPublications);
+    on<RefreshPublications>(
+      _onRefreshPublications,
+      transformer: debounce<RefreshPublications>(
+        const Duration(milliseconds: 300),
+      ),
+    );
   }
 
   Future<void> _onLoadPublications(
@@ -102,14 +107,22 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
     Emitter<PublicationState> emit,
   ) async {
     if (state is PublicationLoading) return;
-
     emit(PublicationLoading());
     _currentPage = 1;
     try {
-      final response = await publicationRepository.fetchPublications(
-        page: _currentPage,
-        limit: _limit,
-      );
+      PublicationResponse response;
+      if (event.isFeed) {
+        response = await publicationRepository.fetchPublications(
+          page: _currentPage,
+          limit: _limit,
+          time: DateTime.now().toIso8601String(),
+        );
+      } else {
+        response = await publicationRepository.fetchPublications(
+          page: _currentPage,
+          limit: _limit,
+        );
+      }
       emit(
         PublicationSuccess(
           publications: response.publications,

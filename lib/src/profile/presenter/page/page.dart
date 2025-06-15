@@ -5,7 +5,8 @@ import 'package:mobile/core/core.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool isFeed;
+  const ProfileScreen({super.key, required this.isFeed});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -118,6 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       child: ShowOwnPublicationsPage(
                         key: ValueKey(shouldRefresh),
                         refresh: shouldRefresh,
+                        isFeed: widget.isFeed,
                       ),
                     ),
                   ],

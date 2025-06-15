@@ -24,3 +24,12 @@ class LoadMorePublications extends PublicationEvent {
   @override
   List<Object> get props => [isFeed];
 }
+
+class RefreshPublications extends PublicationEvent {
+  final bool isFeed;
+
+  const RefreshPublications({this.isFeed = false});
+
+  @override
+  List<Object> get props => [isFeed];
+}
