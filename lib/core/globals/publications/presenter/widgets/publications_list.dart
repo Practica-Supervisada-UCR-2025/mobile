@@ -17,6 +17,7 @@ class _PublicationsListState extends State<PublicationsList>
   late final ScrollController _scrollController;
   late final PublicationBloc _bloc;
   bool _showRefreshButton = false;
+  final reportedIds = LocalStorage().reportedPublications;
 
   @override
   void initState() {
@@ -120,6 +121,10 @@ class _PublicationsListState extends State<PublicationsList>
                 itemCount: publications.length + 1,
                 itemBuilder: (context, index) {
                   if (index < publications.length) {
+                    // Temporally hide reported cached publications.
+                    if (reportedIds.contains(publications[index].id)) {
+                      return const SizedBox.shrink();
+                    }
                     return PublicationCard(publication: publications[index]);
                   } else {
                     return state.hasReachedMax

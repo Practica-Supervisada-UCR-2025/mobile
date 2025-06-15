@@ -62,7 +62,8 @@ class LocalStorage {
   String get userEmail => _prefs.getString('userEmail') ?? '';
 
   // User Profile Picture
-  set userProfilePicture(String picture) => _prefs.setString('userProfilePicture', picture);
+  set userProfilePicture(String picture) =>
+      _prefs.setString('userProfilePicture', picture);
   String get userProfilePicture => _prefs.getString('userProfilePicture') ?? '';
 
   // Check if user is logged in
@@ -71,5 +72,16 @@ class LocalStorage {
   // Clear all stored data
   Future<void> clear() async {
     await _prefs.clear();
+  }
+
+  // Temporally reported publications cache.
+  set reportedPublications(Set<String> ids) =>
+      _prefs.setStringList('reportedPublications', ids.toList());
+  Set<String> get reportedPublications =>
+      _prefs.getStringList('reportedPublications')?.toSet() ?? {};
+  void addReportedPublication(String id) {
+    final current = reportedPublications;
+    current.add(id);
+    reportedPublications = current;
   }
 }

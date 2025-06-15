@@ -4,10 +4,7 @@ import 'package:mobile/core/core.dart';
 class PublicationCard extends StatelessWidget {
   final Publication publication;
 
-  const PublicationCard({
-    super.key,
-    required this.publication,
-  });
+  const PublicationCard({super.key, required this.publication});
 
   @override
   Widget build(BuildContext context) {
@@ -15,12 +12,12 @@ class PublicationCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       child: Container(
         decoration: BoxDecoration(
-          border: Border (
+          border: Border(
             bottom: BorderSide(
               color: Theme.of(context).colorScheme.outline,
               width: 0.3,
             ),
-          )
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -47,21 +44,17 @@ class PublicationCard extends StatelessWidget {
                         ),
                         Text(
                           relativeDate(publication.createdAt),
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      // No action for now
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem<String>(
-                        value: 'delete',
-                        child: Text('Delete'),
-                      ),
-                    ],
+                  PublicationOptionsButton(
+                    publicationId: publication.id,
+                    publicationUsername: publication.username,
                   ),
                 ],
               ),
@@ -74,7 +67,8 @@ class PublicationCard extends StatelessWidget {
               const SizedBox(height: 8),
 
               /// Attachment
-              if (publication.attachment != null && publication.attachment!.isNotEmpty)
+              if (publication.attachment != null &&
+                  publication.attachment!.isNotEmpty)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
@@ -123,9 +117,10 @@ class _ExpandableTextState extends State<_ExpandableText> {
   @override
   Widget build(BuildContext context) {
     final isLong = widget.content.length > _limit;
-    final displayText = _expanded || !isLong
-        ? widget.content
-        : '${widget.content.substring(0, _limit)}...';
+    final displayText =
+        _expanded || !isLong
+            ? widget.content
+            : '${widget.content.substring(0, _limit)}...';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
