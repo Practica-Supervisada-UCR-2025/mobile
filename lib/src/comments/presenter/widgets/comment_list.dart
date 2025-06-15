@@ -41,6 +41,38 @@ class _CommentsListState extends State<CommentsList> {
     return currentScroll >= (maxScroll * 0.9);
   }
 
+  Widget _buildAttachment(String url) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12.0),
+        child: Image.network(
+          url,
+          height: 200,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          // Muestra un indicador de carga mientras la imagen se descarga
+          loadingBuilder: (context, child, progress) {
+            if (progress == null) return child;
+            return Container(
+              height: 200,
+              color: Colors.grey.shade200,
+              child: const Center(child: CircularProgressIndicator()),
+            );
+          },
+          // Muestra un ícono de error si la imagen no se puede cargar
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              height: 200,
+              color: Colors.grey.shade200,
+              child: const Icon(Icons.error, color: Colors.grey),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -124,13 +156,35 @@ class _CommentsListState extends State<CommentsList> {
 
               final comment = state.comments[commentIndex];
               
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 8.0), 
-                leading: const CircleAvatar(radius: 20), 
-                title: Text(comment.username, style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
-                subtitle: Text(comment.content, style: textTheme.bodyMedium),
-                dense: true,
-              );
+               return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                  leading: CircleAvatar(
+                    radius: 20,
+                    // Muestra la imagen de perfil. Si no hay, muestra un ícono.
+                    backgroundImage: comment.profileImageUrl != null
+                        ? NetworkImage(comment.profileImageUrl!)
+                        : null,
+                    child: comment.profileImageUrl == null
+                        ? const Icon(Icons.person, size: 22)
+                        : null,
+                  ),
+                  title: Text(
+                    comment.username, 
+                    style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // El texto del comentario
+                      Text(comment.content, style: textTheme.bodyMedium),
+                      
+                      // Si hay una URL de adjunto, la muestra usando el helper
+                      if (comment.attachmentUrl != null)
+                        _buildAttachment(comment.attachmentUrl!),
+                    ],
+                  ),
+                  dense: true,
+                );
             },
           );
         }
