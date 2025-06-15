@@ -4,6 +4,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mobile/core/services/notifications_service/domain/repository/notifications_handler.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:mobile/src/profile/profile.dart';
+import 'package:mobile/src/search/search.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'src/create/create.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +15,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/core.dart';
 import 'firebase_options.dart';
 import 'core/services/notifications_service/data/api/notifications_handler_impl.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:mobile/src/comments/comments.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -30,7 +34,18 @@ void main() async {
 
   await notificationHandler.initialize();
 
-  runApp(MyApp());
+  const isRelease = bool.fromEnvironment('dart.vm.product');
+
+  final packageInfo = await PackageInfo.fromPlatform();
+  final releaseVersion =
+      'ucr-connect@${packageInfo.version}+${packageInfo.buildNumber}';
+
+  await SentryFlutter.init((options) {
+    options.dsn = dotenv.env['SENTRY_DSN'];
+    options.sendDefaultPii = true;
+    options.environment = isRelease ? 'production' : 'debug';
+    options.release = releaseVersion;
+  }, appRunner: () => runApp(SentryWidget(child: MyApp())));
 }
 
 class MyApp extends StatelessWidget {
@@ -60,9 +75,6 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),
-        ),
-        RepositoryProvider<PublicationRepository>(
-          create: (context) => PublicationRepositoryAPI(),
         ),
         RepositoryProvider<ApiService>(create: (_) => ApiServiceImpl()),
 
@@ -96,6 +108,16 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider<MediaPickerRepository>(
           create: (_) => MediaPickerRepositoryImpl(),
+        ),
+        RepositoryProvider<SearchUsersRepository>(
+          create:
+              (_) => SearchUsersRepositoryImpl(apiService: ApiServiceImpl()),
+        ),
+        RepositoryProvider<CommentsRepository>(
+          create:
+              (context) => CommentsRepositoryImpl(
+                apiService: context.read<ApiService>(),
+              ),
         ),
       ],
       child: MultiBlocProvider(
@@ -134,16 +156,16 @@ class MyApp extends StatelessWidget {
                   createPostRepository: context.read<CreatePostRepository>(),
                 ),
           ),
-          BlocProvider<PublicationBloc>(
-            create:
-                (context) => PublicationBloc(
-                  publicationRepository: context.read<PublicationRepository>(),
-                )..add(LoadPublications()),
-          ),
           BlocProvider<EditProfileBloc>(
             create:
                 (context) => EditProfileBloc(
                   editProfileRepository: context.read<EditProfileRepository>(),
+                ),
+          ),
+          BlocProvider<SearchBloc>(
+            create:
+                (context) => SearchBloc(
+                  searchUsersRepository: context.read<SearchUsersRepository>(),
                 ),
           ),
         ],

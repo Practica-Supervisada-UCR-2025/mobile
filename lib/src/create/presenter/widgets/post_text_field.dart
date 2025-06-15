@@ -22,6 +22,9 @@ class PostTextField extends StatelessWidget {
           hintText: 'What’s on your mind?',
           border: InputBorder.none,
           counterText: '',
+          hintStyle: TextStyle(
+            color: Colors.grey,
+          ),
         ),
         style: Theme.of(context).textTheme.bodyLarge,
       ),
