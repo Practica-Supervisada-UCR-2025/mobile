@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/core.dart';
 
 class PostsPage extends StatelessWidget {
-  const PostsPage({super.key});
+  final bool isFeed;
+  const PostsPage({super.key, required this.isFeed});
 
   @override
   Widget build(BuildContext context) {
-    return 
-    Container(
+    return Container(
       color: Theme.of(context).colorScheme.surface,
-      child: BlocProvider(
-        create: (_) => PublicationBloc(
-          publicationRepository: PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS),
-        )..add(LoadPublications()),
-        child: const PublicationsList(scrollKey: "allPosts"),
-      ),
+      child: PublicationsList(scrollKey: "allPosts", isFeed: isFeed),
     );
   }
 }

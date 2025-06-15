@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/core/globals/widgets/gif_viewer.dart';
 import 'package:mobile/src/create/create.dart';
 
 class PostImage extends StatefulWidget {
@@ -101,31 +102,35 @@ class _PostImageState extends State<PostImage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: SizedBox(
-              height: 200,
+              height: 300,
               width: double.infinity,
-              child: Center(
-                child: Image.network(
-                  widget.gifData!.tinyGifUrl,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
-                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                    return Container(
-                      color: Colors.grey[200],
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
-                    );
-                  },
-                ),
-              ),
+              child: _isLocalGif
+                  ? GifImageViewer(
+                      key: ValueKey<String>(widget.gifData!.tinyGifUrl),
+                      imageFile: widget.image!,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.network(
+                      widget.gifData!.tinyGifUrl,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      },
+                      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                        return Container(
+                          color: Colors.grey[200],
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
+                        );
+                      },
+                    ),
             ),
           ),
         ),
@@ -139,8 +144,8 @@ class _PostImageState extends State<PostImage> {
 
   Widget _buildCloseButton(VoidCallback onTapCallbackFromParent) {
     return Positioned(
-      top: 12,
-      right: 28,
+      top: 20,
+      right: 24,
       child: GestureDetector(
         onTap: onTapCallbackFromParent, 
         child: Container(
@@ -148,7 +153,7 @@ class _PostImageState extends State<PostImage> {
             color: Colors.black,
             shape: BoxShape.circle,
           ),
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(6.0),
           child: const Icon(
             Icons.close,
             color: Colors.white,

@@ -175,5 +175,83 @@ void main() {
     test('LoadMorePublications equality', () {
       expect(LoadMorePublications(), equals(LoadMorePublications()));
     });
+    test('RefreshPublications equality', () {
+      expect(RefreshPublications(), equals(RefreshPublications()));
+    });
+  });
+
+  group('PublicationSuccess hasReachedMax', () {
+    test('returns true when currentPage >= totalPages', () {
+      final state = PublicationSuccess(
+        publications: [samplePub1],
+        totalPosts: 1,
+        totalPages: 1,
+        currentPage: 1,
+      );
+      expect(state.hasReachedMax, true);
+    });
+
+    test('returns false when currentPage < totalPages', () {
+      final state = PublicationSuccess(
+        publications: [samplePub1],
+        totalPosts: 2,
+        totalPages: 2,
+        currentPage: 1,
+      );
+      expect(state.hasReachedMax, false);
+    });
+  });
+
+  group('RefreshPublications', () {
+    blocTest<PublicationBloc, PublicationState>(
+      'emits [Loading, Success] when refresh is triggered and repository responds',
+      build: () {
+        when(() => repository.fetchPublications(page: 1, limit: 10)).thenAnswer(
+          (_) async => PublicationResponse(
+            publications: [samplePub1],
+            totalPosts: 1,
+            totalPages: 1,
+            currentPage: 1,
+          ),
+        );
+        return bloc;
+      },
+      act: (b) => b.add(RefreshPublications()),
+      expect:
+          () => [
+            PublicationLoading(),
+            PublicationSuccess(
+              publications: [samplePub1],
+              totalPosts: 1,
+              totalPages: 1,
+              currentPage: 1,
+            ),
+          ],
+      verify: (_) {
+        verify(
+          () => repository.fetchPublications(page: 1, limit: 10),
+        ).called(1);
+      },
+    );
+
+    blocTest<PublicationBloc, PublicationState>(
+      'emits [Loading, Failure] when refresh throws exception',
+      build: () {
+        when(
+          () => repository.fetchPublications(page: 1, limit: 10),
+        ).thenThrow(Exception('Oops'));
+        return bloc;
+      },
+      act: (b) => b.add(RefreshPublications()),
+      expect: () => [PublicationLoading(), PublicationFailure()],
+    );
+
+    blocTest<PublicationBloc, PublicationState>(
+      'does nothing when current state is already PublicationLoading',
+      build: () => bloc,
+      seed: () => PublicationLoading(),
+      act: (b) => b.add(RefreshPublications()),
+      expect: () => [],
+    );
   });
 }
