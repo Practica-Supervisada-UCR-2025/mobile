@@ -50,12 +50,9 @@ class CommentsPage extends StatelessWidget {
         child: BlocListener<CommentsCreateBloc, CommentsCreateState>(
           listener: (context, state) {
             if (state is CommentSuccess) {
-              // 🔁 Refrescar comentarios
               context.read<CommentsLoadBloc>().add(FetchInitialComments());
-              // 🧹 Limpiar input
               context.read<CommentsCreateBloc>().add(CommentReset());
             } else if (state is CommentFailure) {
-              // ⚠️ Mostrar error
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(SnackBar(content: Text('Error: ${state.error}')));
