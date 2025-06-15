@@ -6,7 +6,12 @@ import 'package:mockito/annotations.dart';
 import 'package:mobile/src/auth/auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-@GenerateMocks([LoginRepository, LocalStorage, TokensRepository])
+@GenerateMocks([
+  LoginRepository,
+  LocalStorage,
+  TokensRepository,
+  NotificationsService,
+])
 import 'login_bloc_test.mocks.dart';
 
 void main() {
@@ -14,6 +19,7 @@ void main() {
   late MockLocalStorage mockLocalStorage;
   late MockTokensRepository mockTokensRepository;
   late LoginBloc loginBloc;
+  late NotificationsService mockNotificationsService;
 
   final testUser = AuthUserInfo(
     id: 'test-user-id',
@@ -27,11 +33,13 @@ void main() {
     mockLoginRepository = MockLoginRepository();
     mockLocalStorage = MockLocalStorage();
     mockTokensRepository = MockTokensRepository();
+    mockNotificationsService = MockNotificationsService();
 
     loginBloc = LoginBloc(
       loginRepository: mockLoginRepository,
       localStorage: mockLocalStorage,
       tokensRepository: mockTokensRepository,
+      notificationsService: mockNotificationsService,
     );
   });
 
@@ -78,6 +86,14 @@ void main() {
         when(mockLocalStorage.userEmail = testUser.email).thenReturn('');
         when(mockLocalStorage.accessToken = 'accessToken').thenReturn('');
 
+        when(mockNotificationsService.setupNotificationsSilently()).thenAnswer(
+          (_) async => const NotificationSetupResult(
+            hasPermission: true,
+            hasFCMToken: true,
+            success: true,
+          ),
+        );
+
         return loginBloc;
       },
       act:
@@ -104,6 +120,7 @@ void main() {
         verify(mockLocalStorage.userId = testUser.id).called(1);
         verify(mockLocalStorage.userEmail = testUser.email).called(1);
         verify(mockLocalStorage.accessToken = 'accessToken').called(1);
+        verify(mockNotificationsService.setupNotificationsSilently()).called(1);
       },
     );
 

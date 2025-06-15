@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/core.dart';
+import 'package:mobile/src/comments/presenter/page/comments_page.dart';
 
 class PublicationCard extends StatelessWidget {
   final Publication publication;
@@ -24,7 +25,6 @@ class PublicationCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Header
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -61,7 +61,6 @@ class PublicationCard extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              /// Content text with "See more"
               _ExpandableText(content: publication.content),
 
               const SizedBox(height: 8),
@@ -81,16 +80,31 @@ class PublicationCard extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              /// Reactions & Comments
               Row(
                 children: [
-                  const Icon(Icons.favorite_border, size: 20),
-                  const SizedBox(width: 4),
+                  IconButton(
+                    icon: const Icon(Icons.favorite_border, size: 20),
+                    onPressed: () {},
+                  ),
                   Text(publication.likes.toString()),
                   const SizedBox(width: 16),
-                  const Icon(Icons.chat_bubble_outline, size: 20),
-                  const SizedBox(width: 4),
+                  IconButton(
+                    icon: const Icon(Icons.chat_bubble_outline, size: 20),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder:
+                              (_) => CommentsPage(publication: publication),
+                        ),
+                      );
+                    },
+                  ),
                   Text(publication.comments.toString()),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.share, size: 20),
+                    onPressed: () {},
+                  ),
                 ],
               ),
             ],

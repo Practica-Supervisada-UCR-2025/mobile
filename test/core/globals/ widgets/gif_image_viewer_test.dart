@@ -4,8 +4,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mobile/core/globals/widgets/gif_viewer.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:mobile/src/create/presenter/widgets/gif_image_viewer.dart';
 
 class MockFile extends Mock implements File {
   final String mockPath;
