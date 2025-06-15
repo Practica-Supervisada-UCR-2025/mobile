@@ -3,6 +3,15 @@ import 'package:mobile/src/comments/comments.dart';
 
 void main() {
   group('CommentsLoadState', () {
+    final comment = CommentModel(
+      id: '1',
+      content: 'hola',
+      username: 'usuario',
+      createdAt: DateTime(2023, 1, 1),
+      profileImageUrl: 'url1',
+      attachmentUrl: 'url2',
+    );
+
     test('CommentsLoadInitial props está vacío', () {
       expect(const CommentsLoadInitial().props, []);
     });
@@ -12,14 +21,7 @@ void main() {
       expect(loading.props, [true]);
     });
 
-    test('CommentsLoaded props y copyWith funcionan', () {
-      final comment = CommentModel(
-        id: '1',
-        content: 'hola',
-        username: 'usuario',
-        createdAt: DateTime(2023, 1, 1),
-      );
-
+    test('CommentsLoaded props y copyWith funcionan con nuevos campos', () {
       const loaded = CommentsLoaded(
         comments: [],
         hasReachedEnd: false,
@@ -33,6 +35,7 @@ void main() {
       );
 
       expect(copied.comments.length, 1);
+      expect(copied.comments.first, comment);
       expect(copied.hasReachedEnd, true);
       expect(copied.currentIndex, 1);
     });
@@ -49,6 +52,8 @@ void main() {
       content: 'Prueba',
       username: 'usuario',
       createdAt: DateTime(2023, 1, 1),
+      profileImageUrl: 'url1',
+      attachmentUrl: 'url2',
     );
 
     test('retorna una nueva instancia con campos actualizados', () {
@@ -78,7 +83,7 @@ void main() {
 
       final copied = original.copyWith();
 
-      expect(copied, original); 
+      expect(copied, original);
     });
 
     test('props incluye todos los campos', () {
