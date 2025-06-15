@@ -1,10 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:mobile/core/storage/storage.dart';
 import 'package:mobile/core/globals/publications/publications.dart'
     show
         PublicationBloc,
@@ -29,7 +30,9 @@ class FakePublicationState extends Fake implements PublicationState {}
 void main() {
   late MockPublicationBloc mockBloc;
 
-  setUpAll(() {
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    await LocalStorage.init();
     registerFallbackValue(FakePublicationEvent());
     registerFallbackValue(FakePublicationState());
   });

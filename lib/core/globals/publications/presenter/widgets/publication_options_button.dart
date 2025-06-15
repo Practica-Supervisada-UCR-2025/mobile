@@ -55,6 +55,16 @@ class PublicationOptionsButton extends StatelessWidget {
                 ],
               ),
             ),
+            const PopupMenuItem(
+              value: 'report',
+              child: Row(
+                children: [
+                  Icon(Icons.flag_outlined, size: 20),
+                  SizedBox(width: 8),
+                  Text('Report'),
+                ],
+              ),
+            ),
           ]);
         } else {
           items.add(

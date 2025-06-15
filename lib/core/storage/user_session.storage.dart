@@ -73,15 +73,4 @@ class LocalStorage {
   Future<void> clear() async {
     await _prefs.clear();
   }
-
-  // Temporally reported publications cache.
-  set reportedPublications(Set<String> ids) =>
-      _prefs.setStringList('reportedPublications', ids.toList());
-  Set<String> get reportedPublications =>
-      _prefs.getStringList('reportedPublications')?.toSet() ?? {};
-  void addReportedPublication(String id) {
-    final current = reportedPublications;
-    current.add(id);
-    reportedPublications = current;
-  }
 }

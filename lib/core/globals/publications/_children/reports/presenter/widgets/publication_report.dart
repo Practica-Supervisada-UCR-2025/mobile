@@ -73,7 +73,6 @@ class _ReportBottomSheetState extends State<ReportBottomSheet> {
                 'Your report has been sent successfully.\nA moderator will review the post.',
             onClose: () => _closeAndReset(),
           );
-          LocalStorage().addReportedPublication(widget.publicationId);
         } else if (state is ReportPublicationFailure) {
           content = FeedbackContent(
             icon: Icons.cancel_outlined,
