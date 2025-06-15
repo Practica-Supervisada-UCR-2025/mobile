@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mobile/core/globals/widgets/gif_picker_bottom_sheet.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:mobile/src/create/presenter/widgets/gif_picker_bottom_sheet.dart';
 import 'package:mobile/src/shared/models/gif_model.dart';
 import 'package:mobile/src/shared/models/trending_response.dart';
 import 'package:mobile/src/shared/services/tenor_gif_service.dart';

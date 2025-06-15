@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'package:mobile/core/core.dart';
 import 'package:network_image_mock/network_image_mock.dart';
@@ -44,34 +45,49 @@ void main() {
   });
 
   Widget buildTestableWidget() {
-    return Provider<PublicationRepository>.value(
-      value: mockPublicationRepository,
-      child: MultiProvider(
-        providers: [
-          BlocProvider<ProfileBloc>.value(value: mockProfileBloc),
-          BlocProvider<PublicationBloc>.value(value: mockPublicationBloc),
-        ],
-        child: const MaterialApp(home: ProfileScreen()),
-      ),
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder:
+              (context, state) => Provider<PublicationRepository>.value(
+                value: mockPublicationRepository,
+                child: MultiProvider(
+                  providers: [
+                    BlocProvider<ProfileBloc>.value(value: mockProfileBloc),
+                    BlocProvider<PublicationBloc>.value(
+                      value: mockPublicationBloc,
+                    ),
+                  ],
+                  child: const ProfileScreen(),
+                ),
+              ),
+        ),
+      ],
     );
+
+    return MaterialApp.router(routerConfig: router);
   }
 
   group('ProfileScreen', () {
-    testWidgets('shows profile skeleton indicator when state is ProfileLoading',
-        (WidgetTester tester) async {
-      whenListen(
-        mockProfileBloc,
-        Stream.fromIterable([ProfileLoading()]),
-        initialState: ProfileLoading(),
-      );
+    testWidgets(
+      'shows profile skeleton indicator when state is ProfileLoading',
+      (WidgetTester tester) async {
+        whenListen(
+          mockProfileBloc,
+          Stream.fromIterable([ProfileLoading()]),
+          initialState: ProfileLoading(),
+        );
 
-      await tester.pumpWidget(buildTestableWidget());
+        await tester.pumpWidget(buildTestableWidget());
 
-      expect(find.byType(ProfileSkeleton), findsOneWidget);
-    });
+        expect(find.byType(ProfileSkeleton), findsOneWidget);
+      },
+    );
 
-    testWidgets('shows user data when state is ProfileSuccess',
-        (WidgetTester tester) async {
+    testWidgets('shows user data when state is ProfileSuccess', (
+      WidgetTester tester,
+    ) async {
       whenListen(
         mockProfileBloc,
         Stream.fromIterable([ProfileSuccess(user: testUser)]),
@@ -89,8 +105,9 @@ void main() {
       });
     });
 
-    testWidgets('shows error message when state is ProfileFailure',
-        (WidgetTester tester) async {
+    testWidgets('shows error message when state is ProfileFailure', (
+      WidgetTester tester,
+    ) async {
       whenListen(
         mockProfileBloc,
         Stream.fromIterable([ProfileFailure(error: 'Error profile')]),
@@ -102,8 +119,9 @@ void main() {
       expect(find.text('Error loading profile'), findsOneWidget);
     });
 
-    testWidgets('shows placeholder when state is unknown',
-        (WidgetTester tester) async {
+    testWidgets('shows placeholder when state is unknown', (
+      WidgetTester tester,
+    ) async {
       whenListen(
         mockProfileBloc,
         Stream.fromIterable([ProfileInitial()]),

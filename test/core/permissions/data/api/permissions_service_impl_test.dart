@@ -18,12 +18,14 @@ void main() {
   test('getCameraStatus returns granted', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      if (methodCall.method == 'checkPermissionStatus') {
-        return 1; // 1 = PermissionStatus.granted
-      }
-      throw PlatformException(
-          code: 'unimplemented', message: 'Method not implemented');
-    });
+          if (methodCall.method == 'checkPermissionStatus') {
+            return 1; // 1 = PermissionStatus.granted
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
 
     final result = await service.getCameraStatus();
     expect(result, PermissionStatus.granted);
@@ -32,29 +34,33 @@ void main() {
   test('requestCamera returns denied', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      if (methodCall.method == 'requestPermissions') {
-        return {
-          1: 0, // 0 = PermissionStatus.denied
-        };
-      }
-      throw PlatformException(
-          code: 'unimplemented', message: 'Method not implemented');
-    });
+          if (methodCall.method == 'requestPermissions') {
+            return {
+              1: 0, // 0 = PermissionStatus.denied
+            };
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
 
     final result = await service.requestCamera();
     expect(result, PermissionStatus.denied);
   });
 
-   // getGalleryStatus
+  // getGalleryStatus
   test('getGalleryStatus returns granted', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      if (methodCall.method == 'checkPermissionStatus') {
-        return 1; // granted
-      }
-      throw PlatformException(
-          code: 'unimplemented', message: 'Method not implemented');
-    });
+          if (methodCall.method == 'checkPermissionStatus') {
+            return 1; // granted
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
 
     final result = await service.getGalleryStatus();
     expect(result, PermissionStatus.granted);
@@ -64,14 +70,16 @@ void main() {
   test('requestGallery returns denied', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      if (methodCall.method == 'requestPermissions') {
-        return {
-          Permission.photos.value: 0, // denied
-        };
-      }
-      throw PlatformException(
-          code: 'unimplemented', message: 'Method not implemented');
-    });
+          if (methodCall.method == 'requestPermissions') {
+            return {
+              Permission.photos.value: 0, // denied
+            };
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
 
     final result = await service.requestGallery();
     expect(result, PermissionStatus.denied);
@@ -81,12 +89,14 @@ void main() {
   test('getStorageStatus returns granted', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      if (methodCall.method == 'checkPermissionStatus') {
-        return 1; // granted
-      }
-      throw PlatformException(
-          code: 'unimplemented', message: 'Method not implemented');
-    });
+          if (methodCall.method == 'checkPermissionStatus') {
+            return 1; // granted
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
 
     final result = await service.getStorageStatus();
     expect(result, PermissionStatus.granted);
@@ -96,14 +106,16 @@ void main() {
   test('requestStorage returns denied', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      if (methodCall.method == 'requestPermissions') {
-        return {
-          Permission.storage.value: 0, // denied
-        };
-      }
-      throw PlatformException(
-          code: 'unimplemented', message: 'Method not implemented');
-    });
+          if (methodCall.method == 'requestPermissions') {
+            return {
+              Permission.storage.value: 0, // denied
+            };
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
 
     final result = await service.requestStorage();
     expect(result, PermissionStatus.denied);
@@ -113,12 +125,14 @@ void main() {
   test('getPhotosStatus returns granted', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      if (methodCall.method == 'checkPermissionStatus') {
-        return 1; // granted
-      }
-      throw PlatformException(
-          code: 'unimplemented', message: 'Method not implemented');
-    });
+          if (methodCall.method == 'checkPermissionStatus') {
+            return 1; // granted
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
 
     final result = await service.getPhotosStatus();
     expect(result, PermissionStatus.granted);
@@ -128,16 +142,54 @@ void main() {
   test('requestPhotos returns denied', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      if (methodCall.method == 'requestPermissions') {
-        return {
-          Permission.photos.value: 0, // denied
-        };
-      }
-      throw PlatformException(
-          code: 'unimplemented', message: 'Method not implemented');
-    });
+          if (methodCall.method == 'requestPermissions') {
+            return {
+              Permission.photos.value: 0, // denied
+            };
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
 
     final result = await service.requestPhotos();
+    expect(result, PermissionStatus.denied);
+  });
+
+  // getNotificationsStatus
+  test('getNotificationsStatus returns granted', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+          if (methodCall.method == 'checkPermissionStatus') {
+            return 1; // granted
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
+
+    final result = await service.getNotificationsStatus();
+    expect(result, PermissionStatus.granted);
+  });
+
+  // requestNotifications
+  test('requestNotifications returns denied', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+          if (methodCall.method == 'requestPermissions') {
+            return {
+              Permission.notification.value: 0, // denied
+            };
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
+
+    final result = await service.requestNotifications();
     expect(result, PermissionStatus.denied);
   });
 
@@ -145,12 +197,14 @@ void main() {
   test('openSettings returns true', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      if (methodCall.method == 'openAppSettings') {
-        return true;
-      }
-      throw PlatformException(
-          code: 'unimplemented', message: 'Method not implemented');
-    });
+          if (methodCall.method == 'openAppSettings') {
+            return true;
+          }
+          throw PlatformException(
+            code: 'unimplemented',
+            message: 'Method not implemented',
+          );
+        });
 
     final result = await service.openSettings();
     expect(result, isTrue);

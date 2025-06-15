@@ -135,6 +135,17 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
           as bool);
 
   @override
+  String get fcmToken =>
+      (super.noSuchMethod(
+            Invocation.getter(#fcmToken),
+            returnValue: _i7.dummyValue<String>(
+              this,
+              Invocation.getter(#fcmToken),
+            ),
+          )
+          as String);
+
+  @override
   set accessToken(String? token) => super.noSuchMethod(
     Invocation.setter(#accessToken, token),
     returnValueForMissingStub: null,
@@ -167,6 +178,12 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   @override
   set userProfilePicture(String? picture) => super.noSuchMethod(
     Invocation.setter(#userProfilePicture, picture),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set fcmToken(String? token) => super.noSuchMethod(
+    Invocation.setter(#fcmToken, token),
     returnValueForMissingStub: null,
   );
 
