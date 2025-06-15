@@ -21,11 +21,39 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
     FetchInitialComments event,
     Emitter<CommentsLoadState> emit,
   ) async {
+    // -----------------------------
+    // MODO PRUEBA CON COMENTARIOS MOCK
+    // -----------------------------
 
+    // final now = DateTime.now();
+    // const String fakeProfileBaseUrl = 'https://i.pravatar.cc/150?u=';
+    // const String fakeAttachmentUrl = 'https://picsum.photos/seed/picsum/400/300';
+
+    // final mockComments = List.generate(10, (index) {
+    //   return CommentModel(
+    //     id: '${index + 1}',
+    //     username: 'Usuario${index + 1}',
+    //     content: 'Este es el comentario de prueba número ${index + 1}.',
+    //     createdAt: now.subtract(Duration(minutes: (10 - index) * 5)),
+    //     profileImageUrl: '$fakeProfileBaseUrl${index + 1}',
+    //     attachmentUrl: (index == 0 || index % 3 == 0) ? fakeAttachmentUrl : null,
+    //   );
+    // });
+
+    // emit(CommentsLoaded(
+    //   comments: mockComments,
+    //   hasReachedEnd: true,
+    //   currentIndex: 0,
+    // ));
+
+    // -----------------------------
+    // CÓDIGO ORIGINAL DESACTIVADO TEMPORALMENTE
+    // -----------------------------
+    
     try {
       final response = await repository.fetchComments(
         postId: postId,
-        startTime: DateTime.now(),
+        startTime: DateTime.fromMillisecondsSinceEpoch(0),
       );
       emit(CommentsLoaded(
         comments: response.comments,
@@ -37,6 +65,7 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
     }
     
   }
+
 
   Future<void> _onFetchMoreComments(
     FetchMoreComments event,
