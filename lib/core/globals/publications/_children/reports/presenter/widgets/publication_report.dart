@@ -17,7 +17,7 @@ class _ReportBottomSheetState extends State<ReportBottomSheet> {
 
   final List<String> reasons = [
     'Inappropriate content',
-    'It\'s Spam',
+    'It\'s spam',
     'Harassment or bullying',
     'False information',
     'Other reason',
