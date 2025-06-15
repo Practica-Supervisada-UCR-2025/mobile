@@ -19,14 +19,18 @@ class CommentsRepositoryImpl implements CommentsRepository {
   }) async {
     print('[Repository] Consultando comentarios para postId: $postId');
     print('[Repository] startTime: ${startTime.toUtc().toIso8601String()}');
-    final endpoint = 'http://192.168.100.77:3000/api/posts/$postId/comments?startTime=${startTime.toUtc().toIso8601String()}';
+    final endpoint = 'posts/$postId/comments?startTime=${startTime.toUtc().toIso8601String()}';
 
     final response = await apiService.get(endpoint);
 
     if (response.statusCode == 200) {
+      print('[Repository] Comentarios obtenidos exitosamente para postId: $postId');
+      print('[Repository] Respuesta: ${response.body}');
       final data = json.decode(response.body);
       return CommentsResponse.fromJson(data);
     } else {
+      print('[Repository] Error al obtener comentarios para postId: $postId');
+      print('[Repository] Código de estado: ${response.statusCode}');
       return CommentsResponse(comments: [], totalItems: 0, currentIndex: 0);
     }
   }
