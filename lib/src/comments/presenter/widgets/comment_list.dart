@@ -51,7 +51,6 @@ class _CommentsListState extends State<CommentsList> {
           height: 200,
           width: double.infinity,
           fit: BoxFit.cover,
-          // Muestra un indicador de carga mientras la imagen se descarga
           loadingBuilder: (context, child, progress) {
             if (progress == null) return child;
             return Container(
@@ -60,7 +59,6 @@ class _CommentsListState extends State<CommentsList> {
               child: const Center(child: CircularProgressIndicator()),
             );
           },
-          // Muestra un ícono de error si la imagen no se puede cargar
           errorBuilder: (context, error, stackTrace) {
             return Container(
               height: 200,
@@ -160,7 +158,6 @@ class _CommentsListState extends State<CommentsList> {
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
                   leading: CircleAvatar(
                     radius: 20,
-                    // Muestra la imagen de perfil. Si no hay, muestra un ícono.
                     backgroundImage: comment.profileImageUrl != null
                         ? NetworkImage(comment.profileImageUrl!)
                         : null,
@@ -175,10 +172,8 @@ class _CommentsListState extends State<CommentsList> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // El texto del comentario
                       Text(comment.content, style: textTheme.bodyMedium),
                       
-                      // Si hay una URL de adjunto, la muestra usando el helper
                       if (comment.attachmentUrl != null)
                         _buildAttachment(comment.attachmentUrl!),
                     ],
