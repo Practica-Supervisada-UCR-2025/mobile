@@ -10,7 +10,7 @@ class PermissionSettingsDialog {
         return AlertDialog(
           title: const Text('Permission Denied'),
           content: Text(
-            'You have permanently denied permission to access the $resource. '
+            'Permission to use $resource has been permanently denied. '
             'You can enable it in the app settings.',
           ),
           actions: <Widget>[

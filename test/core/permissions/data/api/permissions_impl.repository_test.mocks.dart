@@ -3,9 +3,9 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i12;
+import 'dart:async' as _i10;
 
-import 'package:device_info_plus/device_info_plus.dart' as _i14;
+import 'package:device_info_plus/device_info_plus.dart' as _i12;
 import 'package:device_info_plus/src/model/android_device_info.dart' as _i2;
 import 'package:device_info_plus/src/model/ios_device_info.dart' as _i3;
 import 'package:device_info_plus/src/model/linux_device_info.dart' as _i4;
@@ -14,14 +14,11 @@ import 'package:device_info_plus/src/model/web_browser_info.dart' as _i5;
 import 'package:device_info_plus/src/model/windows_device_info.dart' as _i7;
 import 'package:device_info_plus_platform_interface/device_info_plus_platform_interface.dart'
     as _i8;
-import 'package:flutter/foundation.dart' as _i10;
-import 'package:flutter/src/widgets/framework.dart' as _i9;
-import 'package:flutter/src/widgets/notification_listener.dart' as _i16;
-import 'package:mobile/core/permissions/data/api/permissions_service.dart'
-    as _i11;
+import 'package:mobile/core/permissions/domain/repository/permissions_service.dart'
+    as _i9;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i15;
-import 'package:permission_handler/permission_handler.dart' as _i13;
+import 'package:mockito/src/dummies.dart' as _i13;
+import 'package:permission_handler/permission_handler.dart' as _i11;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -84,213 +81,200 @@ class _FakeAndroidBuildVersion_7 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-class _FakeWidget_8 extends _i1.SmartFake implements _i9.Widget {
-  _FakeWidget_8(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-
-  @override
-  String toString({
-    _i10.DiagnosticLevel? minLevel = _i10.DiagnosticLevel.info,
-  }) => super.toString();
-}
-
-class _FakeInheritedWidget_9 extends _i1.SmartFake
-    implements _i9.InheritedWidget {
-  _FakeInheritedWidget_9(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-
-  @override
-  String toString({
-    _i10.DiagnosticLevel? minLevel = _i10.DiagnosticLevel.info,
-  }) => super.toString();
-}
-
-class _FakeDiagnosticsNode_10 extends _i1.SmartFake
-    implements _i10.DiagnosticsNode {
-  _FakeDiagnosticsNode_10(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-
-  @override
-  String toString({
-    _i10.TextTreeConfiguration? parentConfiguration,
-    _i10.DiagnosticLevel? minLevel = _i10.DiagnosticLevel.info,
-  }) => super.toString();
-}
-
 /// A class which mocks [PermissionService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPermissionService extends _i1.Mock implements _i11.PermissionService {
+class MockPermissionService extends _i1.Mock implements _i9.PermissionService {
   MockPermissionService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i12.Future<_i13.PermissionStatus> getCameraStatus() =>
+  _i10.Future<_i11.PermissionStatus> getCameraStatus() =>
       (super.noSuchMethod(
             Invocation.method(#getCameraStatus, []),
-            returnValue: _i12.Future<_i13.PermissionStatus>.value(
-              _i13.PermissionStatus.denied,
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
             ),
           )
-          as _i12.Future<_i13.PermissionStatus>);
+          as _i10.Future<_i11.PermissionStatus>);
 
   @override
-  _i12.Future<_i13.PermissionStatus> requestCamera() =>
+  _i10.Future<_i11.PermissionStatus> requestCamera() =>
       (super.noSuchMethod(
             Invocation.method(#requestCamera, []),
-            returnValue: _i12.Future<_i13.PermissionStatus>.value(
-              _i13.PermissionStatus.denied,
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
             ),
           )
-          as _i12.Future<_i13.PermissionStatus>);
+          as _i10.Future<_i11.PermissionStatus>);
 
   @override
-  _i12.Future<_i13.PermissionStatus> getGalleryStatus() =>
+  _i10.Future<_i11.PermissionStatus> getGalleryStatus() =>
       (super.noSuchMethod(
             Invocation.method(#getGalleryStatus, []),
-            returnValue: _i12.Future<_i13.PermissionStatus>.value(
-              _i13.PermissionStatus.denied,
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
             ),
           )
-          as _i12.Future<_i13.PermissionStatus>);
+          as _i10.Future<_i11.PermissionStatus>);
 
   @override
-  _i12.Future<_i13.PermissionStatus> requestGallery() =>
+  _i10.Future<_i11.PermissionStatus> requestGallery() =>
       (super.noSuchMethod(
             Invocation.method(#requestGallery, []),
-            returnValue: _i12.Future<_i13.PermissionStatus>.value(
-              _i13.PermissionStatus.denied,
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
             ),
           )
-          as _i12.Future<_i13.PermissionStatus>);
+          as _i10.Future<_i11.PermissionStatus>);
 
   @override
-  _i12.Future<_i13.PermissionStatus> getStorageStatus() =>
+  _i10.Future<_i11.PermissionStatus> getStorageStatus() =>
       (super.noSuchMethod(
             Invocation.method(#getStorageStatus, []),
-            returnValue: _i12.Future<_i13.PermissionStatus>.value(
-              _i13.PermissionStatus.denied,
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
             ),
           )
-          as _i12.Future<_i13.PermissionStatus>);
+          as _i10.Future<_i11.PermissionStatus>);
 
   @override
-  _i12.Future<_i13.PermissionStatus> requestStorage() =>
+  _i10.Future<_i11.PermissionStatus> requestStorage() =>
       (super.noSuchMethod(
             Invocation.method(#requestStorage, []),
-            returnValue: _i12.Future<_i13.PermissionStatus>.value(
-              _i13.PermissionStatus.denied,
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
             ),
           )
-          as _i12.Future<_i13.PermissionStatus>);
+          as _i10.Future<_i11.PermissionStatus>);
 
   @override
-  _i12.Future<_i13.PermissionStatus> getPhotosStatus() =>
+  _i10.Future<_i11.PermissionStatus> getPhotosStatus() =>
       (super.noSuchMethod(
             Invocation.method(#getPhotosStatus, []),
-            returnValue: _i12.Future<_i13.PermissionStatus>.value(
-              _i13.PermissionStatus.denied,
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
             ),
           )
-          as _i12.Future<_i13.PermissionStatus>);
+          as _i10.Future<_i11.PermissionStatus>);
 
   @override
-  _i12.Future<_i13.PermissionStatus> requestPhotos() =>
+  _i10.Future<_i11.PermissionStatus> requestPhotos() =>
       (super.noSuchMethod(
             Invocation.method(#requestPhotos, []),
-            returnValue: _i12.Future<_i13.PermissionStatus>.value(
-              _i13.PermissionStatus.denied,
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
             ),
           )
-          as _i12.Future<_i13.PermissionStatus>);
+          as _i10.Future<_i11.PermissionStatus>);
 
   @override
-  _i12.Future<bool> openSettings() =>
+  _i10.Future<_i11.PermissionStatus> getNotificationsStatus() =>
+      (super.noSuchMethod(
+            Invocation.method(#getNotificationsStatus, []),
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
+            ),
+          )
+          as _i10.Future<_i11.PermissionStatus>);
+
+  @override
+  _i10.Future<_i11.PermissionStatus> requestNotifications() =>
+      (super.noSuchMethod(
+            Invocation.method(#requestNotifications, []),
+            returnValue: _i10.Future<_i11.PermissionStatus>.value(
+              _i11.PermissionStatus.denied,
+            ),
+          )
+          as _i10.Future<_i11.PermissionStatus>);
+
+  @override
+  _i10.Future<bool> openSettings() =>
       (super.noSuchMethod(
             Invocation.method(#openSettings, []),
-            returnValue: _i12.Future<bool>.value(false),
+            returnValue: _i10.Future<bool>.value(false),
           )
-          as _i12.Future<bool>);
+          as _i10.Future<bool>);
 }
 
 /// A class which mocks [DeviceInfoPlugin].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockDeviceInfoPlugin extends _i1.Mock implements _i14.DeviceInfoPlugin {
+class MockDeviceInfoPlugin extends _i1.Mock implements _i12.DeviceInfoPlugin {
   MockDeviceInfoPlugin() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i12.Future<_i2.AndroidDeviceInfo> get androidInfo =>
+  _i10.Future<_i2.AndroidDeviceInfo> get androidInfo =>
       (super.noSuchMethod(
             Invocation.getter(#androidInfo),
-            returnValue: _i12.Future<_i2.AndroidDeviceInfo>.value(
+            returnValue: _i10.Future<_i2.AndroidDeviceInfo>.value(
               _FakeAndroidDeviceInfo_0(this, Invocation.getter(#androidInfo)),
             ),
           )
-          as _i12.Future<_i2.AndroidDeviceInfo>);
+          as _i10.Future<_i2.AndroidDeviceInfo>);
 
   @override
-  _i12.Future<_i3.IosDeviceInfo> get iosInfo =>
+  _i10.Future<_i3.IosDeviceInfo> get iosInfo =>
       (super.noSuchMethod(
             Invocation.getter(#iosInfo),
-            returnValue: _i12.Future<_i3.IosDeviceInfo>.value(
+            returnValue: _i10.Future<_i3.IosDeviceInfo>.value(
               _FakeIosDeviceInfo_1(this, Invocation.getter(#iosInfo)),
             ),
           )
-          as _i12.Future<_i3.IosDeviceInfo>);
+          as _i10.Future<_i3.IosDeviceInfo>);
 
   @override
-  _i12.Future<_i4.LinuxDeviceInfo> get linuxInfo =>
+  _i10.Future<_i4.LinuxDeviceInfo> get linuxInfo =>
       (super.noSuchMethod(
             Invocation.getter(#linuxInfo),
-            returnValue: _i12.Future<_i4.LinuxDeviceInfo>.value(
+            returnValue: _i10.Future<_i4.LinuxDeviceInfo>.value(
               _FakeLinuxDeviceInfo_2(this, Invocation.getter(#linuxInfo)),
             ),
           )
-          as _i12.Future<_i4.LinuxDeviceInfo>);
+          as _i10.Future<_i4.LinuxDeviceInfo>);
 
   @override
-  _i12.Future<_i5.WebBrowserInfo> get webBrowserInfo =>
+  _i10.Future<_i5.WebBrowserInfo> get webBrowserInfo =>
       (super.noSuchMethod(
             Invocation.getter(#webBrowserInfo),
-            returnValue: _i12.Future<_i5.WebBrowserInfo>.value(
+            returnValue: _i10.Future<_i5.WebBrowserInfo>.value(
               _FakeWebBrowserInfo_3(this, Invocation.getter(#webBrowserInfo)),
             ),
           )
-          as _i12.Future<_i5.WebBrowserInfo>);
+          as _i10.Future<_i5.WebBrowserInfo>);
 
   @override
-  _i12.Future<_i6.MacOsDeviceInfo> get macOsInfo =>
+  _i10.Future<_i6.MacOsDeviceInfo> get macOsInfo =>
       (super.noSuchMethod(
             Invocation.getter(#macOsInfo),
-            returnValue: _i12.Future<_i6.MacOsDeviceInfo>.value(
+            returnValue: _i10.Future<_i6.MacOsDeviceInfo>.value(
               _FakeMacOsDeviceInfo_4(this, Invocation.getter(#macOsInfo)),
             ),
           )
-          as _i12.Future<_i6.MacOsDeviceInfo>);
+          as _i10.Future<_i6.MacOsDeviceInfo>);
 
   @override
-  _i12.Future<_i7.WindowsDeviceInfo> get windowsInfo =>
+  _i10.Future<_i7.WindowsDeviceInfo> get windowsInfo =>
       (super.noSuchMethod(
             Invocation.getter(#windowsInfo),
-            returnValue: _i12.Future<_i7.WindowsDeviceInfo>.value(
+            returnValue: _i10.Future<_i7.WindowsDeviceInfo>.value(
               _FakeWindowsDeviceInfo_5(this, Invocation.getter(#windowsInfo)),
             ),
           )
-          as _i12.Future<_i7.WindowsDeviceInfo>);
+          as _i10.Future<_i7.WindowsDeviceInfo>);
 
   @override
-  _i12.Future<_i8.BaseDeviceInfo> get deviceInfo =>
+  _i10.Future<_i8.BaseDeviceInfo> get deviceInfo =>
       (super.noSuchMethod(
             Invocation.getter(#deviceInfo),
-            returnValue: _i12.Future<_i8.BaseDeviceInfo>.value(
+            returnValue: _i10.Future<_i8.BaseDeviceInfo>.value(
               _FakeBaseDeviceInfo_6(this, Invocation.getter(#deviceInfo)),
             ),
           )
-          as _i12.Future<_i8.BaseDeviceInfo>);
+          as _i10.Future<_i8.BaseDeviceInfo>);
 }
 
 /// A class which mocks [AndroidDeviceInfo].
@@ -316,7 +300,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get board =>
       (super.noSuchMethod(
             Invocation.getter(#board),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#board),
             ),
@@ -327,7 +311,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get bootloader =>
       (super.noSuchMethod(
             Invocation.getter(#bootloader),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#bootloader),
             ),
@@ -338,7 +322,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get brand =>
       (super.noSuchMethod(
             Invocation.getter(#brand),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#brand),
             ),
@@ -349,7 +333,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get device =>
       (super.noSuchMethod(
             Invocation.getter(#device),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#device),
             ),
@@ -360,7 +344,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get display =>
       (super.noSuchMethod(
             Invocation.getter(#display),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#display),
             ),
@@ -371,7 +355,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get fingerprint =>
       (super.noSuchMethod(
             Invocation.getter(#fingerprint),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#fingerprint),
             ),
@@ -382,7 +366,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get hardware =>
       (super.noSuchMethod(
             Invocation.getter(#hardware),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#hardware),
             ),
@@ -393,7 +377,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get host =>
       (super.noSuchMethod(
             Invocation.getter(#host),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#host),
             ),
@@ -404,7 +388,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get id =>
       (super.noSuchMethod(
             Invocation.getter(#id),
-            returnValue: _i15.dummyValue<String>(this, Invocation.getter(#id)),
+            returnValue: _i13.dummyValue<String>(this, Invocation.getter(#id)),
           )
           as String);
 
@@ -412,7 +396,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get manufacturer =>
       (super.noSuchMethod(
             Invocation.getter(#manufacturer),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#manufacturer),
             ),
@@ -423,7 +407,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get model =>
       (super.noSuchMethod(
             Invocation.getter(#model),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#model),
             ),
@@ -434,7 +418,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get product =>
       (super.noSuchMethod(
             Invocation.getter(#product),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#product),
             ),
@@ -445,7 +429,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get name =>
       (super.noSuchMethod(
             Invocation.getter(#name),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#name),
             ),
@@ -480,7 +464,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get tags =>
       (super.noSuchMethod(
             Invocation.getter(#tags),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#tags),
             ),
@@ -491,7 +475,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get type =>
       (super.noSuchMethod(
             Invocation.getter(#type),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#type),
             ),
@@ -518,7 +502,7 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
   String get serialNumber =>
       (super.noSuchMethod(
             Invocation.getter(#serialNumber),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#serialNumber),
             ),
@@ -573,7 +557,7 @@ class MockAndroidBuildVersion extends _i1.Mock
   String get codename =>
       (super.noSuchMethod(
             Invocation.getter(#codename),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#codename),
             ),
@@ -584,7 +568,7 @@ class MockAndroidBuildVersion extends _i1.Mock
   String get incremental =>
       (super.noSuchMethod(
             Invocation.getter(#incremental),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#incremental),
             ),
@@ -595,7 +579,7 @@ class MockAndroidBuildVersion extends _i1.Mock
   String get release =>
       (super.noSuchMethod(
             Invocation.getter(#release),
-            returnValue: _i15.dummyValue<String>(
+            returnValue: _i13.dummyValue<String>(
               this,
               Invocation.getter(#release),
             ),
@@ -613,127 +597,4 @@ class MockAndroidBuildVersion extends _i1.Mock
             returnValue: <String, dynamic>{},
           )
           as Map<String, dynamic>);
-}
-
-/// A class which mocks [BuildContext].
-///
-/// See the documentation for Mockito's code generation for more information.
-class MockBuildContext extends _i1.Mock implements _i9.BuildContext {
-  MockBuildContext() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  @override
-  _i9.Widget get widget =>
-      (super.noSuchMethod(
-            Invocation.getter(#widget),
-            returnValue: _FakeWidget_8(this, Invocation.getter(#widget)),
-          )
-          as _i9.Widget);
-
-  @override
-  bool get mounted =>
-      (super.noSuchMethod(Invocation.getter(#mounted), returnValue: false)
-          as bool);
-
-  @override
-  bool get debugDoingBuild =>
-      (super.noSuchMethod(
-            Invocation.getter(#debugDoingBuild),
-            returnValue: false,
-          )
-          as bool);
-
-  @override
-  _i9.InheritedWidget dependOnInheritedElement(
-    _i9.InheritedElement? ancestor, {
-    Object? aspect,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(
-              #dependOnInheritedElement,
-              [ancestor],
-              {#aspect: aspect},
-            ),
-            returnValue: _FakeInheritedWidget_9(
-              this,
-              Invocation.method(
-                #dependOnInheritedElement,
-                [ancestor],
-                {#aspect: aspect},
-              ),
-            ),
-          )
-          as _i9.InheritedWidget);
-
-  @override
-  void visitAncestorElements(_i9.ConditionalElementVisitor? visitor) =>
-      super.noSuchMethod(
-        Invocation.method(#visitAncestorElements, [visitor]),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void visitChildElements(_i9.ElementVisitor? visitor) => super.noSuchMethod(
-    Invocation.method(#visitChildElements, [visitor]),
-    returnValueForMissingStub: null,
-  );
-
-  @override
-  void dispatchNotification(_i16.Notification? notification) =>
-      super.noSuchMethod(
-        Invocation.method(#dispatchNotification, [notification]),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  _i10.DiagnosticsNode describeElement(
-    String? name, {
-    _i10.DiagnosticsTreeStyle? style = _i10.DiagnosticsTreeStyle.errorProperty,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#describeElement, [name], {#style: style}),
-            returnValue: _FakeDiagnosticsNode_10(
-              this,
-              Invocation.method(#describeElement, [name], {#style: style}),
-            ),
-          )
-          as _i10.DiagnosticsNode);
-
-  @override
-  _i10.DiagnosticsNode describeWidget(
-    String? name, {
-    _i10.DiagnosticsTreeStyle? style = _i10.DiagnosticsTreeStyle.errorProperty,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#describeWidget, [name], {#style: style}),
-            returnValue: _FakeDiagnosticsNode_10(
-              this,
-              Invocation.method(#describeWidget, [name], {#style: style}),
-            ),
-          )
-          as _i10.DiagnosticsNode);
-
-  @override
-  List<_i10.DiagnosticsNode> describeMissingAncestor({
-    required Type? expectedAncestorType,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#describeMissingAncestor, [], {
-              #expectedAncestorType: expectedAncestorType,
-            }),
-            returnValue: <_i10.DiagnosticsNode>[],
-          )
-          as List<_i10.DiagnosticsNode>);
-
-  @override
-  _i10.DiagnosticsNode describeOwnershipChain(String? name) =>
-      (super.noSuchMethod(
-            Invocation.method(#describeOwnershipChain, [name]),
-            returnValue: _FakeDiagnosticsNode_10(
-              this,
-              Invocation.method(#describeOwnershipChain, [name]),
-            ),
-          )
-          as _i10.DiagnosticsNode);
 }

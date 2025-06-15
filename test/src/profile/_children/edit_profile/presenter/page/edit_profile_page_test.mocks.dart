@@ -3,11 +3,16 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
-import 'dart:io' as _i5;
+import 'dart:async' as _i5;
+import 'dart:io' as _i6;
 
+import 'package:flutter/widgets.dart' as _i8;
+import 'package:image_picker/image_picker.dart' as _i10;
+import 'package:mobile/core/core.dart' as _i3;
 import 'package:mobile/src/profile/domain/models/user.dart' as _i2;
-import 'package:mobile/src/profile/profile.dart' as _i3;
+import 'package:mobile/src/profile/profile.dart' as _i4;
+import 'package:mobile/src/shared/models/gif_model.dart' as _i7;
+import 'package:mobile/src/shared/services/tenor_gif_service.dart' as _i9;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -29,38 +34,44 @@ class _FakeUser_0 extends _i1.SmartFake implements _i2.User {
     : super(parent, parentInvocation);
 }
 
+class _FakeValidationResult_1 extends _i1.SmartFake
+    implements _i3.ValidationResult {
+  _FakeValidationResult_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [ProfileRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockProfileRepository extends _i1.Mock implements _i3.ProfileRepository {
+class MockProfileRepository extends _i1.Mock implements _i4.ProfileRepository {
   MockProfileRepository() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.User> getCurrentUser(String? token) =>
+  _i5.Future<_i2.User> getCurrentUser(String? token) =>
       (super.noSuchMethod(
             Invocation.method(#getCurrentUser, [token]),
-            returnValue: _i4.Future<_i2.User>.value(
+            returnValue: _i5.Future<_i2.User>.value(
               _FakeUser_0(this, Invocation.method(#getCurrentUser, [token])),
             ),
           )
-          as _i4.Future<_i2.User>);
+          as _i5.Future<_i2.User>);
 }
 
 /// A class which mocks [EditProfileRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockEditProfileRepository extends _i1.Mock
-    implements _i3.EditProfileRepository {
+    implements _i4.EditProfileRepository {
   MockEditProfileRepository() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.User> updateUserProfile(
+  _i5.Future<_i2.User> updateUserProfile(
     Map<String, dynamic>? updates, {
-    _i5.File? profilePicture,
+    _i6.File? profilePicture,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -68,7 +79,7 @@ class MockEditProfileRepository extends _i1.Mock
               [updates],
               {#profilePicture: profilePicture},
             ),
-            returnValue: _i4.Future<_i2.User>.value(
+            returnValue: _i5.Future<_i2.User>.value(
               _FakeUser_0(
                 this,
                 Invocation.method(
@@ -79,5 +90,79 @@ class MockEditProfileRepository extends _i1.Mock
               ),
             ),
           )
-          as _i4.Future<_i2.User>);
+          as _i5.Future<_i2.User>);
+}
+
+/// A class which mocks [MediaPickerRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockMediaPickerRepository extends _i1.Mock
+    implements _i3.MediaPickerRepository {
+  MockMediaPickerRepository() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.Future<_i7.GifModel?> pickGifFromTenor({
+    required _i8.BuildContext? context,
+    _i9.TenorGifService? gifService,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#pickGifFromTenor, [], {
+              #context: context,
+              #gifService: gifService,
+            }),
+            returnValue: _i5.Future<_i7.GifModel?>.value(),
+          )
+          as _i5.Future<_i7.GifModel?>);
+
+  @override
+  _i5.Future<_i6.File?> pickImageFromGallery({
+    required _i8.BuildContext? context,
+    required _i3.MediaPickerConfig? config,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#pickImageFromGallery, [], {
+              #context: context,
+              #config: config,
+            }),
+            returnValue: _i5.Future<_i6.File?>.value(),
+          )
+          as _i5.Future<_i6.File?>);
+
+  @override
+  _i5.Future<_i6.File?> takePhoto({
+    required _i8.BuildContext? context,
+    required _i3.MediaPickerConfig? config,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#takePhoto, [], {
+              #context: context,
+              #config: config,
+            }),
+            returnValue: _i5.Future<_i6.File?>.value(),
+          )
+          as _i5.Future<_i6.File?>);
+
+  @override
+  _i5.Future<_i3.ValidationResult> validateFile({
+    required _i10.XFile? file,
+    required _i3.MediaPickerConfig? config,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#validateFile, [], {
+              #file: file,
+              #config: config,
+            }),
+            returnValue: _i5.Future<_i3.ValidationResult>.value(
+              _FakeValidationResult_1(
+                this,
+                Invocation.method(#validateFile, [], {
+                  #file: file,
+                  #config: config,
+                }),
+              ),
+            ),
+          )
+          as _i5.Future<_i3.ValidationResult>);
 }

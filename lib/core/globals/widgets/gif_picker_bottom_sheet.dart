@@ -25,7 +25,7 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
   bool _isLoadingMore = false;
   int _currentPage = 0;
   String? _currentQuery;
-  String? _nextTrendingPos; 
+  String? _nextTrendingPos;
   late final TenorGifService _gifService;
 
   @override
@@ -39,17 +39,19 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
       }
     });
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100 && !_isLoadingMore) {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 100 &&
+          !_isLoadingMore) {
         _loadMoreGifs();
       }
     });
   }
 
   Future<void> _loadTrending() async {
-    if(!mounted) return;
+    if (!mounted) return;
     setState(() => _loading = true);
     try {
-      _currentQuery = null; 
+      _currentQuery = null;
       final response = await _gifService.getTrendingGifs(pos: null);
       if (mounted) {
         setState(() {
@@ -70,19 +72,19 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
 
   Future<void> _search(String query) async {
     if (query.trim().isEmpty) {
-      _loadTrending(); 
+      _loadTrending();
       return;
     }
-    if(!mounted) return;
+    if (!mounted) return;
     setState(() => _loading = true);
     try {
       _currentQuery = query;
-      _currentPage = 0; 
+      _currentPage = 0;
       final gifs = await _gifService.searchGifs(query, pos: _currentPage);
       if (mounted) {
         setState(() {
           _gifs = gifs;
-          _nextTrendingPos = null; 
+          _nextTrendingPos = null;
           _loading = false;
         });
       }
@@ -102,12 +104,17 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
 
     try {
       List<GifModel> moreGifs = [];
-      if (_currentQuery != null) { 
+      if (_currentQuery != null) {
         _currentPage++;
-        final List<GifModel> newSearchGifs = await _gifService.searchGifs(_currentQuery!, pos: _currentPage);
+        final List<GifModel> newSearchGifs = await _gifService.searchGifs(
+          _currentQuery!,
+          pos: _currentPage,
+        );
         moreGifs.addAll(newSearchGifs);
       } else if (_nextTrendingPos != null) {
-        final response = await _gifService.getTrendingGifs(pos: _nextTrendingPos);
+        final response = await _gifService.getTrendingGifs(
+          pos: _nextTrendingPos,
+        );
         moreGifs.addAll(response.gifs);
         _nextTrendingPos = response.next;
       }
@@ -159,13 +166,13 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
             if (_loading)
               const Center(child: CircularProgressIndicator())
             else if (_gifs.isEmpty)
-               const Center(child: Text("No GIFs found.")) 
+              const Center(child: Text("No GIFs found."))
             else
               SizedBox(
                 height: 300,
                 child: GridView.builder(
                   controller: _scrollController,
-                  itemCount: _gifs.length + (_isLoadingMore ? 1 : 0), 
+                  itemCount: _gifs.length + (_isLoadingMore ? 1 : 0),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     mainAxisSpacing: 8,
@@ -177,6 +184,7 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
                     }
                     final gif = _gifs[index];
                     return GestureDetector(
+                      key: Key('gif_${gif.id}'),
                       onTap: () {
                         widget.onGifSelected(gif);
                       },
@@ -185,7 +193,9 @@ class _GifPickerBottomSheetState extends State<GifPickerBottomSheet> {
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, progress) {
                           if (progress == null) return child;
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         },
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(Icons.error_outline);

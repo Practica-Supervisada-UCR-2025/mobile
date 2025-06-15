@@ -208,7 +208,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     ProfileImagePicker(
-                      currentImage: widget.user.image,
+                      currentImage: _isRemovingImage ? '' : widget.user.image,
                       selectedImage: _selectedImage,
                       onImageSelected: _handleImageChanged,
                     ),

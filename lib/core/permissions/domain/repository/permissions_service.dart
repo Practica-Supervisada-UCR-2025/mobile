@@ -12,6 +12,9 @@ abstract class PermissionService {
 
   Future<PermissionStatus> getPhotosStatus();
   Future<PermissionStatus> requestPhotos();
-  
+
+  Future<PermissionStatus> getNotificationsStatus();
+  Future<PermissionStatus> requestNotifications();
+
   Future<bool> openSettings();
 }

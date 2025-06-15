@@ -17,15 +17,21 @@ class BottomBar extends StatefulWidget {
 
 class _BottomBarState extends State<BottomBar> {
   Future<void> _pickImageFromGallery() async {
-    final image = await MediaPickerService.pickImageFromGallery(
-      context: context,
-      onInvalidFile: (error) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
-      },
-      allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
-      maxSizeInBytes: MAX_IMAGE_SIZE,
-    );
+    final image = await context
+        .read<MediaPickerRepository>()
+        .pickImageFromGallery(
+          context: context,
+          config: MediaPickerConfig(
+            allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
+            maxSizeInBytes: MAX_IMAGE_SIZE,
+            onInvalidFile: (error) {
+              if (!mounted) return;
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(error)));
+            },
+          ),
+        );
 
     if (!mounted) return;
     if (image != null) {
@@ -34,14 +40,18 @@ class _BottomBarState extends State<BottomBar> {
   }
 
   Future<void> _takePhoto() async {
-    final photo = await MediaPickerService.takePhoto(
+    final photo = await context.read<MediaPickerRepository>().takePhoto(
       context: context,
-      onInvalidFile: (error) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
-      },
-      allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
-      maxSizeInBytes: MAX_IMAGE_SIZE,
+      config: MediaPickerConfig(
+        allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
+        maxSizeInBytes: MAX_IMAGE_SIZE,
+        onInvalidFile: (error) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error)));
+        },
+      ),
     );
 
     if (!mounted) return;
@@ -51,7 +61,9 @@ class _BottomBarState extends State<BottomBar> {
   }
 
   Future<void> _pickGifFromMediaPicker() async {
-    final GifModel? gif = await MediaPickerService.pickGifFromTenor(context: context);
+    final GifModel? gif = await context
+        .read<MediaPickerRepository>()
+        .pickGifFromTenor(context: context);
 
     if (!mounted) return;
     if (gif != null) {
@@ -68,15 +80,14 @@ class _BottomBarState extends State<BottomBar> {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           border: Border(
-            top: BorderSide(
-              color: Theme.of(context).dividerColor,
-            ),
+            top: BorderSide(color: Theme.of(context).dividerColor),
           ),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white10
-                  : Colors.black12,
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white10
+                      : Colors.black12,
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -107,9 +118,10 @@ class _BottomBarState extends State<BottomBar> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: isOverLimit
-                        ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).textTheme.bodyMedium?.color,
+                    color:
+                        isOverLimit
+                            ? Theme.of(context).colorScheme.error
+                            : Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 );
               },

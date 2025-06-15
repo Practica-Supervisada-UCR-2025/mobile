@@ -19,8 +19,8 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
     if (status.isGranted) return true;
 
     if (status.isPermanentlyDenied) {
-      if (context != null && context.mounted) {
-        PermissionSettingsDialog.show(context, 'camera');
+      if (context?.mounted == true) {
+        PermissionSettingsDialog.show(context!, 'camera');
       }
       return false;
     }
@@ -40,8 +40,8 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
       if (status.isGranted) return true;
 
       if (status.isPermanentlyDenied) {
-        if (context != null && context.mounted) {
-          PermissionSettingsDialog.show(context, 'gallery');
+        if (context?.mounted == true) {
+          PermissionSettingsDialog.show(context!, 'gallery');
         }
         return false;
       }
@@ -54,8 +54,8 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
       if (status.isGranted) return true;
 
       if (status.isPermanentlyDenied) {
-        if (context != null && context.mounted) {
-          PermissionSettingsDialog.show(context, 'storage');
+        if (context?.mounted == true) {
+          PermissionSettingsDialog.show(context!, 'storage');
         }
         return false;
       }
@@ -63,6 +63,32 @@ class PermissionsRepositoryImpl implements PermissionsRepository {
       status = await permissionService.requestStorage();
       return status.isGranted;
     }
+  }
+
+  @override
+  Future<bool> checkNotificationPermission({
+    BuildContext? context,
+    showDialogIfDenied,
+  }) async {
+    final androidInfo = await deviceInfoPlugin.androidInfo;
+    final sdkInt = androidInfo.version.sdkInt;
+
+    if (sdkInt < 33) return true;
+
+    var status = await permissionService.getNotificationsStatus();
+
+    if (status.isGranted) return true;
+
+    if (status.isPermanentlyDenied) {
+      if (showDialogIfDenied == true && context?.mounted == true) {
+        PermissionSettingsDialog.show(context!, 'notifications');
+      }
+
+      return false;
+    }
+
+    status = await permissionService.requestNotifications();
+    return status.isGranted;
   }
 
   @override
