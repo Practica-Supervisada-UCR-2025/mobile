@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/core.dart';
 
 class ShowOwnPublicationsPage extends StatelessWidget {
@@ -7,10 +6,8 @@ class ShowOwnPublicationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => PublicationBloc(
-        publicationRepository: PublicationRepositoryAPI(endpoint: ENDPOINT_OWN_PUBLICATIONS),
-      )..add(LoadPublications()),
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
       child: const PublicationsList(scrollKey: "ownPosts"),
     );
   }

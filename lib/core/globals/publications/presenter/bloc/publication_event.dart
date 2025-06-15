@@ -7,6 +7,20 @@ abstract class PublicationEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadPublications extends PublicationEvent {}
+class LoadPublications extends PublicationEvent {
+  final bool isFeed;
 
-class LoadMorePublications extends PublicationEvent {}
+  const LoadPublications({this.isFeed = false});
+
+  @override
+  List<Object> get props => [isFeed];
+}
+
+class LoadMorePublications extends PublicationEvent {
+  final bool isFeed;
+
+  const LoadMorePublications({this.isFeed = false});
+
+  @override
+  List<Object> get props => [isFeed];
+}

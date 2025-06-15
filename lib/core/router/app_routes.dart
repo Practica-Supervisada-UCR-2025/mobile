@@ -47,12 +47,17 @@ final List<RouteBase> appRoutes = [
         builder: (context, state) {
           return RepositoryProvider<PublicationRepository>(
             create: (context) => PublicationRepositoryAPI(
-              endpoint: ENDPOINT_OWN_PUBLICATIONS,
+              endpoint: ENDPOINT_FEED_PUBLICATIONS,
             ),
             child: BlocProvider<PublicationBloc>(
-              create: (context) => PublicationBloc(
-                publicationRepository: context.read<PublicationRepository>(),
-              )..add(LoadPublications()),
+              create: (context) {
+                final bloc = PublicationBloc(
+                  publicationRepository: context.read<PublicationRepository>(),
+                );
+                bloc.add(LoadPublications(isFeed: true));
+                bloc.add(LoadMorePublications(isFeed: true));
+                return bloc;
+              },
               child: const HomeScreen(),
             ),
           );
