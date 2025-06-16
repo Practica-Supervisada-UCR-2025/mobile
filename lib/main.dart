@@ -119,6 +119,9 @@ class MyApp extends StatelessWidget {
                 apiService: context.read<ApiService>(),
               ),
         ),
+        RepositoryProvider<ReportPublicationRepository>(
+          create: (context) => ReportPublicationRepositoryAPI(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -166,6 +169,13 @@ class MyApp extends StatelessWidget {
             create:
                 (context) => SearchBloc(
                   searchUsersRepository: context.read<SearchUsersRepository>(),
+                ),
+          ),
+          BlocProvider<ReportPublicationBloc>(
+            create:
+                (context) => ReportPublicationBloc(
+                  reportPublicationRepository:
+                      context.read<ReportPublicationRepository>(),
                 ),
           ),
         ],
