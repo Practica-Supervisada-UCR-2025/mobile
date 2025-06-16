@@ -49,7 +49,7 @@ class _PublicationsListState extends State<PublicationsList>
     if (thresholdReached &&
         state is PublicationSuccess &&
         !state.hasReachedMax) {
-      _bloc.add(LoadMorePublications());
+      _bloc.add(LoadMorePublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
     }
 
     final shouldShow = _scrollController.offset > 600;
@@ -64,7 +64,7 @@ class _PublicationsListState extends State<PublicationsList>
     setState(() {
       _showRefreshButton = false;
     });
-    _bloc.add(RefreshPublications());
+    _bloc.add(RefreshPublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
 
     await _bloc.stream.firstWhere(
       (state) => state is PublicationSuccess || state is PublicationFailure,
