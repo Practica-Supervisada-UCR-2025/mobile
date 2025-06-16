@@ -16,7 +16,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true; // Keep the state when navigating back
-  bool shouldRefresh = false; // Flag to trigger publications refresh
 
   @override
   void initState() {
@@ -27,23 +26,6 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   void _loadProfile() {
     context.read<ProfileBloc>().add(ProfileLoad());
-  }
-
-  // Refresh publications after creating a new post
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final extra = GoRouterState.of(context).extra;
-    if (extra is Map && extra['refresh'] == true) {
-      setState(() {
-        shouldRefresh = true;
-      });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          shouldRefresh = false;
-        });
-      });
-    }
   }
 
   @override

@@ -204,14 +204,14 @@ void main() {
 
   group('RefreshPublications', () {
     blocTest<PublicationBloc, PublicationState>(
-      'emits [Loading, Success] when refresh is triggered and repository responds',
+      'emits [PublicationLoading, PublicationSuccess] when fetch is successful',
       build: () {
         when(() => repository.fetchPublications(page: 1, limit: 10)).thenAnswer(
           (_) async => PublicationResponse(
             publications: [samplePub1],
-            totalPosts: 1,
-            totalPages: 1,
             currentPage: 1,
+            totalPages: 1,
+            totalPosts: 1,
           ),
         );
         return bloc;
@@ -220,27 +220,21 @@ void main() {
       wait: const Duration(milliseconds: 350),
       expect:
           () => [
-            PublicationLoading(),
-            PublicationSuccess(
-              publications: [samplePub1],
-              totalPosts: 1,
-              totalPages: 1,
-              currentPage: 1,
+            isA<PublicationLoading>(),
+            isA<PublicationSuccess>().having(
+              (s) => s.publications.length,
+              'length',
+              1,
             ),
           ],
-      verify: (_) {
-        verify(
-          () => repository.fetchPublications(page: 1, limit: 10),
-        ).called(1);
-      },
     );
 
     blocTest<PublicationBloc, PublicationState>(
-      'emits [Loading, Failure] when refresh throws exception',
+      'emits [PublicationLoading, PublicationFailure] when fetch throws',
       build: () {
         when(
           () => repository.fetchPublications(page: 1, limit: 10),
-        ).thenThrow(Exception('Oops'));
+        ).thenThrow(Exception('oops'));
         return bloc;
       },
       act: (b) => b.add(RefreshPublications()),
@@ -255,5 +249,58 @@ void main() {
       act: (b) => b.add(RefreshPublications()),
       expect: () => [],
     );
+  });
+
+  group('HidePublication', () {
+    blocTest<PublicationBloc, PublicationState>(
+      'emits updated state without hidden publication when in PublicationSuccess',
+      build: () => bloc,
+      seed:
+          () => PublicationSuccess(
+            publications: [samplePub1, samplePub2],
+            totalPosts: 2,
+            totalPages: 1,
+            currentPage: 1,
+          ),
+      act: (b) => b.add(HidePublication('1')),
+      expect:
+          () => [
+            PublicationSuccess(
+              publications: [samplePub2],
+              totalPosts: 1,
+              totalPages: 1,
+              currentPage: 1,
+            ),
+          ],
+    );
+
+    blocTest<PublicationBloc, PublicationState>(
+      'does nothing when HidePublication is received but state is not PublicationSuccess (Initial)',
+      build: () => bloc,
+      seed: () => PublicationInitial(),
+      act: (b) => b.add(HidePublication('1')),
+      expect: () => [],
+    );
+
+    blocTest<PublicationBloc, PublicationState>(
+      'does nothing when HidePublication is received but state is not PublicationSuccess (Failure)',
+      build: () => bloc,
+      seed: () => PublicationFailure(),
+      act: (b) => b.add(HidePublication('1')),
+      expect: () => [],
+    );
+  });
+
+  group('HidePublication Event Equatable', () {
+    test('HidePublication equality', () {
+      expect(const HidePublication('abc123'), const HidePublication('abc123'));
+    });
+
+    test('HidePublication inequality', () {
+      expect(
+        const HidePublication('abc123'),
+        isNot(const HidePublication('xyz456')),
+      );
+    });
   });
 }

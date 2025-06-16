@@ -33,3 +33,12 @@ class RefreshPublications extends PublicationEvent {
   @override
   List<Object> get props => [isFeed];
 }
+
+class HidePublication extends PublicationEvent {
+  final String publicationId;
+
+  const HidePublication(this.publicationId);
+
+  @override
+  List<Object> get props => [publicationId];
+}
