@@ -11,7 +11,6 @@ class CommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("CommentsPage: publication.id = ${publication.id}");
     final unifiedBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return Scaffold(
@@ -30,7 +29,6 @@ class CommentsPage extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) {
-              print('[BlocProvider] postId enviado al Bloc: ${publication.id}');
               return CommentsLoadBloc(
                 repository: CommentsRepositoryImpl(
                   apiService: Provider.of<ApiService>(context, listen: false),
