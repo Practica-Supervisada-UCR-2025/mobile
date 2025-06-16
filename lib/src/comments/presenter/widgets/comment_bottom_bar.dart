@@ -26,15 +26,21 @@ class CommentBottomBar extends StatefulWidget {
 
 class _CommentBottomBarState extends State<CommentBottomBar> {
   Future<void> _pickImageFromGallery() async {
-    final image = await MediaPickerService.pickImageFromGallery(
-      context: context,
-      onInvalidFile: (error) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
-      },
-      allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
-      maxSizeInBytes: MAX_IMAGE_SIZE,
-    );
+    final image = await context
+        .read<MediaPickerRepository>()
+        .pickImageFromGallery(
+          context: context,
+          config: MediaPickerConfig(
+            allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
+            maxSizeInBytes: MAX_IMAGE_SIZE,
+            onInvalidFile: (error) {
+              if (!mounted) return;
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(error)));
+            },
+          ),
+        );
 
     if (!mounted) return;
     if (image != null) {
@@ -44,14 +50,18 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
   }
 
   Future<void> _takePhoto() async {
-    final photo = await MediaPickerService.takePhoto(
+    final photo = await context.read<MediaPickerRepository>().takePhoto(
       context: context,
-      onInvalidFile: (error) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
-      },
-      allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
-      maxSizeInBytes: MAX_IMAGE_SIZE,
+      config: MediaPickerConfig(
+        allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
+        maxSizeInBytes: MAX_IMAGE_SIZE,
+        onInvalidFile: (error) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error)));
+        },
+      ),
     );
 
     if (!mounted) return;
@@ -63,14 +73,16 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
 
   Future<void> _pickGifFromMediaPicker() async {
     widget.onGifPickerOpened?.call();
-    
-    final GifModel? gif = await MediaPickerService.pickGifFromTenor(context: context);
+
+    final GifModel? gif = await context
+        .read<MediaPickerRepository>()
+        .pickGifFromTenor(context: context);
 
     if (!mounted) return;
-    
+
     if (gif != null) {
       widget.onImageSelected(null);
-      
+
       if (widget.onGifSelected != null) {
         widget.onGifSelected!(gif);
       } else {
@@ -89,9 +101,7 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
       bottom: true,
       child: Container(
         padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0, top: 0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-        ),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
         child: Row(
           children: [
             IconButton(
@@ -117,9 +127,10 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: isOverLimit
-                        ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).textTheme.bodyMedium?.color,
+                    color:
+                        isOverLimit
+                            ? Theme.of(context).colorScheme.error
+                            : Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 );
               },
@@ -145,12 +156,16 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
               },
               builder: (context, state) {
                 final isEnabled = state.isValid;
-                
+
                 final replyButton = TextButton(
                   onPressed: null,
                   style: TextButton.styleFrom(
-                    backgroundColor: isEnabled ? AppColors.primary 
-                    : AppColors.getDisabledPostButtonColor(Theme.of(context).brightness),
+                    backgroundColor:
+                        isEnabled
+                            ? AppColors.primary
+                            : AppColors.getDisabledPostButtonColor(
+                              Theme.of(context).brightness,
+                            ),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -172,50 +187,66 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
                   builder: (context, constraints) {
                     return Stack(
                       children: [
-                        Opacity(
-                          opacity: 0,
-                          child: replyButton,
-                        ),
+                        Opacity(opacity: 0, child: replyButton),
                         Positioned.fill(
-                          child: state is CommentSubmitting
-                              ? const Center(
-                                  child: SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
+                          child:
+                              state is CommentSubmitting
+                                  ? const Center(
+                                    child: SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.0,
+                                      ),
+                                    ),
+                                  )
+                                  : TextButton(
+                                    onPressed:
+                                        isEnabled
+                                            ? () {
+                                              final bloc =
+                                                  context
+                                                      .read<
+                                                        CommentsCreateBloc
+                                                      >();
+                                              bloc.add(
+                                                CommentSubmitted(
+                                                  postId: widget.postId,
+                                                  text: state.text,
+                                                  image: state.image,
+                                                  selectedGif:
+                                                      state.selectedGif,
+                                                ),
+                                              );
+                                            }
+                                            : null,
+                                    style: TextButton.styleFrom(
+                                      backgroundColor:
+                                          isEnabled
+                                              ? AppColors.primary
+                                              : AppColors.getDisabledPostButtonColor(
+                                                Theme.of(context).brightness,
+                                              ),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      minimumSize: const Size(0, 0),
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Reply',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
-                                )
-                              : TextButton(
-                                  onPressed: isEnabled ? () {
-                                    final bloc = context.read<CommentsCreateBloc>();
-                                    bloc.add(CommentSubmitted(
-                                      postId: widget.postId,
-                                      text: state.text,
-                                      image: state.image,
-                                      selectedGif: state.selectedGif,
-                                    ));
-                                  } : null,
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: isEnabled ? AppColors.primary 
-                                    : AppColors.getDisabledPostButtonColor(Theme.of(context).brightness),
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                    minimumSize: const Size(0, 0),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Reply',
-                                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-                                  ),
-                                ),
                         ),
                       ],
                     );
