@@ -17,3 +17,7 @@ const DEFAULT_PROFILE_PIC_2 =
     'https://utfs.io/f/Ri7z8Bp5NkcuKusSJHzg7svjdQTeVIL2qyOpRG9W4XnzUto6';
 
 const ENDPOINT_OWN_PUBLICATIONS = 'user/posts/mine';
+
+const ENDPOINT_FEED_PUBLICATIONS = 'posts/feed';
+
+const ENDPOINT_PUBLICATIONS_FROM_OTHERS = 'posts/user/';

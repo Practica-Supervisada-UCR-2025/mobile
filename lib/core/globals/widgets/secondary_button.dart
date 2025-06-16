@@ -43,7 +43,7 @@ Widget build(BuildContext context) {
               )
             : Text(
                 text,
-                style: Theme.of(context).textTheme.labelMedium, // Estilo más pequeño
+                style: Theme.of(context).textTheme.labelMedium,
               ),
       ),
     ),

@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:mobile/core/globals/publications/publications.dart';
-import 'package:mobile/src/home/home.dart';
+import 'package:mobile/src/profile/_children/_children.dart';
 
 void main() {
   testWidgets(
-    'HomePage builds the BlocProvider and displays PublicationsList',
+    'ShowPostFromOthersPage builds the BlocProvider and displays PublicationsList',
     (WidgetTester tester) async {
+      const testUserId = '123';
+
       await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<PublicationBloc>(
-            create: (_) => PublicationBloc(
-              publicationRepository: _FakeFailureRepository(),
-            ),
-            child: HomeScreen(isFeed: true),
-          ),
-        ),
+        MaterialApp(home: ShowPostFromOthersPage(userId: testUserId)),
       );
+
       expect(find.byType(BlocProvider<PublicationBloc>), findsOneWidget);
       expect(find.byType(PublicationsList), findsOneWidget);
     },
@@ -34,7 +31,7 @@ void main() {
         MaterialApp(
           home: BlocProvider<PublicationBloc>.value(
             value: failureBloc,
-            child: const PublicationsList(scrollKey: "homePage", isFeed: true, isOtherUser: false),
+            child: const PublicationsList(scrollKey: "otherPosts", isFeed: true, isOtherUser: true),
           ),
         ),
       );
@@ -46,7 +43,6 @@ void main() {
       expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
 
       await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
-
       await tester.pumpAndSettle();
 
       expect(find.text('Failed to load posts'), findsOneWidget);

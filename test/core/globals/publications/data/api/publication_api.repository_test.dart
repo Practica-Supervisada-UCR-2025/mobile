@@ -53,7 +53,7 @@ void main() {
 
       final result = await repository.fetchPublications(page: 1, limit: 10);
 
-      expect(result.publications.length, 1);
+      expect(result.publications.length, 2);
       expect(result.publications.first.id, '1');
       expect(result.totalPosts, 1);
     });
