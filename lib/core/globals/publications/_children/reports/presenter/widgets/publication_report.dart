@@ -14,6 +14,13 @@ class ReportBottomSheet extends StatefulWidget {
 class _ReportBottomSheetState extends State<ReportBottomSheet> {
   String selectedReason = 'Inappropriate content';
   String otherReasonText = '';
+  late PublicationBloc _publicationBloc;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _publicationBloc = context.read<PublicationBloc>();
+  }
 
   final List<String> reasons = [
     'Inappropriate content',
@@ -65,6 +72,11 @@ class _ReportBottomSheetState extends State<ReportBottomSheet> {
         Widget content;
 
         if (state is ReportPublicationSuccess) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _publicationBloc.add(HidePublication(widget.publicationId));
+            }
+          });
           content = FeedbackContent(
             icon: Icons.check_circle_outline,
             color: Colors.green,

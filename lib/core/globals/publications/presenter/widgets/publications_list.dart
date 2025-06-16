@@ -59,18 +59,25 @@ class _PublicationsListState extends State<PublicationsList>
   }
 
   Future<void> _onRefresh() async {
-    setState(() => _showRefreshButton = false);
-    if (_scrollController.hasClients) {
-      await _scrollController.animateTo(
-        0.0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-      ScrollStorage.setOffset(widget.scrollKey, 0.0);
-    }
-
+    setState(() {
+      _showRefreshButton = false;
+    });
     _bloc.add(RefreshPublications());
-    await Future.delayed(const Duration(milliseconds: 300));
+
+    await _bloc.stream.firstWhere(
+      (state) => state is PublicationSuccess || state is PublicationFailure,
+    );
+
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
