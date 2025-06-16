@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
 
 class ShowOwnPublicationsPage extends StatefulWidget {
-  const ShowOwnPublicationsPage({super.key});
+  final bool isFeed;
+  const ShowOwnPublicationsPage({super.key, required this.isFeed});
 
   @override
   State<ShowOwnPublicationsPage> createState() =>
@@ -53,7 +54,7 @@ class _ShowOwnPublicationsPageState extends State<ShowOwnPublicationsPage> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _publicationBloc,
-      child: const PublicationsList(scrollKey: "ownPosts"),
+      child: const PublicationsList(scrollKey: "ownPosts", isFeed: false),
     );
   }
 }

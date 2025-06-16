@@ -5,7 +5,8 @@ import 'package:mobile/core/core.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool isFeed;
+  const ProfileScreen({super.key, required this.isFeed});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -15,6 +16,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true; // Keep the state when navigating back
+  //bool shouldRefresh = false; // Flag to trigger publications refresh
 
   @override
   void initState() {
@@ -26,6 +28,23 @@ class _ProfileScreenState extends State<ProfileScreen>
   void _loadProfile() {
     context.read<ProfileBloc>().add(ProfileLoad());
   }
+
+  // Refresh publications after creating a new post
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   final extra = GoRouterState.of(context).extra;
+  //   if (extra is Map && extra['refresh'] == true) {
+  //     setState(() {
+  //       shouldRefresh = true;
+  //     });
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       setState(() {
+  //         shouldRefresh = false;
+  //       });
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +115,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     const SizedBox(height: 20),
                     Divider(color: Theme.of(context).colorScheme.outline),
-                    Expanded(child: ShowOwnPublicationsPage()),
+                    Expanded(
+                      child: ShowOwnPublicationsPage(
+                        isFeed: widget.isFeed,
+                      ),
+                    ),
                   ],
                 );
               } else if (state is ProfileFailure) {

@@ -59,7 +59,7 @@ void main() {
                       value: mockPublicationBloc,
                     ),
                   ],
-                  child: const ProfileScreen(),
+                  child: const ProfileScreen(isFeed: false),
                 ),
               ),
         ),

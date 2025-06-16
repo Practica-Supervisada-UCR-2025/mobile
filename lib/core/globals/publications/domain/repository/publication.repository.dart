@@ -18,5 +18,6 @@ abstract class PublicationRepository {
   Future<PublicationResponse> fetchPublications({
     required int page,
     required int limit,
+    String? time,
   });
 }

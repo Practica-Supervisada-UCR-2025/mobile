@@ -14,7 +14,7 @@ void main() {
         routes: [
           GoRoute(
             path: '/',
-            builder: (context, state) => const ShowOwnPublicationsPage(),
+            builder: (context, state) => const ShowOwnPublicationsPage(isFeed: false),
           ),
         ],
       );
@@ -39,7 +39,7 @@ void main() {
         MaterialApp(
           home: BlocProvider<PublicationBloc>.value(
             value: failureBloc,
-            child: const PublicationsList(scrollKey: "homePage"),
+            child: const PublicationsList(scrollKey: "homePage", isFeed: false),
           ),
         ),
       );
@@ -67,6 +67,7 @@ class _FakeFailureRepository implements PublicationRepository {
   Future<PublicationResponse> fetchPublications({
     required int page,
     required int limit,
+    String? time,
   }) async {
     await Future.delayed(const Duration(milliseconds: 50));
     throw Exception('simulated failure');
