@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:mobile/core/constants/constants.dart';
-import 'package:mobile/core/storage/storage.dart';
-import 'package:mobile/core/globals/publications/publications.dart';
-
+import 'package:mobile/src/profile/profile.dart';
+import 'package:mobile/core/core.dart';
 class PublicationRepositoryAPI implements PublicationRepository {
   final http.Client client;
   static const _baseUrl = API_POST_BASE_URL;
@@ -28,6 +26,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
       throw Exception('No JWT token found');
     }
 
+    
     late final Uri uri;
     if (time != null && time.isNotEmpty) {
       if (isOtherUser == true) {
@@ -68,6 +67,20 @@ class PublicationRepositoryAPI implements PublicationRepository {
 
     final List<Publication> publications = [];
 
+    User user;
+    if (isOtherUser == true){
+      final userId = postsJson[0]['user_id'] is String
+          ? postsJson[0]['user_id'] as String
+          : LocalStorage().userId;
+      final profileRepo = ProfileRepositoryAPI(apiService: ApiServiceImpl());
+      user = await profileRepo.getUserProfile(userId, LocalStorage().accessToken);
+    } else{
+      user = User(email: "",
+                  username: LocalStorage().username,
+                  image: LocalStorage().userProfilePicture,
+                  firstName: "",
+                  lastName: "");
+    }
     for (final raw in postsJson) {
       if (raw is Map<String, dynamic>) {
         final String id = raw['id'] is String ? raw['id'] as String : '';
@@ -80,12 +93,12 @@ class PublicationRepositoryAPI implements PublicationRepository {
         final String username =
             raw['username'] is String ? raw['username'] 
             : LocalStorage().username.isNotEmpty
-                ? LocalStorage().username
+                ? user.username
                 : 'User';
         final imageUrl =
             raw['profile_picture'] is String ? raw['profile_picture'] 
             : LocalStorage().userProfilePicture.isNotEmpty
-                ? LocalStorage().userProfilePicture
+                ? user.image
                 : DEFAULT_PROFILE_PIC;
 
         DateTime createdAt;

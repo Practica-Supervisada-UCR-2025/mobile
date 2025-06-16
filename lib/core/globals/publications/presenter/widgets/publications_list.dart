@@ -6,8 +6,9 @@ import 'package:mobile/core/storage/storage.dart';
 class PublicationsList extends StatefulWidget {
   final bool isFeed;
   final String scrollKey;
+  final bool isOtherUser;
 
-  const PublicationsList({super.key, required this.scrollKey, required this.isFeed});
+  const PublicationsList({super.key, required this.scrollKey, required this.isFeed, required this.isOtherUser});
 
   @override
   State<PublicationsList> createState() => _PublicationsListState();
@@ -70,7 +71,7 @@ class _PublicationsListState extends State<PublicationsList>
       ScrollStorage.setOffset(widget.scrollKey, 0.0);
     }
     
-    _bloc.add(RefreshPublications(isFeed: widget.isFeed));
+    _bloc.add(RefreshPublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
     await Future.delayed(const Duration(milliseconds: 300));
   }
 

@@ -10,7 +10,7 @@ class ShowOwnPublicationsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).colorScheme.surface,
-      child: PublicationsList(scrollKey: "ownPosts", isFeed: isFeed),
+      child: PublicationsList(scrollKey: "ownPosts", isFeed: isFeed, isOtherUser: false),
     );
   }
 }
