@@ -12,15 +12,12 @@ import 'package:mobile/core/globals/publications/publications.dart'
         PublicationEvent,
         PublicationState,
         LoadPublications,
-        LoadMorePublications,
         PublicationInitial,
         PublicationLoading,
         PublicationFailure,
         PublicationSuccess,
-        Publication,
-        PublicationsList,
-        PublicationCard;
-
+        PublicationsList;
+        
 class MockPublicationBloc extends Mock implements PublicationBloc {}
 
 class FakePublicationEvent extends Fake implements PublicationEvent {}
