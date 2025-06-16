@@ -103,8 +103,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                     if(isOwnProfile)
                       Expanded(
                         child: ShowOwnPublicationsPage(
-                          key: ValueKey(shouldRefresh),
-                          refresh: shouldRefresh,
                           isFeed: widget.isFeed,
                         ),
                       ),
@@ -112,8 +110,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                       Expanded(
                         child: ShowPostFromOthersPage(
                           userId: widget.userId!,
-                          key: ValueKey(shouldRefresh),
-                          refresh: shouldRefresh,
                           isFeed: widget.isFeed,
                         ),
                       ),
