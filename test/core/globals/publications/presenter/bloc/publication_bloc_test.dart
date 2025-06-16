@@ -217,6 +217,7 @@ void main() {
         return bloc;
       },
       act: (b) => b.add(RefreshPublications()),
+      wait: const Duration(milliseconds: 350),
       expect:
           () => [
             PublicationLoading(),
@@ -243,6 +244,7 @@ void main() {
         return bloc;
       },
       act: (b) => b.add(RefreshPublications()),
+      wait: const Duration(milliseconds: 350),
       expect: () => [PublicationLoading(), PublicationFailure()],
     );
 

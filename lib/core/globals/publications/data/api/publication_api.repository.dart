@@ -57,9 +57,6 @@ class PublicationRepositoryAPI implements PublicationRepository {
         postsJson.addAll(body['data'] as List<dynamic>);
       }
     }
-    if (body.containsKey('data') && body['data'] is List) {
-      postsJson.addAll(body['data'] as List<dynamic>);
-    }
 
     final List<Publication> publications = [];
 

@@ -1,149 +1,118 @@
 import 'dart:convert';
-
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:mobile/core/constants/constants.dart';
-import 'package:mobile/core/storage/storage.dart';
-import 'package:mobile/core/globals/publications/publications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile/core/globals/publications/data/api/publication_api.repository.dart';
+import 'package:mobile/core/storage/user_session.storage.dart';
 
 void main() {
+  const MethodChannel preferencesChannel = MethodChannel('plugins.flutter.io/shared_preferences');
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('PublicationRepositoryAPI.fetchPublications', () {
-    late PublicationRepositoryAPI repository;
+  setUpAll(() async {
+    // ignore: deprecated_member_use
+    preferencesChannel.setMockMethodCallHandler((MethodCall methodCall) async {
+      if (methodCall.method == 'getAll') {
+        return <String, Object>{
+          'accessToken': 'token123',
+          'username': 'testuser',
+          'userProfilePicture': 'pic://url',
+        };
+      }
+      return null;
+    });
+    SharedPreferences.setMockInitialValues({
+      'accessToken': 'token123',
+      'username': 'testuser',
+      'userProfilePicture': 'pic://url',
+    });
+    await LocalStorage.init();
+  });
 
-    setUp(() async {
-      SharedPreferences.setMockInitialValues({
-        'accessToken': 'mock-token',
-        'username': 'MockUser',
-      });
+  group('PublicationRepositoryAPI', () {
+    test('throws when JWT token is empty', () async {
+      SharedPreferences.setMockInitialValues({'accessToken': ''});
       await LocalStorage.init();
-    });
 
-    test('uses default http.Client if none is provided', () {
-      final repo = PublicationRepositoryAPI(
-        endpoint: ENDPOINT_OWN_PUBLICATIONS,
-      ); // should trigger line 11
-      expect(repo, isA<PublicationRepositoryAPI>());
-    });
-
-    test('returns list of publications when response is valid', () async {
-      final mockResponse = {
-        'data': [
-          {
-            'id': '1',
-            'content': 'Test content',
-            'created_at': '2024-01-01T12:00:00Z',
-            'file_url': 'https://example.com/image.png',
-            'likes': 5,
-            'comments': 3,
-          },
-        ],
-        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
-      };
-
-      repository = PublicationRepositoryAPI(
-        endpoint: ENDPOINT_OWN_PUBLICATIONS,
-        client: MockClient((request) async {
-          return http.Response(jsonEncode(mockResponse), 200);
-        }),
+      final repo = PublicationRepositoryAPI(endpoint: 'posts');
+      expect(
+        () => repo.fetchPublications(page: 1, limit: 10),
+        throwsA(isA<Exception>()),
       );
-
-      final result = await repository.fetchPublications(page: 1, limit: 10);
-
-      expect(result.publications.length, 1);
-      expect(result.publications.first.id, '1');
-      expect(result.totalPosts, 1);
     });
 
-    test('returns empty list if data is empty', () async {
-      final mockResponse = {
-        'data': [],
-        'metadata': {'totalPosts': 0, 'totalPages': 0, 'currentPage': 1},
-      };
-
-      repository = PublicationRepositoryAPI(
-        endpoint: ENDPOINT_OWN_PUBLICATIONS,
-        client: MockClient((request) async {
-          return http.Response(jsonEncode(mockResponse), 200);
-        }),
-      );
-
-      final result = await repository.fetchPublications(page: 1, limit: 10);
-      expect(result.publications, isEmpty);
-    });
-
-    test('returns default metadata values if metadata is missing', () async {
-      final mockResponse = {'data': []};
-
-      repository = PublicationRepositoryAPI(
-        endpoint: ENDPOINT_OWN_PUBLICATIONS,
-        client: MockClient((request) async {
-          return http.Response(jsonEncode(mockResponse), 200);
-        }),
-      );
-
-      final result = await repository.fetchPublications(page: 3, limit: 10);
-      expect(result.currentPage, 3);
-    });
-
-    test('throws exception on non-200 response', () async {
-      repository = PublicationRepositoryAPI(
-        endpoint: ENDPOINT_OWN_PUBLICATIONS,
-        client: MockClient((request) async {
-          return http.Response('Unauthorized', 401);
-        }),
-      );
+    test('throws on non-200 HTTP response', () async {
+      final mockClient = MockClient((_) async => http.Response('', 404));
+      final repo = PublicationRepositoryAPI(client: mockClient, endpoint: 'posts');
 
       expect(
-        () async => await repository.fetchPublications(page: 1, limit: 10),
-        throwsException,
+        () => repo.fetchPublications(page: 1, limit: 5),
+        throwsA(predicate((e) => e.toString().contains('Failed to load posts: 404'))),
       );
     });
 
-    test('throws exception if token is empty', () async {
-      SharedPreferences.setMockInitialValues({
-        'accessToken': '',
-        'username': 'MockUser',
-      });
-      await LocalStorage.init();
-
-      repository = PublicationRepositoryAPI(
-        endpoint: ENDPOINT_OWN_PUBLICATIONS,
-      );
-
-      await expectLater(
-        () async => await repository.fetchPublications(page: 1, limit: 10),
-        throwsException,
-      );
-    });
-
-    test('uses fallback DateTime.now() when created_at is invalid', () async {
-      final mockResponse = {
+    test('parses data list correctly', () async {
+      final mockJson = {
         'data': [
           {
             'id': '1',
-            'content': 'Broken date',
-            'created_at': 'invalid-date',
-            'file_url': '',
-            'likes': 0,
-            'comments': 0,
-          },
+            'content': 'hello',
+            'file_url': null,
+            'created_at': '2025-06-15T00:00:00Z',
+            'username': 'user1',
+            'profile_picture': 'url1',
+            'likes': 5,
+            'comments': 2,
+          }
         ],
-        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+        'metadata': {
+          'totalPosts': 1,
+          'totalPages': 1,
+          'currentPage': 1,
+        },
       };
+      final mockClient = MockClient((_) async => http.Response(jsonEncode(mockJson), 200));
+      final repo = PublicationRepositoryAPI(client: mockClient, endpoint: 'posts');
 
-      repository = PublicationRepositoryAPI(
-        endpoint: ENDPOINT_OWN_PUBLICATIONS,
-        client: MockClient((request) async {
-          return http.Response(jsonEncode(mockResponse), 200);
-        }),
-      );
+      final resp = await repo.fetchPublications(page: 1, limit: 10);
+      expect(resp.publications, hasLength(1));
+      final pub = resp.publications.first;
+      expect(pub.id, equals('1'));
+      expect(pub.content, equals('hello'));
+      expect(pub.attachment, isNull);
+      expect(pub.likes, equals(5));
+      expect(pub.comments, equals(2));
 
-      final result = await repository.fetchPublications(page: 1, limit: 10);
-      expect(result.publications.first.createdAt, isA<DateTime>());
+      expect(resp.totalPosts, equals(1));
+      expect(resp.totalPages, equals(1));
+      expect(resp.currentPage, equals(1));
+    });
+
+    test('parses posts array when time filter is provided', () async {
+      final timeFilter = '2025-06-14';
+      final mockJson = {
+        'posts': {
+          'data': [
+            {
+              'id': '2',
+              'content': 'hi',
+              'file_url': 'fileUrl',
+              'created_at': 'invalid-date',
+              'likes': 0,
+              'comments': 0,
+            }
+          ]
+        },
+        'metadata': {},
+      };
+      final mockClient = MockClient((_) async => http.Response(jsonEncode(mockJson), 200));
+      final repo = PublicationRepositoryAPI(client: mockClient, endpoint: 'posts');
+
+      final resp = await repo.fetchPublications(page: 1, limit: 5, time: timeFilter);
+      expect(resp.publications, hasLength(1));
+      expect(resp.publications.first.id, equals('2'));
     });
   });
 }

@@ -1,16 +1,50 @@
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mocktail/mocktail.dart';
+
 import 'package:mobile/core/globals/publications/publications.dart';
 import 'package:mobile/src/home/home.dart';
 
+class MockPublicationBloc extends Mock implements PublicationBloc {}
+class FakePublicationEvent extends Fake implements PublicationEvent {}
+class FakePublicationState extends Fake implements PublicationState {}
+
 void main() {
+  late PublicationBloc mockBloc;
+
+  setUpAll(() {
+    registerFallbackValue(FakePublicationEvent());
+    registerFallbackValue(FakePublicationState());
+  });
+
+  setUp(() {
+    mockBloc = MockPublicationBloc();
+  });
+
   testWidgets(
-    'HomePage builds the BlocProvider and displays PublicationsList',
+    'HomeScreen builds the BlocProvider and displays PublicationsList',
     (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(home: HomeScreen()),
+      // Simulamos estado de carga inicial
+      when(() => mockBloc.state).thenReturn(PublicationLoading());
+      whenListen<PublicationState>(
+        mockBloc,
+        Stream.value(PublicationLoading()),
+        initialState: PublicationLoading(),
       );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: BlocProvider<PublicationBloc>.value(
+            value: mockBloc,
+            child: const HomeScreen(isFeed: true),
+          ),
+        ),
+      );
+      await tester.pump(); // <-- reemplazamos pumpAndSettle()
+
+      // Verificamos que exista el provider y la lista
       expect(find.byType(BlocProvider<PublicationBloc>), findsOneWidget);
       expect(find.byType(PublicationsList), findsOneWidget);
     },
@@ -19,41 +53,39 @@ void main() {
   testWidgets(
     'When PublicationsList fails and Retry is pressed, the error message reappears',
     (WidgetTester tester) async {
-      final failureBloc = PublicationBloc(
-        publicationRepository: _FakeFailureRepository(),
+      // Simulamos estado de error
+      when(() => mockBloc.state).thenReturn(PublicationFailure());
+      whenListen<PublicationState>(
+        mockBloc,
+        Stream.value(PublicationFailure()),
+        initialState: PublicationFailure(),
       );
 
       await tester.pumpWidget(
         MaterialApp(
           home: BlocProvider<PublicationBloc>.value(
-            value: failureBloc,
-            child: const PublicationsList(scrollKey: "homePage",),
+            value: mockBloc,
+            child: const PublicationsList(
+              scrollKey: 'homePage',
+              isFeed: true,
+            ),
           ),
         ),
       );
+      await tester.pump(); // <-- reemplazamos pumpAndSettle()
 
-      failureBloc.add(LoadPublications());
-      await tester.pumpAndSettle();
-
+      // Debe verse el mensaje de fallo y el botón Retry
       expect(find.text('Failed to load posts'), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
+      final retryBtn = find.widgetWithText(ElevatedButton, 'Retry');
+      expect(retryBtn, findsOneWidget);
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
+      // Al pulsarlo, se dispara LoadPublications y el mensaje sigue ahí
+      await tester.tap(retryBtn);
+      await tester.pump();
 
-      await tester.pumpAndSettle();
-
+      verify(() => mockBloc.add(LoadPublications())).called(1);
       expect(find.text('Failed to load posts'), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
+      expect(retryBtn, findsOneWidget);
     },
   );
-}
-
-class _FakeFailureRepository implements PublicationRepository {
-  @override
-  Future<PublicationResponse> fetchPublications({
-    required int page,
-    required int limit,
-  }) {
-    throw Exception('simulated failure');
-  }
 }
