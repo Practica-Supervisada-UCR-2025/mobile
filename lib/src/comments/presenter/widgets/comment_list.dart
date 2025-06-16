@@ -117,7 +117,7 @@ class _CommentsListState extends State<CommentsList> {
               ],
             );
           }
-
+          final commentsToDisplay = state.comments.reversed.toList();
           return ListView.separated(
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -152,7 +152,7 @@ class _CommentsListState extends State<CommentsList> {
                 return const SizedBox.shrink(); 
               }
 
-              final comment = state.comments[commentIndex];
+              final comment = commentsToDisplay[commentIndex];
               
                return ListTile(
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
