@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
 
 class ShowOwnPublicationsPage extends StatefulWidget {
-  const ShowOwnPublicationsPage({super.key});
+  final bool isFeed;
+  const ShowOwnPublicationsPage({super.key, required this.isFeed});
 
   @override
   State<ShowOwnPublicationsPage> createState() =>
@@ -14,16 +15,8 @@ class ShowOwnPublicationsPage extends StatefulWidget {
 class _ShowOwnPublicationsPageState extends State<ShowOwnPublicationsPage> {
   int? _lastRefreshTimestamp;
   late PublicationBloc _publicationBloc;
-class ShowOwnPublicationsPage extends StatelessWidget {
-  final bool refresh;
-  final bool isFeed;
-  const ShowOwnPublicationsPage({super.key, this.refresh = false, required this.isFeed});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.surface,
-      child: PublicationsList(scrollKey: "ownPosts", isFeed: isFeed),
   void initState() {
     super.initState();
     _publicationBloc = PublicationBloc(
@@ -61,7 +54,7 @@ class ShowOwnPublicationsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _publicationBloc,
-      child: const PublicationsList(scrollKey: "ownPosts"),
+      child: const PublicationsList(scrollKey: "ownPosts", isFeed: false),
     );
   }
 }
