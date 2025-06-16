@@ -26,6 +26,7 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
       ),
     );
     on<RefreshPublications>(_onRefreshPublications);
+    on<HidePublication>(_onHidePublication);
   }
 
   Future<void> _onLoadPublications(
@@ -84,11 +85,10 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
     RefreshPublications event,
     Emitter<PublicationState> emit,
   ) async {
-    if (state is PublicationLoading) return;
-
-    emit(PublicationLoading());
     _currentPage = 1;
     try {
+      emit(PublicationLoading());
+      await Future.delayed(Duration(milliseconds: 100));
       final response = await publicationRepository.fetchPublications(
         page: _currentPage,
         limit: _limit,
@@ -104,5 +104,26 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
     } catch (_) {
       emit(PublicationFailure());
     }
+  }
+
+  void _onHidePublication(
+    HidePublication event,
+    Emitter<PublicationState> emit,
+  ) {
+    if (state is! PublicationSuccess) return;
+    final current = state as PublicationSuccess;
+    final updatedList =
+        current.publications
+            .where((pub) => pub.id != event.publicationId)
+            .toList();
+
+    emit(
+      PublicationSuccess(
+        publications: updatedList,
+        totalPosts: current.totalPosts - 1,
+        totalPages: current.totalPages,
+        currentPage: current.currentPage,
+      ),
+    );
   }
 }
