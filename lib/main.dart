@@ -122,6 +122,9 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<ReportPublicationRepository>(
           create: (context) => ReportPublicationRepositoryAPI(),
         ),
+        RepositoryProvider<DeletePublicationRepository>(
+          create: (context) => DeletePublicationRepositoryAPI(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -176,6 +179,13 @@ class MyApp extends StatelessWidget {
                 (context) => ReportPublicationBloc(
                   reportPublicationRepository:
                       context.read<ReportPublicationRepository>(),
+                ),
+          ),
+          BlocProvider<DeletePublicationBloc>(
+            create:
+                (context) => DeletePublicationBloc(
+                  deletePublicationRepository:
+                      context.read<DeletePublicationRepository>(),
                 ),
           ),
         ],

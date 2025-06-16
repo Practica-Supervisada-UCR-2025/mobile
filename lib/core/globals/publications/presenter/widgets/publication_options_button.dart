@@ -14,6 +14,7 @@ class PublicationOptionsButton extends StatelessWidget {
 
   void showReportBottomSheet(BuildContext context) {
     context.read<ReportPublicationBloc>().add(ReportPublicationReset());
+    final publicationBloc = context.read<PublicationBloc>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -21,7 +22,29 @@ class PublicationOptionsButton extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => ReportBottomSheet(publicationId: publicationId),
+      builder:
+          (context) => BlocProvider.value(
+            value: publicationBloc,
+            child: ReportBottomSheet(publicationId: publicationId),
+          ),
+    );
+  }
+
+  void showDeleteBottomSheet(BuildContext context) {
+    context.read<DeletePublicationBloc>().add(DeletePublicationReset());
+    final publicationBloc = context.read<PublicationBloc>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder:
+          (context) => BlocProvider.value(
+            value: publicationBloc,
+            child: DeleteBottomSheet(publicationId: publicationId),
+          ),
     );
   }
 
@@ -29,49 +52,50 @@ class PublicationOptionsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isOwner = LocalStorage().username == publicationUsername;
 
-    return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_vert),
-      onSelected: (value) {
-        switch (value) {
-          case 'report':
-            showReportBottomSheet(context);
-            break;
-          case 'delete':
-            break;
-        }
-      },
-      itemBuilder: (context) {
-        final items = <PopupMenuEntry<String>>[];
+    return Builder(
+      builder:
+          (safeContext) => PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'report') {
+                showReportBottomSheet(safeContext);
+              } else if (value == 'delete') {
+                showDeleteBottomSheet(safeContext);
+              }
+            },
+            itemBuilder: (context) {
+              final items = <PopupMenuEntry<String>>[];
 
-        if (isOwner) {
-          items.addAll([
-            const PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete_outline, size: 20),
-                  SizedBox(width: 8),
-                  Text('Delete'),
-                ],
-              ),
-            ),
-          ]);
-        } else {
-          items.add(
-            const PopupMenuItem(
-              value: 'report',
-              child: Row(
-                children: [
-                  Icon(Icons.flag_outlined, size: 20),
-                  SizedBox(width: 8),
-                  Text('Report'),
-                ],
-              ),
-            ),
-          );
-        }
-        return items;
-      },
+              if (isOwner) {
+                items.add(
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, size: 20),
+                        SizedBox(width: 8),
+                        Text('Delete'),
+                      ],
+                    ),
+                  ),
+                );
+              } else {
+                items.add(
+                  const PopupMenuItem(
+                    value: 'report',
+                    child: Row(
+                      children: [
+                        Icon(Icons.flag_outlined, size: 20),
+                        SizedBox(width: 8),
+                        Text('Report'),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              return items;
+            },
+          ),
     );
   }
 }

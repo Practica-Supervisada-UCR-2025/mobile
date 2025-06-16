@@ -12,3 +12,12 @@ class LoadPublications extends PublicationEvent {}
 class LoadMorePublications extends PublicationEvent {}
 
 class RefreshPublications extends PublicationEvent {}
+
+class HidePublication extends PublicationEvent {
+  final String publicationId;
+
+  const HidePublication(this.publicationId);
+
+  @override
+  List<Object> get props => [publicationId];
+}
