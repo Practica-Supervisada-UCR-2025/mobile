@@ -55,8 +55,8 @@ void main() {
           'content': '¡Qué buena publicación!',
           'username': 'testuser',
           'created_at': '2023-10-26T10:30:00.000Z',
-          'profile_image_url': 'https://example.com/profile.jpg',
-          'attachment_url': 'https://example.com/attachment.png',
+          'profile_picture': 'https://example.com/profile.jpg',
+          'file_url': 'https://example.com/attachment.png',
         };
 
         final result = CommentModel.fromJson(jsonMap);
@@ -70,8 +70,8 @@ void main() {
           'content': 'Otro comentario.',
           'username': 'testuser2',
           'created_at': '2023-10-26T10:30:00.000Z',
-          'profile_image_url': null, 
-          'attachment_url': null,
+          'profile_picture': null, 
+          'file_url': null,
         };
 
         final result = CommentModel.fromJson(jsonMap);

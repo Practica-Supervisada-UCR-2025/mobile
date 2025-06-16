@@ -3,204 +3,236 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:equatable/equatable.dart';
 
+// Asegúrate de que las rutas de importación sean correctas para tu proyecto.
 import 'package:mobile/src/comments/comments.dart';
 
+// --- Mocks y Clases de Ayuda ---
+
+// Mock para el repositorio de comentarios.
 class MockCommentsRepository extends Mock implements CommentsRepository {}
 
-void main() {
-  late CommentsRepository mockRepository;
-  late String postId;
+// Es una buena práctica registrar valores de fallback para tipos complejos.
+class FakeDateTime extends Fake implements DateTime {}
 
+void main() {
+  // --- Declaraciones y Setup ---
+
+  late CommentsRepository mockRepository;
+  late CommentsLoadBloc commentsLoadBloc;
+  const postId = 'post-id-123';
+  const commentsPerPage = 5; // Coincide con la constante en tu BLoC
+
+  // Datos de prueba para los comentarios
   final comment1 = CommentModel(
     id: '1',
     username: 'user1',
-    content: 'Comentario 1',
-    createdAt: DateTime(2023, 1, 1),
+    content: 'Primer comentario',
+    createdAt: DateTime(2025, 6, 15, 10, 0, 0),
   );
   final comment2 = CommentModel(
     id: '2',
     username: 'user2',
-    content: 'Comentario 2',
-    createdAt: DateTime(2023, 1, 2),
+    content: 'Segundo comentario',
+    createdAt: DateTime(2025, 6, 15, 10, 5, 0),
   );
+  // Lista de comentarios para la primera página
+  final firstPageComments = [comment1, comment2];
+
   final comment3 = CommentModel(
     id: '3',
     username: 'user3',
-    content: 'Comentario 3',
-    createdAt: DateTime(2023, 1, 3),
+    content: 'Tercer comentario',
+    createdAt: DateTime(2025, 6, 15, 10, 10, 0),
   );
+  // Lista de comentarios para la segunda página
+  final secondPageComments = [comment3];
 
   setUpAll(() {
-    registerFallbackValue(DateTime(2023));
+    // Registra el fallback para que Mocktail sepa cómo manejar DateTime en `any(named: ...)`
+    registerFallbackValue(FakeDateTime());
   });
 
   setUp(() {
+    // Configura Equatable para que muestre strings legibles en los errores
     EquatableConfig.stringify = true;
     mockRepository = MockCommentsRepository();
-    postId = 'post-123';
+    commentsLoadBloc = CommentsLoadBloc(
+      repository: mockRepository,
+      postId: postId,
+    );
   });
 
+  tearDown(() {
+    commentsLoadBloc.close();
+  });
+
+  // --- Pruebas ---
+
   group('CommentsLoadBloc', () {
-    test('estado inicial es CommentsLoadInitial', () {
-      expect(
-        CommentsLoadBloc(repository: mockRepository, postId: postId).state,
-        const CommentsLoadInitial(),
-      );
+    test('el estado inicial debe ser CommentsLoadInitial', () {
+      expect(commentsLoadBloc.state, const CommentsLoadInitial());
     });
 
-    group('FetchInitialComments', () {
-      final response = CommentsResponse(
-        comments: [comment1, comment2],
-        totalItems: 3,
+    group('FetchInitialComments Event', () {
+      final initialResponse = CommentsResponse(
+        comments: firstPageComments,
+        totalItems: 3, // Hay más de los que se cargaron
         currentIndex: 0,
       );
 
       blocTest<CommentsLoadBloc, CommentsLoadState>(
-        'emite [CommentsLoaded] con comentarios cargados',
+        'debe emitir [Loading, Loaded] cuando fetchComments tiene éxito',
         setUp: () {
+          // Configura el mock para devolver una respuesta exitosa
           when(() => mockRepository.fetchComments(
                 postId: any(named: 'postId'),
                 startTime: any(named: 'startTime'),
-              )).thenAnswer((_) async => response);
+                limit: any(named: 'limit'),
+              )).thenAnswer((_) async => initialResponse);
         },
-        build: () => CommentsLoadBloc(repository: mockRepository, postId: postId),
+        build: () => commentsLoadBloc,
         act: (bloc) => bloc.add(FetchInitialComments()),
         expect: () => <CommentsLoadState>[
+          const CommentsLoading(isInitialFetch: true),
           CommentsLoaded(
-            comments: response.comments,
-            hasReachedEnd: false,
-            currentIndex: response.currentIndex,
+            comments: initialResponse.comments,
+            hasReachedEnd: false, // 2 de 3, no ha llegado al final
+            currentIndex: initialResponse.currentIndex,
           ),
         ],
         verify: (_) {
+          // Verifica que el método del repositorio fue llamado con los parámetros correctos
           verify(() => mockRepository.fetchComments(
-            postId: postId,
-            startTime: DateTime.fromMillisecondsSinceEpoch(0),
-          )).called(1);
+                postId: postId,
+                startTime: DateTime.fromMillisecondsSinceEpoch(0),
+                limit: commentsPerPage,
+              )).called(1);
         },
       );
-      
+
       blocTest<CommentsLoadBloc, CommentsLoadState>(
-        'emite [CommentsLoaded] con lista vacía cuando no hay comentarios',
+        'debe emitir [Loading, Loaded] con hasReachedEnd=true si se cargan todos los items',
         setUp: () {
+          final finalResponse = CommentsResponse(
+            comments: firstPageComments,
+            totalItems: 2, // Total es igual a la cantidad cargada
+            currentIndex: 0,
+          );
           when(() => mockRepository.fetchComments(
                 postId: any(named: 'postId'),
                 startTime: any(named: 'startTime'),
-              )).thenAnswer((_) async => CommentsResponse(
-                comments: [],
-                totalItems: 0,
-                currentIndex: 0,
-              ));
+                limit: any(named: 'limit'),
+              )).thenAnswer((_) async => finalResponse);
         },
-        build: () => CommentsLoadBloc(repository: mockRepository, postId: postId),
+        build: () => commentsLoadBloc,
         act: (bloc) => bloc.add(FetchInitialComments()),
         expect: () => <CommentsLoadState>[
-          const CommentsLoaded(
-            comments: [],
-            hasReachedEnd: true, 
+          const CommentsLoading(isInitialFetch: true),
+          CommentsLoaded(
+            comments: firstPageComments,
+            hasReachedEnd: true, // 2 de 2, sí ha llegado al final
             currentIndex: 0,
           ),
         ],
       );
 
       blocTest<CommentsLoadBloc, CommentsLoadState>(
-        'emite CommentsError si fetch lanza excepción',
+        'debe emitir [Loading, Error] cuando fetchComments falla',
         setUp: () {
+          // Configura el mock para que lance una excepción
           when(() => mockRepository.fetchComments(
-            postId: any(named: 'postId'),
-            startTime: any(named: 'startTime'),
-          )).thenThrow(Exception('Falló'));
+                postId: any(named: 'postId'),
+                startTime: any(named: 'startTime'),
+                limit: any(named: 'limit'),
+              )).thenThrow(Exception('Error de red'));
         },
-        build: () => CommentsLoadBloc(repository: mockRepository, postId: postId),
+        build: () => commentsLoadBloc,
         act: (bloc) => bloc.add(FetchInitialComments()),
         expect: () => <CommentsLoadState>[
-          const CommentsError(message: 'Exception: Falló'),
+          const CommentsLoading(isInitialFetch: true),
+          const CommentsError(message: 'Exception: Error de red'),
         ],
       );
     });
 
-    group('FetchMoreComments', () {
-      final initialComments = [comment1, comment2];
-      final loadedState = CommentsLoaded(
-        comments: initialComments,
+    group('FetchMoreComments Event', () {
+      // Estado inicial para las pruebas de paginación
+      final initialState = CommentsLoaded(
+        comments: firstPageComments,
         hasReachedEnd: false,
         currentIndex: 0,
       );
-      final response = CommentsResponse(
-        comments: [comment3],
-        totalItems: 3,
+
+      final secondResponse = CommentsResponse(
+        comments: secondPageComments,
+        totalItems: 3, // 2 (iniciales) + 1 (nuevo) = 3
         currentIndex: 1,
       );
 
       blocTest<CommentsLoadBloc, CommentsLoadState>(
-        'agrega más comentarios al final',
+        'debe emitir [Loaded] con la lista de comentarios actualizada',
         setUp: () {
           when(() => mockRepository.fetchComments(
-            postId: postId,
-            startTime: comment2.createdAt,
-          )).thenAnswer((_) async => response);
+                postId: postId,
+                startTime: firstPageComments.last.createdAt, // startTime es el último comentario
+                limit: commentsPerPage,
+              )).thenAnswer((_) async => secondResponse);
         },
-        build: () => CommentsLoadBloc(repository: mockRepository, postId: postId),
-        seed: () => loadedState,
+        build: () => commentsLoadBloc,
+        seed: () => initialState, // Inicia el BLoC con un estado ya cargado
         act: (bloc) => bloc.add(FetchMoreComments()),
         expect: () => <CommentsLoadState>[
           CommentsLoaded(
-            comments: [...initialComments, ...response.comments],
-            hasReachedEnd: true,
-            currentIndex: response.currentIndex,
+            comments: [...firstPageComments, ...secondPageComments], // Lista combinada
+            hasReachedEnd: true, // 3 de 3, se alcanzó el final
+            currentIndex: secondResponse.currentIndex,
           ),
         ],
+        verify: (_) {
+          // Verifica que la llamada para paginar fue correcta
+          verify(() => mockRepository.fetchComments(
+                postId: postId,
+                startTime: firstPageComments.last.createdAt,
+                limit: commentsPerPage,
+              )).called(1);
+        },
       );
 
       blocTest<CommentsLoadBloc, CommentsLoadState>(
-        'no hace nada si ya hasReachedEnd',
-        build: () => CommentsLoadBloc(repository: mockRepository, postId: postId),
-        seed: () => const CommentsLoaded(comments: [], hasReachedEnd: true, currentIndex: 0),
-        act: (bloc) => bloc.add(FetchMoreComments()),
-        expect: () => [],
-        verify: (_) {
-          verifyNever(() => mockRepository.fetchComments(
-            postId: any(named: 'postId'),
-            startTime: any(named: 'startTime'),
-          ));
-        },
-      );
-    });
-  });
-
-  group('CommentsLoadBloc - caso sin comentarios', () {
-    blocTest<CommentsLoadBloc, CommentsLoadState>(
-      'emite [CommentsLoaded] con lista vacía cuando no hay comentarios',
-      setUp: () {
-        when(() => mockRepository.fetchComments(
-              postId: postId,
-              startTime: DateTime.fromMillisecondsSinceEpoch(0),
-            )).thenAnswer(
-          (_) async => CommentsResponse(
-            comments: [],
-            totalItems: 0,
-            currentIndex: 0,
-          ),
-        );
-      },
-      build: () => CommentsLoadBloc(
-        repository: mockRepository,
-        postId: postId,
-      ),
-      act: (bloc) => bloc.add(FetchInitialComments()),
-      expect: () => [
-        const CommentsLoaded(
-          comments: [],
+        'no debe emitir estados si hasReachedEnd ya es true',
+        build: () => commentsLoadBloc,
+        // Inicia el BLoC con un estado que ya alcanzó el final
+        seed: () => CommentsLoaded(
+          comments: firstPageComments,
           hasReachedEnd: true,
           currentIndex: 0,
         ),
-      ],
-      verify: (_) {
-        verify(() => mockRepository.fetchComments(
-              postId: postId,
-              startTime: DateTime.fromMillisecondsSinceEpoch(0),
-            )).called(1);
-      },
-    );
+        act: (bloc) => bloc.add(FetchMoreComments()),
+        expect: () => <CommentsLoadState>[], // No se esperan nuevos estados
+        verify: (_) {
+          // Verifica que NUNCA se llamó al repositorio
+          verifyNever(() => mockRepository.fetchComments(
+              postId: any(named: 'postId'),
+              startTime: any(named: 'startTime'),
+              limit: any(named: 'limit')));
+        },
+      );
+
+      blocTest<CommentsLoadBloc, CommentsLoadState>(
+          'debe emitir [Error] si la paginación falla',
+          setUp: () {
+            when(() => mockRepository.fetchComments(
+                  postId: any(named: 'postId'),
+                  startTime: any(named: 'startTime'),
+                  limit: any(named: 'limit'),
+                )).thenThrow(Exception('Error de paginación'));
+          },
+          build: () => commentsLoadBloc,
+          seed: () => initialState, // Inicia con un estado válido para paginar
+          act: (bloc) => bloc.add(FetchMoreComments()),
+          expect: () => <CommentsLoadState>[
+                const CommentsError(message: 'Exception: Error de paginación'),
+              ]);
+    });
   });
 }

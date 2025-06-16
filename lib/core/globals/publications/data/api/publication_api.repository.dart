@@ -39,7 +39,6 @@ class PublicationRepositoryAPI implements PublicationRepository {
     }
 
     final body = json.decode(resp.body) as Map<String, dynamic>;
-
     final postsJson = <dynamic>[];
     if (body.containsKey('data') && body['data'] is List) {
       postsJson.addAll(body['data'] as List<dynamic>);
@@ -67,6 +66,13 @@ class PublicationRepositoryAPI implements PublicationRepository {
         final String? attachment =
             fileUrl != null && fileUrl.isNotEmpty ? fileUrl : null;
 
+        int commentCount = 0;
+        if (raw['commentCount'] is int) {
+          commentCount = raw['commentCount'] as int;
+        } else if (raw['_count'] is Map && raw['_count']['comments'] is int) {
+          commentCount = raw['_count']['comments'] as int;
+        }
+
         publications.add(
           Publication(
             id: id,
@@ -82,7 +88,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
             createdAt: createdAt,
             attachment: attachment,
             likes: raw['likes'] is int ? raw['likes'] as int : 0,
-            comments: raw['comments'] is int ? raw['comments'] as int : 0,
+            comments: commentCount, 
           ),
         );
       }
