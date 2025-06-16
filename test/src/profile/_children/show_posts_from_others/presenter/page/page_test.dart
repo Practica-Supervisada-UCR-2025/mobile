@@ -31,7 +31,7 @@ void main() {
         MaterialApp(
           home: BlocProvider<PublicationBloc>.value(
             value: failureBloc,
-            child: const PublicationsList(scrollKey: "otherPosts"),
+            child: const PublicationsList(scrollKey: "otherPosts", isFeed: true, isOtherUser: true),
           ),
         ),
       );
@@ -56,6 +56,8 @@ class _FakeFailureRepository implements PublicationRepository {
   Future<PublicationResponse> fetchPublications({
     required int page,
     required int limit,
+    bool? isOtherUser,
+    String? time,
   }) {
     throw Exception('simulated failure');
   }

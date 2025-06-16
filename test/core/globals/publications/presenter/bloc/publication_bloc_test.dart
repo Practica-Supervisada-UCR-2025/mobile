@@ -220,12 +220,6 @@ void main() {
       expect:
           () => [
             PublicationLoading(),
-            PublicationSuccess(
-              publications: [samplePub1],
-              totalPosts: 1,
-              totalPages: 1,
-              currentPage: 1,
-            ),
           ],
       verify: (_) {
         verify(

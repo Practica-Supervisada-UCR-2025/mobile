@@ -9,7 +9,14 @@ void main() {
     'HomePage builds the BlocProvider and displays PublicationsList',
     (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(home: HomeScreen()),
+        MaterialApp(
+          home: BlocProvider<PublicationBloc>(
+            create: (_) => PublicationBloc(
+              publicationRepository: _FakeFailureRepository(),
+            ),
+            child: HomeScreen(isFeed: true),
+          ),
+        ),
       );
       expect(find.byType(BlocProvider<PublicationBloc>), findsOneWidget);
       expect(find.byType(PublicationsList), findsOneWidget);
@@ -27,7 +34,7 @@ void main() {
         MaterialApp(
           home: BlocProvider<PublicationBloc>.value(
             value: failureBloc,
-            child: const PublicationsList(scrollKey: "homePage",),
+            child: const PublicationsList(scrollKey: "homePage", isFeed: true, isOtherUser: false),
           ),
         ),
       );
@@ -53,6 +60,8 @@ class _FakeFailureRepository implements PublicationRepository {
   Future<PublicationResponse> fetchPublications({
     required int page,
     required int limit,
+    bool? isOtherUser,
+    String? time,
   }) {
     throw Exception('simulated failure');
   }
