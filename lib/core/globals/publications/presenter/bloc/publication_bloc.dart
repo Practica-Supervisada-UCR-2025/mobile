@@ -14,6 +14,7 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
   final PublicationRepository publicationRepository;
   static const int _limit = 10;
   int _currentPage = 1;
+  String time = "";
 
   PublicationBloc({required this.publicationRepository})
     : super(PublicationInitial()) {
@@ -25,7 +26,12 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
         const Duration(milliseconds: 300),
       ),
     );
-    on<RefreshPublications>(_onRefreshPublications);
+    on<RefreshPublications>(
+      _onRefreshPublications,
+      transformer: debounce<RefreshPublications>(
+        const Duration(milliseconds: 300),
+      ),
+    );
     on<HidePublication>(_onHidePublication);
   }
 
@@ -36,18 +42,26 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
     emit(PublicationLoading());
     _currentPage = 1;
     try {
-      final response = await publicationRepository.fetchPublications(
-        page: _currentPage,
-        limit: _limit,
-      );
-      emit(
-        PublicationSuccess(
-          publications: response.publications,
-          totalPosts: response.totalPosts,
-          totalPages: response.totalPages,
-          currentPage: response.currentPage,
-        ),
-      );
+      PublicationResponse response;
+      if (event.isFeed) {
+        response = await publicationRepository.fetchPublications(
+          page: _currentPage,
+          limit: _limit,
+          time: DateTime.now().toIso8601String(),
+          isOtherUser: event.isOtherUser,
+        );
+      } else {
+        response = await publicationRepository.fetchPublications(
+          page: _currentPage,
+          limit: _limit,
+        );
+      }
+      emit(PublicationSuccess(
+        publications: response.publications,
+        totalPosts: response.totalPosts,
+        totalPages: response.totalPages,
+        currentPage: response.currentPage,
+      ));
     } catch (_) {
       emit(PublicationFailure());
     }
@@ -63,10 +77,20 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
 
     final nextPage = current.currentPage + 1;
     try {
-      final response = await publicationRepository.fetchPublications(
-        page: nextPage,
-        limit: _limit,
-      );
+      PublicationResponse response;
+      if (event.isFeed) {
+        response = await publicationRepository.fetchPublications(
+          page: nextPage,
+          limit: _limit,
+          time: current.publications.last.createdAt.toIso8601String(),
+          isOtherUser: event.isOtherUser,
+        );
+      } else {
+        response = await publicationRepository.fetchPublications(
+          page: nextPage,
+          limit: _limit,
+        );
+      }
       final all = List.of(current.publications)..addAll(response.publications);
       emit(
         PublicationSuccess(
@@ -85,14 +109,26 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
     RefreshPublications event,
     Emitter<PublicationState> emit,
   ) async {
+    if (state is PublicationLoading) return;
+    emit(PublicationLoading());
     _currentPage = 1;
     try {
       emit(PublicationLoading());
       await Future.delayed(Duration(milliseconds: 100));
-      final response = await publicationRepository.fetchPublications(
-        page: _currentPage,
-        limit: _limit,
-      );
+      PublicationResponse response;
+      if (event.isFeed) {
+        response = await publicationRepository.fetchPublications(
+          page: _currentPage,
+          limit: _limit,
+          time: DateTime.now().toIso8601String(),
+          isOtherUser: event.isOtherUser,
+        );
+      } else {
+        response = await publicationRepository.fetchPublications(
+          page: _currentPage,
+          limit: _limit,
+        );
+      }
       emit(
         PublicationSuccess(
           publications: response.publications,

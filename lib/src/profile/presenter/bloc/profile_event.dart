@@ -8,7 +8,8 @@ abstract class ProfileEvent extends Equatable {
 }
 
 class ProfileLoad extends ProfileEvent {
-  const ProfileLoad();
+  final String? userId;
+  const ProfileLoad({this.userId});
 }
 
 class ProfileRefreshed extends ProfileEvent {

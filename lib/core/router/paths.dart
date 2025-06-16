@@ -8,6 +8,7 @@ class Paths {
   static const String create = '/create';
   static const String notifications = '/notifications';
   static const String profile = '/profile';
+  static String externProfile(String userId) => '/profile/$userId';
   static const String editProfile = '/edit-profile';
   static const String settings = '/settings';
 }
