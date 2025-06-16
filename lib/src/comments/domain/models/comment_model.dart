@@ -23,8 +23,8 @@ class CommentModel extends Equatable {
       content: json['content'],
       username: json['username'],
       createdAt: DateTime.parse(json['created_at']),
-      profileImageUrl: json['profile_image_url'],
-      attachmentUrl: json['attachment_url'],
+      profileImageUrl: json['profile_picture'],
+      attachmentUrl: json['file_url'],
     );
   }
 
