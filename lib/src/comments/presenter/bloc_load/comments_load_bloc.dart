@@ -8,6 +8,8 @@ part 'comments_load_state.dart';
 class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
   final CommentsRepository repository;
   final String postId;
+  static const int _commentsPerPage = 5;
+
 
   CommentsLoadBloc({
     required this.repository,
@@ -21,51 +23,22 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
     FetchInitialComments event,
     Emitter<CommentsLoadState> emit,
   ) async {
-    // -----------------------------
-    // MODO PRUEBA CON COMENTARIOS MOCK
-    // -----------------------------
-
-    final now = DateTime.now();
-    const String fakeProfileBaseUrl = 'https://i.pravatar.cc/150?u=';
-    const String fakeAttachmentUrl = 'https://picsum.photos/seed/picsum/400/300';
-
-    final mockComments = List.generate(10, (index) {
-      return CommentModel(
-        id: '${index + 1}',
-        username: 'Usuario${index + 1}',
-        content: 'Este es el comentario de prueba número ${index + 1}.',
-        createdAt: now.subtract(Duration(minutes: (10 - index) * 5)),
-        profileImageUrl: '$fakeProfileBaseUrl${index + 1}',
-        attachmentUrl: (index == 0 || index % 3 == 0) ? fakeAttachmentUrl : null,
+    emit(const CommentsLoading(isInitialFetch: true));
+    try {
+      final response = await repository.fetchComments(
+        postId: postId,
+        startTime: DateTime.fromMillisecondsSinceEpoch(0),
+        limit: _commentsPerPage,
       );
-    });
-
-    emit(CommentsLoaded(
-      comments: mockComments,
-      hasReachedEnd: true,
-      currentIndex: 0,
-    ));
-
-    // -----------------------------
-    // CÓDIGO ORIGINAL DESACTIVADO TEMPORALMENTE
-    // -----------------------------
-    
-    // try {
-    //   final response = await repository.fetchComments(
-    //     postId: postId,
-    //     startTime: DateTime.fromMillisecondsSinceEpoch(0),
-    //   );
-    //   emit(CommentsLoaded(
-    //     comments: response.comments,
-    //     hasReachedEnd: response.comments.length >= response.totalItems,
-    //     currentIndex: response.currentIndex,
-    //   ));
-    // } catch (e) {
-    //   emit(CommentsError(message: e.toString()));
-    // }
-    
+      emit(CommentsLoaded(
+        comments: response.comments,
+        hasReachedEnd: response.comments.length >= response.totalItems,
+        currentIndex: response.currentIndex,
+      ));
+    } catch (e) {
+      emit(CommentsError(message: e.toString()));
+    }
   }
-
 
   Future<void> _onFetchMoreComments(
     FetchMoreComments event,
@@ -79,6 +52,7 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
       final response = await repository.fetchComments(
         postId: postId,
         startTime: currentState.comments.last.createdAt,
+        limit: _commentsPerPage,
       );
 
       final updatedComments = List<CommentModel>.from(currentState.comments)
