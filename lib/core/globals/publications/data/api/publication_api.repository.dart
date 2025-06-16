@@ -21,6 +21,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
     required int page,
     required int limit,
     String? time,
+    bool? isOtherUser,
   }) async {
     final token = await _getJwtToken();
     if (token.isEmpty) {
@@ -29,7 +30,11 @@ class PublicationRepositoryAPI implements PublicationRepository {
 
     late final Uri uri;
     if (time != null && time.isNotEmpty) {
-      uri = Uri.parse('$_baseUrl$endpoint?limit=$limit&date=$time');
+      if (isOtherUser == true) {
+        uri = Uri.parse('$_baseUrl$endpoint?limit=$limit&time=$time');
+      } else {
+        uri = Uri.parse('$_baseUrl$endpoint?limit=$limit&date=$time');
+      }
     }
     else {
       uri = Uri.parse('$_baseUrl$endpoint?page=$page&limit=$limit');

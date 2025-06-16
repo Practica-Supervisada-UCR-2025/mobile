@@ -19,5 +19,6 @@ abstract class PublicationRepository {
     required int page,
     required int limit,
     String? time,
+    bool? isOtherUser,
   });
 }

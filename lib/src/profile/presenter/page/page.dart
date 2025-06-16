@@ -6,7 +6,9 @@ import 'package:mobile/src/profile/profile.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool isFeed;
-  const ProfileScreen({super.key, required this.isFeed});
+  final String? userId;
+
+  const ProfileScreen({super.key, required this.isFeed, this.userId});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -26,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   void _loadProfile() {
-    context.read<ProfileBloc>().add(ProfileLoad());
+    context.read<ProfileBloc>().add(ProfileLoad(userId: widget.userId));
   }
 
   // Refresh publications after creating a new post
@@ -48,6 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isOwnProfile = widget.userId == null;
     super.build(context);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -92,14 +95,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 ),
                               ),
                               const SizedBox(height: 18),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Flexible(child: _buildCreatePostButton()),
-                                  const SizedBox(width: 8),
-                                  Flexible(child: _buildModifyButton(user)),
-                                ],
-                              ),
+                              if (isOwnProfile)
+                                Row(
+                                  children: [
+                                    Flexible(child: _buildCreatePostButton()),
+                                    const SizedBox(width: 8),
+                                    Flexible(child: _buildModifyButton(user)),
+                                  ],
+                                ),
                             ],
                           ),
                         ),
@@ -115,13 +118,23 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     const SizedBox(height: 20),
                     Divider(color: Theme.of(context).colorScheme.outline),
-                    Expanded(
-                      child: ShowOwnPublicationsPage(
-                        key: ValueKey(shouldRefresh),
-                        refresh: shouldRefresh,
-                        isFeed: widget.isFeed,
+                    if(isOwnProfile)
+                      Expanded(
+                        child: ShowOwnPublicationsPage(
+                          key: ValueKey(shouldRefresh),
+                          refresh: shouldRefresh,
+                          isFeed: widget.isFeed,
+                        ),
                       ),
-                    ),
+                    if (!isOwnProfile)
+                      Expanded(
+                        child: ShowPostFromOthersPage(
+                          userId: widget.userId!,
+                          key: ValueKey(shouldRefresh),
+                          refresh: shouldRefresh,
+                          isFeed: widget.isFeed,
+                        ),
+                      ),
                   ],
                 );
               } else if (state is ProfileFailure) {

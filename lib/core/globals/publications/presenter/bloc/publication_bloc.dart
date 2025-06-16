@@ -47,6 +47,7 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
           page: _currentPage,
           limit: _limit,
           time: DateTime.now().toIso8601String(),
+          isOtherUser: event.isOtherUser,
         );
       } else {
         response = await publicationRepository.fetchPublications(
@@ -81,6 +82,7 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
           page: nextPage,
           limit: _limit,
           time: current.publications.last.createdAt.toIso8601String(),
+          isOtherUser: event.isOtherUser,
         );
       } else {
         response = await publicationRepository.fetchPublications(
@@ -116,6 +118,7 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
           page: _currentPage,
           limit: _limit,
           time: DateTime.now().toIso8601String(),
+          isOtherUser: event.isOtherUser,
         );
       } else {
         response = await publicationRepository.fetchPublications(

@@ -4,10 +4,14 @@ import 'package:mobile/core/core.dart';
 
 class ShowPostFromOthersPage extends StatelessWidget {
   final String userId;
+  final bool? refresh;
+  final bool isFeed;
 
   const ShowPostFromOthersPage({
     super.key,
     required this.userId,
+    this.refresh,
+    this.isFeed = true,
     });
   
 
@@ -16,8 +20,8 @@ class ShowPostFromOthersPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => PublicationBloc(
         publicationRepository: PublicationRepositoryAPI(endpoint: '$ENDPOINT_PUBLICATIONS_FROM_OTHERS$userId' ),
-      )..add(LoadPublications()),
-      child: const PublicationsList(scrollKey: "otherPosts"),
+      )..add(LoadPublications(isFeed: true, isOtherUser: true)),
+      child: const PublicationsList(scrollKey: "otherPosts", isFeed: true),
     );
   }
 }
