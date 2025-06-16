@@ -131,5 +131,28 @@ void main() {
         ),
       );
     });
+
+    test('deletePublication uses JWT token from LocalStorage', () async {
+      SharedPreferences.setMockInitialValues({'accessToken': 'jwt-test-token'});
+
+      LocalStorage.resetInstance();
+      await LocalStorage.init();
+
+      final mockClient = MockClient((request) async {
+        expect(request.headers['Authorization'], 'Bearer jwt-test-token');
+        expect(request.method, 'DELETE');
+
+        return http.Response(
+          jsonEncode({
+            'status': 'success',
+            'data': {'deleted': true},
+          }),
+          200,
+        );
+      });
+
+      final repository = DeletePublicationRepositoryAPI(client: mockClient);
+      await repository.deletePublication(publicationId: 'some-id');
+    });
   });
 }

@@ -290,4 +290,17 @@ void main() {
       expect: () => [],
     );
   });
+
+  group('HidePublication Event Equatable', () {
+    test('HidePublication equality', () {
+      expect(const HidePublication('abc123'), const HidePublication('abc123'));
+    });
+
+    test('HidePublication inequality', () {
+      expect(
+        const HidePublication('abc123'),
+        isNot(const HidePublication('xyz456')),
+      );
+    });
+  });
 }

@@ -65,4 +65,24 @@ void main() {
       expect: () => [DeletePublicationInitial()],
     );
   });
+
+  group('DeletePublicationEvent Equatable', () {
+    test('DeletePublicationRequest equality', () {
+      expect(
+        const DeletePublicationRequest(publicationId: '123'),
+        const DeletePublicationRequest(publicationId: '123'),
+      );
+    });
+
+    test('DeletePublicationRequest inequality', () {
+      expect(
+        const DeletePublicationRequest(publicationId: '123'),
+        isNot(const DeletePublicationRequest(publicationId: '456')),
+      );
+    });
+
+    test('DeletePublicationReset equality', () {
+      expect(DeletePublicationReset(), equals(DeletePublicationReset()));
+    });
+  });
 }
