@@ -1,43 +1,24 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/auth/_children/_children.dart';
-
-class ServiceLocator {
-  static final ServiceLocator _instance = ServiceLocator._internal();
-  factory ServiceLocator() => _instance;
-  ServiceLocator._internal();
-
-  LogoutBloc? _logoutBloc;
-  GlobalKey<ScaffoldMessengerState>? _scaffoldMessengerKey;
-
-  void registerLogoutBloc(LogoutBloc logoutBloc) {
-    _logoutBloc = logoutBloc;
-  }
-
-  void registerScaffoldMessengerKey(GlobalKey<ScaffoldMessengerState> key) {
-    _scaffoldMessengerKey = key;
-  }
-
-  LogoutBloc? get logoutBloc => _logoutBloc;
-  GlobalKey<ScaffoldMessengerState>? get scaffoldMessengerKey =>
-      _scaffoldMessengerKey;
-}
 
 class ApiServiceImpl implements ApiService {
   final http.Client client;
   final LocalStorage localStorage;
   final String baseUrl;
+  final ServiceLocator serviceLocator; // 👈 inyectado
 
   ApiServiceImpl({
     http.Client? client,
     LocalStorage? localStorage,
     String? baseUrl,
+    ServiceLocator? serviceLocator,
   }) : client = client ?? http.Client(),
        localStorage = localStorage ?? LocalStorage(),
-       baseUrl = baseUrl ?? API_BASE_URL;
+       baseUrl = baseUrl ?? API_BASE_URL,
+       serviceLocator = serviceLocator ?? ServiceLocator();
 
   String _getBaseUrl({String? endpoint}) {
     if (endpoint != null && endpoint.startsWith('posts/')) {

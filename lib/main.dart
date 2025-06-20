@@ -79,7 +79,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),
         ),
-        RepositoryProvider<ApiService>(create: (_) => ApiServiceImpl()),
+        RepositoryProvider<ApiService>(
+          create: (_) => ApiServiceImpl(serviceLocator: ServiceLocator()),
+        ),
 
         RepositoryProvider<EditProfileRepository>(
           create:
@@ -114,7 +116,9 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider<SearchUsersRepository>(
           create:
-              (_) => SearchUsersRepositoryImpl(apiService: ApiServiceImpl()),
+              (context) => SearchUsersRepositoryImpl(
+                apiService: context.read<ApiService>(),
+              ),
         ),
         RepositoryProvider<CommentsRepository>(
           create:
@@ -146,10 +150,8 @@ class MyApp extends StatelessWidget {
               final logoutBloc = LogoutBloc(
                 logoutRepository: context.read<LogoutRepository>(),
               );
-              ServiceLocator().registerLogoutBloc(logoutBloc);
-              ServiceLocator().registerScaffoldMessengerKey(
-                scaffoldMessengerKey,
-              );
+              ServiceLocator().logoutBloc = logoutBloc;
+              ServiceLocator().scaffoldMessengerKey = scaffoldMessengerKey;
 
               return logoutBloc;
             },
