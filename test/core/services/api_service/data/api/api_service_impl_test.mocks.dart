@@ -3,14 +3,21 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i3;
-import 'dart:convert' as _i4;
-import 'dart:typed_data' as _i6;
+import 'dart:async' as _i7;
+import 'dart:convert' as _i8;
+import 'dart:typed_data' as _i10;
+import 'dart:ui' as _i13;
 
+import 'package:flutter/foundation.dart' as _i4;
+import 'package:flutter/material.dart' as _i3;
+import 'package:flutter/scheduler.dart' as _i5;
+import 'package:flutter_bloc/flutter_bloc.dart' as _i14;
 import 'package:http/http.dart' as _i2;
-import 'package:mobile/core/storage/user_session.storage.dart' as _i7;
+import 'package:mobile/core/services/service_locator.dart' as _i12;
+import 'package:mobile/core/storage/user_session.storage.dart' as _i11;
+import 'package:mobile/src/auth/_children/_children.dart' as _i6;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i5;
+import 'package:mockito/src/dummies.dart' as _i9;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -37,6 +44,63 @@ class _FakeStreamedResponse_1 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
+class _FakeScaffoldMessenger_2 extends _i1.SmartFake
+    implements _i3.ScaffoldMessenger {
+  _FakeScaffoldMessenger_2(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+
+  @override
+  String toString({_i4.DiagnosticLevel? minLevel = _i4.DiagnosticLevel.info}) =>
+      super.toString();
+}
+
+class _FakeBuildContext_3 extends _i1.SmartFake implements _i3.BuildContext {
+  _FakeBuildContext_3(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeScaffoldFeatureController_4<T extends _i3.Widget, U>
+    extends _i1.SmartFake
+    implements _i3.ScaffoldFeatureController<T, U> {
+  _FakeScaffoldFeatureController_4(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeWidget_5 extends _i1.SmartFake implements _i3.Widget {
+  _FakeWidget_5(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+
+  @override
+  String toString({_i4.DiagnosticLevel? minLevel = _i4.DiagnosticLevel.info}) =>
+      super.toString();
+}
+
+class _FakeDiagnosticsNode_6 extends _i1.SmartFake
+    implements _i4.DiagnosticsNode {
+  _FakeDiagnosticsNode_6(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+
+  @override
+  String toString({
+    _i4.TextTreeConfiguration? parentConfiguration,
+    _i4.DiagnosticLevel? minLevel = _i4.DiagnosticLevel.info,
+  }) => super.toString();
+}
+
+class _FakeTicker_7 extends _i1.SmartFake implements _i5.Ticker {
+  _FakeTicker_7(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+
+  @override
+  String toString({bool? debugIncludeStack = false}) => super.toString();
+}
+
+class _FakeLogoutRepository_8 extends _i1.SmartFake
+    implements _i6.LogoutRepository {
+  _FakeLogoutRepository_8(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [Client].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -46,37 +110,37 @@ class MockClient extends _i1.Mock implements _i2.Client {
   }
 
   @override
-  _i3.Future<_i2.Response> head(Uri? url, {Map<String, String>? headers}) =>
+  _i7.Future<_i2.Response> head(Uri? url, {Map<String, String>? headers}) =>
       (super.noSuchMethod(
             Invocation.method(#head, [url], {#headers: headers}),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i7.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(#head, [url], {#headers: headers}),
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i7.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> get(Uri? url, {Map<String, String>? headers}) =>
+  _i7.Future<_i2.Response> get(Uri? url, {Map<String, String>? headers}) =>
       (super.noSuchMethod(
             Invocation.method(#get, [url], {#headers: headers}),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i7.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(#get, [url], {#headers: headers}),
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i7.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> post(
+  _i7.Future<_i2.Response> post(
     Uri? url, {
     Map<String, String>? headers,
     Object? body,
-    _i4.Encoding? encoding,
+    _i8.Encoding? encoding,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -84,7 +148,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
               [url],
               {#headers: headers, #body: body, #encoding: encoding},
             ),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i7.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(
@@ -95,14 +159,14 @@ class MockClient extends _i1.Mock implements _i2.Client {
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i7.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> put(
+  _i7.Future<_i2.Response> put(
     Uri? url, {
     Map<String, String>? headers,
     Object? body,
-    _i4.Encoding? encoding,
+    _i8.Encoding? encoding,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -110,7 +174,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
               [url],
               {#headers: headers, #body: body, #encoding: encoding},
             ),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i7.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(
@@ -121,14 +185,14 @@ class MockClient extends _i1.Mock implements _i2.Client {
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i7.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> patch(
+  _i7.Future<_i2.Response> patch(
     Uri? url, {
     Map<String, String>? headers,
     Object? body,
-    _i4.Encoding? encoding,
+    _i8.Encoding? encoding,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -136,7 +200,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
               [url],
               {#headers: headers, #body: body, #encoding: encoding},
             ),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i7.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(
@@ -147,14 +211,14 @@ class MockClient extends _i1.Mock implements _i2.Client {
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i7.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> delete(
+  _i7.Future<_i2.Response> delete(
     Uri? url, {
     Map<String, String>? headers,
     Object? body,
-    _i4.Encoding? encoding,
+    _i8.Encoding? encoding,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -162,7 +226,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
               [url],
               {#headers: headers, #body: body, #encoding: encoding},
             ),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i7.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(
@@ -173,44 +237,44 @@ class MockClient extends _i1.Mock implements _i2.Client {
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i7.Future<_i2.Response>);
 
   @override
-  _i3.Future<String> read(Uri? url, {Map<String, String>? headers}) =>
+  _i7.Future<String> read(Uri? url, {Map<String, String>? headers}) =>
       (super.noSuchMethod(
             Invocation.method(#read, [url], {#headers: headers}),
-            returnValue: _i3.Future<String>.value(
-              _i5.dummyValue<String>(
+            returnValue: _i7.Future<String>.value(
+              _i9.dummyValue<String>(
                 this,
                 Invocation.method(#read, [url], {#headers: headers}),
               ),
             ),
           )
-          as _i3.Future<String>);
+          as _i7.Future<String>);
 
   @override
-  _i3.Future<_i6.Uint8List> readBytes(
+  _i7.Future<_i10.Uint8List> readBytes(
     Uri? url, {
     Map<String, String>? headers,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#readBytes, [url], {#headers: headers}),
-            returnValue: _i3.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
+            returnValue: _i7.Future<_i10.Uint8List>.value(_i10.Uint8List(0)),
           )
-          as _i3.Future<_i6.Uint8List>);
+          as _i7.Future<_i10.Uint8List>);
 
   @override
-  _i3.Future<_i2.StreamedResponse> send(_i2.BaseRequest? request) =>
+  _i7.Future<_i2.StreamedResponse> send(_i2.BaseRequest? request) =>
       (super.noSuchMethod(
             Invocation.method(#send, [request]),
-            returnValue: _i3.Future<_i2.StreamedResponse>.value(
+            returnValue: _i7.Future<_i2.StreamedResponse>.value(
               _FakeStreamedResponse_1(
                 this,
                 Invocation.method(#send, [request]),
               ),
             ),
           )
-          as _i3.Future<_i2.StreamedResponse>);
+          as _i7.Future<_i2.StreamedResponse>);
 
   @override
   void close() => super.noSuchMethod(
@@ -222,7 +286,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
 /// A class which mocks [LocalStorage].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
+class MockLocalStorage extends _i1.Mock implements _i11.LocalStorage {
   MockLocalStorage() {
     _i1.throwOnMissingStub(this);
   }
@@ -231,7 +295,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get accessToken =>
       (super.noSuchMethod(
             Invocation.getter(#accessToken),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i9.dummyValue<String>(
               this,
               Invocation.getter(#accessToken),
             ),
@@ -242,7 +306,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get refreshToken =>
       (super.noSuchMethod(
             Invocation.getter(#refreshToken),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i9.dummyValue<String>(
               this,
               Invocation.getter(#refreshToken),
             ),
@@ -253,7 +317,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get userId =>
       (super.noSuchMethod(
             Invocation.getter(#userId),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i9.dummyValue<String>(
               this,
               Invocation.getter(#userId),
             ),
@@ -264,7 +328,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get username =>
       (super.noSuchMethod(
             Invocation.getter(#username),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i9.dummyValue<String>(
               this,
               Invocation.getter(#username),
             ),
@@ -275,7 +339,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get userEmail =>
       (super.noSuchMethod(
             Invocation.getter(#userEmail),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i9.dummyValue<String>(
               this,
               Invocation.getter(#userEmail),
             ),
@@ -286,7 +350,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get userProfilePicture =>
       (super.noSuchMethod(
             Invocation.getter(#userProfilePicture),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i9.dummyValue<String>(
               this,
               Invocation.getter(#userProfilePicture),
             ),
@@ -302,7 +366,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get fcmToken =>
       (super.noSuchMethod(
             Invocation.getter(#fcmToken),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i9.dummyValue<String>(
               this,
               Invocation.getter(#fcmToken),
             ),
@@ -352,11 +416,389 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   );
 
   @override
-  _i3.Future<void> clear() =>
+  _i7.Future<void> clear() =>
       (super.noSuchMethod(
             Invocation.method(#clear, []),
-            returnValue: _i3.Future<void>.value(),
-            returnValueForMissingStub: _i3.Future<void>.value(),
+            returnValue: _i7.Future<void>.value(),
+            returnValueForMissingStub: _i7.Future<void>.value(),
           )
-          as _i3.Future<void>);
+          as _i7.Future<void>);
+}
+
+/// A class which mocks [ServiceLocator].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockServiceLocator extends _i1.Mock implements _i12.ServiceLocator {
+  MockServiceLocator() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  set logoutBloc(_i6.LogoutBloc? _logoutBloc) => super.noSuchMethod(
+    Invocation.setter(#logoutBloc, _logoutBloc),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set scaffoldMessengerKey(
+    _i3.GlobalKey<_i3.ScaffoldMessengerState>? _scaffoldMessengerKey,
+  ) => super.noSuchMethod(
+    Invocation.setter(#scaffoldMessengerKey, _scaffoldMessengerKey),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [ScaffoldMessengerState].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockScaffoldMessengerState extends _i1.Mock
+    implements _i3.ScaffoldMessengerState {
+  MockScaffoldMessengerState() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.ScaffoldMessenger get widget =>
+      (super.noSuchMethod(
+            Invocation.getter(#widget),
+            returnValue: _FakeScaffoldMessenger_2(
+              this,
+              Invocation.getter(#widget),
+            ),
+          )
+          as _i3.ScaffoldMessenger);
+
+  @override
+  _i3.BuildContext get context =>
+      (super.noSuchMethod(
+            Invocation.getter(#context),
+            returnValue: _FakeBuildContext_3(this, Invocation.getter(#context)),
+          )
+          as _i3.BuildContext);
+
+  @override
+  bool get mounted =>
+      (super.noSuchMethod(Invocation.getter(#mounted), returnValue: false)
+          as bool);
+
+  @override
+  void didChangeDependencies() => super.noSuchMethod(
+    Invocation.method(#didChangeDependencies, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  _i3.ScaffoldFeatureController<_i3.SnackBar, _i3.SnackBarClosedReason>
+  showSnackBar(
+    _i3.SnackBar? snackBar, {
+    _i3.AnimationStyle? snackBarAnimationStyle,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #showSnackBar,
+              [snackBar],
+              {#snackBarAnimationStyle: snackBarAnimationStyle},
+            ),
+            returnValue: _FakeScaffoldFeatureController_4<
+              _i3.SnackBar,
+              _i3.SnackBarClosedReason
+            >(
+              this,
+              Invocation.method(
+                #showSnackBar,
+                [snackBar],
+                {#snackBarAnimationStyle: snackBarAnimationStyle},
+              ),
+            ),
+          )
+          as _i3.ScaffoldFeatureController<
+            _i3.SnackBar,
+            _i3.SnackBarClosedReason
+          >);
+
+  @override
+  void removeCurrentSnackBar({
+    _i3.SnackBarClosedReason? reason = _i3.SnackBarClosedReason.remove,
+  }) => super.noSuchMethod(
+    Invocation.method(#removeCurrentSnackBar, [], {#reason: reason}),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void hideCurrentSnackBar({
+    _i3.SnackBarClosedReason? reason = _i3.SnackBarClosedReason.hide,
+  }) => super.noSuchMethod(
+    Invocation.method(#hideCurrentSnackBar, [], {#reason: reason}),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void clearSnackBars() => super.noSuchMethod(
+    Invocation.method(#clearSnackBars, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  _i3.ScaffoldFeatureController<
+    _i3.MaterialBanner,
+    _i3.MaterialBannerClosedReason
+  >
+  showMaterialBanner(_i3.MaterialBanner? materialBanner) =>
+      (super.noSuchMethod(
+            Invocation.method(#showMaterialBanner, [materialBanner]),
+            returnValue: _FakeScaffoldFeatureController_4<
+              _i3.MaterialBanner,
+              _i3.MaterialBannerClosedReason
+            >(this, Invocation.method(#showMaterialBanner, [materialBanner])),
+          )
+          as _i3.ScaffoldFeatureController<
+            _i3.MaterialBanner,
+            _i3.MaterialBannerClosedReason
+          >);
+
+  @override
+  void removeCurrentMaterialBanner({
+    _i3.MaterialBannerClosedReason? reason =
+        _i3.MaterialBannerClosedReason.remove,
+  }) => super.noSuchMethod(
+    Invocation.method(#removeCurrentMaterialBanner, [], {#reason: reason}),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void hideCurrentMaterialBanner({
+    _i3.MaterialBannerClosedReason? reason =
+        _i3.MaterialBannerClosedReason.hide,
+  }) => super.noSuchMethod(
+    Invocation.method(#hideCurrentMaterialBanner, [], {#reason: reason}),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void clearMaterialBanners() => super.noSuchMethod(
+    Invocation.method(#clearMaterialBanners, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  _i3.Widget build(_i3.BuildContext? context) =>
+      (super.noSuchMethod(
+            Invocation.method(#build, [context]),
+            returnValue: _FakeWidget_5(
+              this,
+              Invocation.method(#build, [context]),
+            ),
+          )
+          as _i3.Widget);
+
+  @override
+  void dispose() => super.noSuchMethod(
+    Invocation.method(#dispose, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void initState() => super.noSuchMethod(
+    Invocation.method(#initState, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void didUpdateWidget(_i3.ScaffoldMessenger? oldWidget) => super.noSuchMethod(
+    Invocation.method(#didUpdateWidget, [oldWidget]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void reassemble() => super.noSuchMethod(
+    Invocation.method(#reassemble, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void setState(_i13.VoidCallback? fn) => super.noSuchMethod(
+    Invocation.method(#setState, [fn]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void deactivate() => super.noSuchMethod(
+    Invocation.method(#deactivate, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void activate() => super.noSuchMethod(
+    Invocation.method(#activate, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void debugFillProperties(_i4.DiagnosticPropertiesBuilder? properties) =>
+      super.noSuchMethod(
+        Invocation.method(#debugFillProperties, [properties]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  String toString({_i4.DiagnosticLevel? minLevel = _i4.DiagnosticLevel.info}) =>
+      super.toString();
+
+  @override
+  String toStringShort() =>
+      (super.noSuchMethod(
+            Invocation.method(#toStringShort, []),
+            returnValue: _i9.dummyValue<String>(
+              this,
+              Invocation.method(#toStringShort, []),
+            ),
+          )
+          as String);
+
+  @override
+  _i4.DiagnosticsNode toDiagnosticsNode({
+    String? name,
+    _i4.DiagnosticsTreeStyle? style,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#toDiagnosticsNode, [], {
+              #name: name,
+              #style: style,
+            }),
+            returnValue: _FakeDiagnosticsNode_6(
+              this,
+              Invocation.method(#toDiagnosticsNode, [], {
+                #name: name,
+                #style: style,
+              }),
+            ),
+          )
+          as _i4.DiagnosticsNode);
+
+  @override
+  _i5.Ticker createTicker(_i5.TickerCallback? onTick) =>
+      (super.noSuchMethod(
+            Invocation.method(#createTicker, [onTick]),
+            returnValue: _FakeTicker_7(
+              this,
+              Invocation.method(#createTicker, [onTick]),
+            ),
+          )
+          as _i5.Ticker);
+}
+
+/// A class which mocks [LogoutBloc].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockLogoutBloc extends _i1.Mock implements _i6.LogoutBloc {
+  MockLogoutBloc() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i6.LogoutRepository get logoutRepository =>
+      (super.noSuchMethod(
+            Invocation.getter(#logoutRepository),
+            returnValue: _FakeLogoutRepository_8(
+              this,
+              Invocation.getter(#logoutRepository),
+            ),
+          )
+          as _i6.LogoutRepository);
+
+  @override
+  _i6.LogoutState get state =>
+      (super.noSuchMethod(
+            Invocation.getter(#state),
+            returnValue: _i9.dummyValue<_i6.LogoutState>(
+              this,
+              Invocation.getter(#state),
+            ),
+          )
+          as _i6.LogoutState);
+
+  @override
+  _i7.Stream<_i6.LogoutState> get stream =>
+      (super.noSuchMethod(
+            Invocation.getter(#stream),
+            returnValue: _i7.Stream<_i6.LogoutState>.empty(),
+          )
+          as _i7.Stream<_i6.LogoutState>);
+
+  @override
+  bool get isClosed =>
+      (super.noSuchMethod(Invocation.getter(#isClosed), returnValue: false)
+          as bool);
+
+  @override
+  void add(_i6.LogoutEvent? event) => super.noSuchMethod(
+    Invocation.method(#add, [event]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void onEvent(_i6.LogoutEvent? event) => super.noSuchMethod(
+    Invocation.method(#onEvent, [event]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void emit(_i6.LogoutState? state) => super.noSuchMethod(
+    Invocation.method(#emit, [state]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void on<E extends _i6.LogoutEvent>(
+    _i14.EventHandler<E, _i6.LogoutState>? handler, {
+    _i14.EventTransformer<E>? transformer,
+  }) => super.noSuchMethod(
+    Invocation.method(#on, [handler], {#transformer: transformer}),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void onTransition(
+    _i14.Transition<_i6.LogoutEvent, _i6.LogoutState>? transition,
+  ) => super.noSuchMethod(
+    Invocation.method(#onTransition, [transition]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  _i7.Future<void> close() =>
+      (super.noSuchMethod(
+            Invocation.method(#close, []),
+            returnValue: _i7.Future<void>.value(),
+            returnValueForMissingStub: _i7.Future<void>.value(),
+          )
+          as _i7.Future<void>);
+
+  @override
+  void onChange(_i14.Change<_i6.LogoutState>? change) => super.noSuchMethod(
+    Invocation.method(#onChange, [change]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void addError(Object? error, [StackTrace? stackTrace]) => super.noSuchMethod(
+    Invocation.method(#addError, [error, stackTrace]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void onError(Object? error, StackTrace? stackTrace) => super.noSuchMethod(
+    Invocation.method(#onError, [error, stackTrace]),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [GlobalKey].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGlobalKey<T extends _i3.State<_i3.StatefulWidget>> extends _i1.Mock
+    implements _i3.GlobalKey<T> {
+  MockGlobalKey() {
+    _i1.throwOnMissingStub(this);
+  }
 }

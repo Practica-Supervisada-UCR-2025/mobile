@@ -8,7 +8,7 @@ class ApiServiceImpl implements ApiService {
   final http.Client client;
   final LocalStorage localStorage;
   final String baseUrl;
-  final ServiceLocator serviceLocator; // 👈 inyectado
+  final ServiceLocator serviceLocator;
 
   ApiServiceImpl({
     http.Client? client,
@@ -42,18 +42,20 @@ class ApiServiceImpl implements ApiService {
 
   Future<http.Response> _handleResponse(http.Response response) async {
     if (response.statusCode == 401) {
-      final scaffoldMessengerKey = ServiceLocator().scaffoldMessengerKey;
+      final scaffoldMessengerKey = serviceLocator.scaffoldMessengerKey;
+
       if (scaffoldMessengerKey?.currentState != null) {
         scaffoldMessengerKey!.currentState!.showSnackBar(
           SessionExpiredSnackBar(),
         );
       }
 
-      final logoutBloc = ServiceLocator().logoutBloc;
+      final logoutBloc = serviceLocator.logoutBloc;
       if (logoutBloc != null) {
         logoutBloc.add(LogoutRequested());
       }
     }
+
     return response;
   }
 
