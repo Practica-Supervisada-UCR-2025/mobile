@@ -51,6 +51,9 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
@@ -139,10 +142,17 @@ class MyApp extends StatelessWidget {
                 ),
           ),
           BlocProvider<LogoutBloc>(
-            create:
-                (context) => LogoutBloc(
-                  logoutRepository: context.read<LogoutRepository>(),
-                ),
+            create: (context) {
+              final logoutBloc = LogoutBloc(
+                logoutRepository: context.read<LogoutRepository>(),
+              );
+              ServiceLocator().registerLogoutBloc(logoutBloc);
+              ServiceLocator().registerScaffoldMessengerKey(
+                scaffoldMessengerKey,
+              );
+
+              return logoutBloc;
+            },
           ),
           BlocProvider<ProfileBloc>(
             create:
@@ -175,11 +185,20 @@ class MyApp extends StatelessWidget {
             context.read<LoginBloc>().stream.listen((state) {
               notifier.refresh();
             });
+
+            final loginBloc = context.read<LoginBloc>();
+            context.read<LogoutBloc>().stream.listen((state) {
+              if (state is LogoutSuccess) {
+                loginBloc.add(LoginReset());
+              }
+            });
+
             return MaterialApp.router(
               title: 'UCR Connect',
               themeMode: ThemeMode.system,
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
+              scaffoldMessengerKey: scaffoldMessengerKey,
               routerConfig: createRouter(context),
             );
           },
