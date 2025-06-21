@@ -1,9 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile/src/home/_children/news/news.dart';
-import 'package:mobile/src/home/_children/posts/posts.dart';
-import 'package:mobile/src/home/presenter/page/page.dart';
-import 'package:mobile/core/core.dart';
 
 void main() {
   // testWidgets('HomeScreen shows tabs "Posts" and "News" and switches between them',

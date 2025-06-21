@@ -7,7 +7,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:mobile/core/services/api_service/domain/repository/api_service.dart';
-import 'package:mobile/src/profile/domain/models/user.dart';
 
 import 'profile_repository_test.mocks.dart';
 
