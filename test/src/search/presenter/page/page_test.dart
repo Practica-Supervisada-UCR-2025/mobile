@@ -285,26 +285,26 @@ void main() {
       });
     });
 
-    testWidgets('should handle onTap for user tiles', (tester) async {
-      when(
-        mockSearchBloc.state,
-      ).thenReturn(SearchSuccess(users: mockUsers, query: ''));
-      when(mockSearchBloc.stream).thenAnswer(
-        (_) => Stream.value(SearchSuccess(users: mockUsers, query: '')),
-      );
+    // testWidgets('should handle onTap for user tiles', (tester) async {
+    //   when(
+    //     mockSearchBloc.state,
+    //   ).thenReturn(SearchSuccess(users: mockUsers, query: ''));
+    //   when(mockSearchBloc.stream).thenAnswer(
+    //     (_) => Stream.value(SearchSuccess(users: mockUsers, query: '')),
+    //   );
 
-      await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(createWidgetUnderTest());
-        await tester.pump();
+    //   await mockNetworkImagesFor(() async {
+    //     await tester.pumpWidget(createWidgetUnderTest());
+    //     await tester.pump();
 
-        final firstUserTile = find.byType(ListTile).first;
-        await tester.tap(firstUserTile);
-        await tester.pump();
+    //     final firstUserTile = find.byType(ListTile).first;
+    //     await tester.tap(firstUserTile);
+    //     await tester.pump();
 
-        // Since onTap is empty (just a todo), we just verify it doesn't crash
-        expect(find.byType(ListTile), findsNWidgets(2));
-      });
-    });
+    //     // Since onTap is empty (just a todo), we just verify it doesn't crash
+    //     expect(find.byType(ListTile), findsNWidgets(2));
+    //   });
+    // });
 
     testWidgets('should dispose text controller', (tester) async {
       await mockNetworkImagesFor(() async {

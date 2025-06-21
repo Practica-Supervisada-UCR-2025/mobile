@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mobile/core/storage/storage.dart';
 import 'package:mobile/core/core.dart' show DEFAULT_PROFILE_PIC;
 import 'package:mobile/core/globals/publications/publications.dart'
-    show Publication, PublicationCard;
+    show Publication, PublicationCard, PublicationOptionsButton;
 
 void main() {
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    await LocalStorage.init();
+  });
+
   Future<void> pumpCard(
     WidgetTester tester,
     Publication pub, {
@@ -128,14 +135,14 @@ void main() {
     expect(network.url, fileUrl);
   });
 
-  testWidgets('popup menu has Delete option and can be tapped', (
+  testWidgets('PublicationCard renders PublicationOptionsButton', (
     WidgetTester tester,
   ) async {
     final pub = Publication(
-      id: '4',
-      username: 'menuuser',
+      id: '1',
+      username: 'testuser',
       profileImageUrl: '',
-      content: 'Menu test',
+      content: 'Testing options button',
       createdAt: DateTime.now(),
       attachment: null,
       likes: 0,
@@ -143,14 +150,7 @@ void main() {
     );
 
     await pumpCard(tester, pub);
-
-    await tester.tap(find.byType(PopupMenuButton<String>));
-    await tester.pumpAndSettle();
-    expect(find.text('Delete'), findsOneWidget);
-
-    await tester.tap(find.text('Delete'));
-    await tester.pumpAndSettle();
-    expect(find.text('Delete'), findsNothing);
+    expect(find.byType(PublicationOptionsButton), findsOneWidget);
   });
 
   testWidgets('Expandable text: short content does not show See more', (

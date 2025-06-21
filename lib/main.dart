@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
               ),
         ),
         RepositoryProvider<ProfileRepository>(
-          create: (context) => ProfileRepositoryAPI(),
+          create: (context) => ProfileRepositoryAPI(apiService: ApiServiceImpl()),
         ),
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),
@@ -125,6 +125,12 @@ class MyApp extends StatelessWidget {
               (context) => CommentsRepositoryImpl(
                 apiService: context.read<ApiService>(),
               ),
+        ),
+        RepositoryProvider<ReportPublicationRepository>(
+          create: (context) => ReportPublicationRepositoryAPI(),
+        ),
+        RepositoryProvider<DeletePublicationRepository>(
+          create: (context) => DeletePublicationRepositoryAPI(),
         ),
       ],
       child: MultiBlocProvider(
@@ -178,6 +184,20 @@ class MyApp extends StatelessWidget {
             create:
                 (context) => SearchBloc(
                   searchUsersRepository: context.read<SearchUsersRepository>(),
+                ),
+          ),
+          BlocProvider<ReportPublicationBloc>(
+            create:
+                (context) => ReportPublicationBloc(
+                  reportPublicationRepository:
+                      context.read<ReportPublicationRepository>(),
+                ),
+          ),
+          BlocProvider<DeletePublicationBloc>(
+            create:
+                (context) => DeletePublicationBloc(
+                  deletePublicationRepository:
+                      context.read<DeletePublicationRepository>(),
                 ),
           ),
         ],

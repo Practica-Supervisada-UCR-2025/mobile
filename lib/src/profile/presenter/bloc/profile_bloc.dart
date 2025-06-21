@@ -23,12 +23,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     emit(ProfileLoading());
     try {
-      final user = await profileRepository.getCurrentUser(
-        LocalStorage().accessToken,
-      );
-      LocalStorage localStorage = LocalStorage();
-      localStorage.userProfilePicture = user.image;
-      localStorage.username = user.username;
+      final user = event.userId == null
+        ? await profileRepository.getCurrentUser(
+          LocalStorage().accessToken
+        )
+        : await profileRepository.getUserProfile(
+          event.userId!,
+          LocalStorage().accessToken
+        );
+      if(event.userId == null) {
+        LocalStorage localStorage = LocalStorage();
+        localStorage.userProfilePicture = user.image;
+        localStorage.username = user.username;
+      }
       emit(ProfileSuccess(user: user));
     } catch (e) {
       emit(ProfileFailure(error: e.toString()));

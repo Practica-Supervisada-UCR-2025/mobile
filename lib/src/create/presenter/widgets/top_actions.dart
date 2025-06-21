@@ -60,7 +60,10 @@ class TopActions extends StatelessWidget {
 
               Future.delayed(const Duration(milliseconds: 300), () {
                 if (context.mounted) {
-                  context.go(Paths.profile, extra: {'refresh': true});
+                  context.go(
+                    Paths.profile,
+                    extra: {'refresh': DateTime.now().millisecondsSinceEpoch},
+                  );
                 }
               });
             }

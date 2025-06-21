@@ -4,9 +4,11 @@ import 'package:mobile/core/globals/publications/publications.dart';
 import 'package:mobile/core/storage/storage.dart';
 
 class PublicationsList extends StatefulWidget {
+  final bool isFeed;
   final String scrollKey;
+  final bool isOtherUser;
 
-  const PublicationsList({super.key, required this.scrollKey});
+  const PublicationsList({super.key, required this.scrollKey, required this.isFeed, required this.isOtherUser});
 
   @override
   State<PublicationsList> createState() => _PublicationsListState();
@@ -47,7 +49,7 @@ class _PublicationsListState extends State<PublicationsList>
     if (thresholdReached &&
         state is PublicationSuccess &&
         !state.hasReachedMax) {
-      _bloc.add(LoadMorePublications());
+      _bloc.add(LoadMorePublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
     }
 
     final shouldShow = _scrollController.offset > 600;
@@ -59,18 +61,25 @@ class _PublicationsListState extends State<PublicationsList>
   }
 
   Future<void> _onRefresh() async {
-    setState(() => _showRefreshButton = false);
-    if (_scrollController.hasClients) {
-      await _scrollController.animateTo(
-        0.0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-      ScrollStorage.setOffset(widget.scrollKey, 0.0);
-    }
+    setState(() {
+      _showRefreshButton = false;
+    });
+    _bloc.add(RefreshPublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
 
-    _bloc.add(RefreshPublications());
-    await Future.delayed(const Duration(milliseconds: 300));
+    await _bloc.stream.firstWhere(
+      (state) => state is PublicationSuccess || state is PublicationFailure,
+    );
+
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
