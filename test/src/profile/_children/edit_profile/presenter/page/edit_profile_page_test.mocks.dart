@@ -57,6 +57,19 @@ class MockProfileRepository extends _i1.Mock implements _i4.ProfileRepository {
             ),
           )
           as _i5.Future<_i2.User>);
+
+  @override
+  _i5.Future<_i2.User> getUserProfile(String? userId, String? token) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserProfile, [userId, token]),
+            returnValue: _i5.Future<_i2.User>.value(
+              _FakeUser_0(
+                this,
+                Invocation.method(#getUserProfile, [userId, token]),
+              ),
+            ),
+          )
+          as _i5.Future<_i2.User>);
 }
 
 /// A class which mocks [EditProfileRepository].

@@ -65,7 +65,6 @@ class PublicationCard extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              /// Attachment
               if (publication.attachment != null &&
                   publication.attachment!.isNotEmpty)
                 ClipRRect(
@@ -80,35 +79,77 @@ class PublicationCard extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              Row(
+             Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.favorite_border, size: 20),
-                    onPressed: () {},
+                  Row(
+                    children: [
+                      _InteractionButton(
+                        icon: Icons.favorite_border,
+                        label: publication.likes.toString(),
+                        onPressed: () {
+                        },
+                      ),
+                      const SizedBox(width: 24), 
+                      _InteractionButton(
+                        icon: Icons.chat_bubble_outline,
+                        label: publication.comments.toString(),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  CommentsPage(publication: publication),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                  Text(publication.likes.toString()),
-                  const SizedBox(width: 16),
-                  IconButton(
-                    icon: const Icon(Icons.chat_bubble_outline, size: 20),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (_) => CommentsPage(publication: publication),
-                        ),
-                      );
-                    },
-                  ),
-                  Text(publication.comments.toString()),
-                  const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.share, size: 20),
-                    onPressed: () {},
+                    onPressed: () {
+                    },
                   ),
                 ],
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InteractionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  const _InteractionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(20), 
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurface),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
         ),
       ),
     );

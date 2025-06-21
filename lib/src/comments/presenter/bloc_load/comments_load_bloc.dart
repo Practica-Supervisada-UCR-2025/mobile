@@ -8,6 +8,8 @@ part 'comments_load_state.dart';
 class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
   final CommentsRepository repository;
   final String postId;
+  static const int _commentsPerPage = 5;
+
 
   CommentsLoadBloc({
     required this.repository,
@@ -22,32 +24,11 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
     Emitter<CommentsLoadState> emit,
   ) async {
     emit(const CommentsLoading(isInitialFetch: true));
-    
-    await Future.delayed(const Duration(seconds: 1));
-
-    final now = DateTime.now();
-    final mockComments = List.generate(10, (index) {
-      return CommentModel(
-        id: '${index + 1}',
-        username: 'Usuario${index + 1}',
-        content: 'Este es el comentario de prueba número ${index + 1}. El scroll debería funcionar correctamente con esta cantidad de datos.',
-        createdAt: now.subtract(Duration(minutes: (10 - index) * 5)),
-      );
-    });
-
-    emit(CommentsLoaded(
-      comments: mockComments,
-      hasReachedEnd: true, 
-      currentIndex: 0,
-    ));
-
-
-
-    /*// --- CÓDIGO ORIGINAL
     try {
       final response = await repository.fetchComments(
         postId: postId,
         startTime: DateTime.fromMillisecondsSinceEpoch(0),
+        limit: _commentsPerPage,
       );
       emit(CommentsLoaded(
         comments: response.comments,
@@ -57,7 +38,6 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
     } catch (e) {
       emit(CommentsError(message: e.toString()));
     }
-    */
   }
 
   Future<void> _onFetchMoreComments(
@@ -72,6 +52,7 @@ class CommentsLoadBloc extends Bloc<CommentsLoadEvent, CommentsLoadState> {
       final response = await repository.fetchComments(
         postId: postId,
         startTime: currentState.comments.last.createdAt,
+        limit: _commentsPerPage,
       );
 
       final updatedComments = List<CommentModel>.from(currentState.comments)

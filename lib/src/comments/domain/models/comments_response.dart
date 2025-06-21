@@ -1,11 +1,12 @@
+import 'package:equatable/equatable.dart';
 import 'comment_model.dart';
 
-class CommentsResponse {
+class CommentsResponse extends Equatable {
   final List<CommentModel> comments;
   final int totalItems;
   final int currentIndex;
 
-  CommentsResponse({
+  const CommentsResponse({
     required this.comments,
     required this.totalItems,
     required this.currentIndex,
@@ -20,4 +21,7 @@ class CommentsResponse {
       currentIndex: json['metadata']['currentIndex'],
     );
   }
+
+  @override
+  List<Object?> get props => [comments, totalItems, currentIndex];
 }

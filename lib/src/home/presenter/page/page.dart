@@ -3,7 +3,8 @@ import 'package:mobile/src/home/_children/news/news.dart';
 import 'package:mobile/src/home/_children/posts/posts.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final bool isFeed;
+  const HomeScreen({super.key, required this.isFeed});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -54,8 +55,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: const [
-              PostsPage(),
+            children: [
+              PostsPage(isFeed: widget.isFeed),
               NewsPage(),
             ],
           ),

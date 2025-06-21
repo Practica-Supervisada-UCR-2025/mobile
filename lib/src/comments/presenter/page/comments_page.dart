@@ -28,12 +28,14 @@ class CommentsPage extends StatelessWidget {
       body: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => CommentsLoadBloc(
-              repository: CommentsRepositoryImpl(
-                apiService: Provider.of<ApiService>(context, listen: false),
-              ),
-              postId: publication.id.toString(),
-            )..add(FetchInitialComments()),
+            create: (context) {
+              return CommentsLoadBloc(
+                repository: CommentsRepositoryImpl(
+                  apiService: Provider.of<ApiService>(context, listen: false),
+                ),
+                postId: publication.id.toString(),
+              )..add(FetchInitialComments());
+            },
           ),
           BlocProvider(
             create: (context) => CommentsCreateBloc(
@@ -43,18 +45,30 @@ class CommentsPage extends StatelessWidget {
             ),
           ),
         ],
-        child: Column(
-          children: [
-            Expanded(
-              child: CommentsList(publication: publication),
-            ),
-            CommentInput(postId: publication.id),
-          ],
+        child: BlocListener<CommentsCreateBloc, CommentsCreateState>(
+          listener: (context, state) {
+            if (state is CommentSuccess) {
+              context.read<CommentsLoadBloc>().add(FetchInitialComments());
+              context.read<CommentsCreateBloc>().add(CommentReset());
+            } else if (state is CommentFailure) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(SnackBar(content: Text('Error: ${state.error}')));
+            }
+          },
+          child: Column(
+            children: [
+              Expanded(child: CommentsList(publication: publication)),
+              CommentInput(postId: publication.id),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+
 
 class PostPreview extends StatelessWidget {
   final Publication publication;
