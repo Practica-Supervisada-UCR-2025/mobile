@@ -28,28 +28,42 @@ class PublicationCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
-                    foregroundImage: NetworkImage(publication.profileImageUrl),
-                    radius: 18,
+                  GestureDetector(
+                    onTap: () {
+                      if(publication.userId != null){
+                        context.go(Paths.externProfile(publication.userId!));
+                      }
+                    },
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
+                      foregroundImage: NetworkImage(publication.profileImageUrl),
+                      radius: 18,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          publication.username,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          relativeDate(publication.createdAt),
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
+                    child: GestureDetector(
+                      onTap: () {
+                        if(publication.userId != null){
+                          context.go(Paths.externProfile(publication.userId!));
+                        }
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            publication.username,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ),
-                      ],
+                          Text(
+                            relativeDate(publication.createdAt),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   PublicationOptionsButton(
@@ -79,7 +93,7 @@ class PublicationCard extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-             Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
@@ -88,21 +102,23 @@ class PublicationCard extends StatelessWidget {
                         icon: Icons.favorite_border,
                         label: publication.likes.toString(),
                         onPressed: () {
+                          // Like logic here
                         },
                       ),
-                      const SizedBox(width: 24), 
+                      const SizedBox(width: 24),
                       _InteractionButton(
                         icon: Icons.chat_bubble_outline,
                         label: publication.comments.toString(),
                         onPressed: () {
-                        context.go(Paths.comments, extra: publication);
-                      }
+                          context.go(Paths.comments, extra: publication);
+                        },
                       ),
                     ],
                   ),
                   IconButton(
                     icon: const Icon(Icons.share, size: 20),
                     onPressed: () {
+                      // Share logic here
                     },
                   ),
                 ],
@@ -130,7 +146,7 @@ class _InteractionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(20), 
+      borderRadius: BorderRadius.circular(20),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
         child: Row(

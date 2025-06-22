@@ -127,6 +127,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
             attachment: attachment,
             likes: raw['likes'] is int ? raw['likes'] as int : 0,
             comments: commentCount, 
+            userId: raw['user_id'] is String ? raw['user_id'] as String : null,
           ),
         );
       }
