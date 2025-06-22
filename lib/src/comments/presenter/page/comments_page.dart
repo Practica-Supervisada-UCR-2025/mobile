@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/comments/comments.dart';
@@ -22,7 +23,7 @@ class CommentsPage extends StatelessWidget {
         title: const Text("Comments"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.go(Paths.home),
         ),
       ),
       body: MultiBlocProvider(

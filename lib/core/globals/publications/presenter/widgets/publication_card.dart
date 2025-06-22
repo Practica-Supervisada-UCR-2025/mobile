@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
-import 'package:mobile/src/comments/presenter/page/comments_page.dart';
 
 class PublicationCard extends StatelessWidget {
   final Publication publication;
@@ -95,13 +95,8 @@ class PublicationCard extends StatelessWidget {
                         icon: Icons.chat_bubble_outline,
                         label: publication.comments.toString(),
                         onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  CommentsPage(publication: publication),
-                            ),
-                          );
-                        },
+                        context.go(Paths.comments, extra: publication);
+                      }
                       ),
                     ],
                   ),

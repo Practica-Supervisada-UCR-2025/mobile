@@ -11,4 +11,5 @@ class Paths {
   static String externProfile(String userId) => '/profile/$userId';
   static const String editProfile = '/edit-profile';
   static const String settings = '/settings';
+  static const String comments = '/comments';
 }
