@@ -35,6 +35,14 @@ class AppTheme {
       outline: AppColors.textSecondary,
       onPrimary: AppColors.buttonBackground,
     ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: AppColors.primary,      
+      foregroundColor: Colors.white,    
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
   );
 
   static ThemeData darkTheme = ThemeData(
@@ -67,5 +75,14 @@ class AppTheme {
       outline: AppColors.textSecondary,
       onPrimary: AppColors.buttonBackgroundDark,
     ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: AppColors.primary,       // mismo color o uno más claro
+      foregroundColor: AppColors.buttonBackground,            // para contraste en modo oscuro
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
+
   );
 }
