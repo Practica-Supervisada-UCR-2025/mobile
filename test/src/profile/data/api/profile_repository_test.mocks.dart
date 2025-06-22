@@ -3,14 +3,14 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i3;
-import 'dart:convert' as _i4;
-import 'dart:typed_data' as _i6;
+import 'dart:async' as _i4;
+import 'dart:convert' as _i5;
+import 'dart:typed_data' as _i7;
 
 import 'package:http/http.dart' as _i2;
-import 'package:mobile/core/storage/user_session.storage.dart' as _i7;
+import 'package:mobile/core/core.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i5;
+import 'package:mockito/src/dummies.dart' as _i6;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -37,6 +37,16 @@ class _FakeStreamedResponse_1 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
+class _FakeClient_2 extends _i1.SmartFake implements _i2.Client {
+  _FakeClient_2(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeLocalStorage_3 extends _i1.SmartFake implements _i3.LocalStorage {
+  _FakeLocalStorage_3(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [Client].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -46,37 +56,37 @@ class MockClient extends _i1.Mock implements _i2.Client {
   }
 
   @override
-  _i3.Future<_i2.Response> head(Uri? url, {Map<String, String>? headers}) =>
+  _i4.Future<_i2.Response> head(Uri? url, {Map<String, String>? headers}) =>
       (super.noSuchMethod(
             Invocation.method(#head, [url], {#headers: headers}),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i4.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(#head, [url], {#headers: headers}),
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i4.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> get(Uri? url, {Map<String, String>? headers}) =>
+  _i4.Future<_i2.Response> get(Uri? url, {Map<String, String>? headers}) =>
       (super.noSuchMethod(
             Invocation.method(#get, [url], {#headers: headers}),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i4.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(#get, [url], {#headers: headers}),
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i4.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> post(
+  _i4.Future<_i2.Response> post(
     Uri? url, {
     Map<String, String>? headers,
     Object? body,
-    _i4.Encoding? encoding,
+    _i5.Encoding? encoding,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -84,7 +94,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
               [url],
               {#headers: headers, #body: body, #encoding: encoding},
             ),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i4.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(
@@ -95,14 +105,14 @@ class MockClient extends _i1.Mock implements _i2.Client {
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i4.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> put(
+  _i4.Future<_i2.Response> put(
     Uri? url, {
     Map<String, String>? headers,
     Object? body,
-    _i4.Encoding? encoding,
+    _i5.Encoding? encoding,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -110,7 +120,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
               [url],
               {#headers: headers, #body: body, #encoding: encoding},
             ),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i4.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(
@@ -121,14 +131,14 @@ class MockClient extends _i1.Mock implements _i2.Client {
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i4.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> patch(
+  _i4.Future<_i2.Response> patch(
     Uri? url, {
     Map<String, String>? headers,
     Object? body,
-    _i4.Encoding? encoding,
+    _i5.Encoding? encoding,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -136,7 +146,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
               [url],
               {#headers: headers, #body: body, #encoding: encoding},
             ),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i4.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(
@@ -147,14 +157,14 @@ class MockClient extends _i1.Mock implements _i2.Client {
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i4.Future<_i2.Response>);
 
   @override
-  _i3.Future<_i2.Response> delete(
+  _i4.Future<_i2.Response> delete(
     Uri? url, {
     Map<String, String>? headers,
     Object? body,
-    _i4.Encoding? encoding,
+    _i5.Encoding? encoding,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -162,7 +172,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
               [url],
               {#headers: headers, #body: body, #encoding: encoding},
             ),
-            returnValue: _i3.Future<_i2.Response>.value(
+            returnValue: _i4.Future<_i2.Response>.value(
               _FakeResponse_0(
                 this,
                 Invocation.method(
@@ -173,44 +183,44 @@ class MockClient extends _i1.Mock implements _i2.Client {
               ),
             ),
           )
-          as _i3.Future<_i2.Response>);
+          as _i4.Future<_i2.Response>);
 
   @override
-  _i3.Future<String> read(Uri? url, {Map<String, String>? headers}) =>
+  _i4.Future<String> read(Uri? url, {Map<String, String>? headers}) =>
       (super.noSuchMethod(
             Invocation.method(#read, [url], {#headers: headers}),
-            returnValue: _i3.Future<String>.value(
-              _i5.dummyValue<String>(
+            returnValue: _i4.Future<String>.value(
+              _i6.dummyValue<String>(
                 this,
                 Invocation.method(#read, [url], {#headers: headers}),
               ),
             ),
           )
-          as _i3.Future<String>);
+          as _i4.Future<String>);
 
   @override
-  _i3.Future<_i6.Uint8List> readBytes(
+  _i4.Future<_i7.Uint8List> readBytes(
     Uri? url, {
     Map<String, String>? headers,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#readBytes, [url], {#headers: headers}),
-            returnValue: _i3.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
+            returnValue: _i4.Future<_i7.Uint8List>.value(_i7.Uint8List(0)),
           )
-          as _i3.Future<_i6.Uint8List>);
+          as _i4.Future<_i7.Uint8List>);
 
   @override
-  _i3.Future<_i2.StreamedResponse> send(_i2.BaseRequest? request) =>
+  _i4.Future<_i2.StreamedResponse> send(_i2.BaseRequest? request) =>
       (super.noSuchMethod(
             Invocation.method(#send, [request]),
-            returnValue: _i3.Future<_i2.StreamedResponse>.value(
+            returnValue: _i4.Future<_i2.StreamedResponse>.value(
               _FakeStreamedResponse_1(
                 this,
                 Invocation.method(#send, [request]),
               ),
             ),
           )
-          as _i3.Future<_i2.StreamedResponse>);
+          as _i4.Future<_i2.StreamedResponse>);
 
   @override
   void close() => super.noSuchMethod(
@@ -222,7 +232,7 @@ class MockClient extends _i1.Mock implements _i2.Client {
 /// A class which mocks [LocalStorage].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
+class MockLocalStorage extends _i1.Mock implements _i3.LocalStorage {
   MockLocalStorage() {
     _i1.throwOnMissingStub(this);
   }
@@ -231,7 +241,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get accessToken =>
       (super.noSuchMethod(
             Invocation.getter(#accessToken),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#accessToken),
             ),
@@ -242,7 +252,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get refreshToken =>
       (super.noSuchMethod(
             Invocation.getter(#refreshToken),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#refreshToken),
             ),
@@ -253,7 +263,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get userId =>
       (super.noSuchMethod(
             Invocation.getter(#userId),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#userId),
             ),
@@ -264,7 +274,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get username =>
       (super.noSuchMethod(
             Invocation.getter(#username),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#username),
             ),
@@ -275,7 +285,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get userEmail =>
       (super.noSuchMethod(
             Invocation.getter(#userEmail),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#userEmail),
             ),
@@ -286,7 +296,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get userProfilePicture =>
       (super.noSuchMethod(
             Invocation.getter(#userProfilePicture),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#userProfilePicture),
             ),
@@ -302,7 +312,7 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   String get fcmToken =>
       (super.noSuchMethod(
             Invocation.getter(#fcmToken),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#fcmToken),
             ),
@@ -352,11 +362,359 @@ class MockLocalStorage extends _i1.Mock implements _i7.LocalStorage {
   );
 
   @override
-  _i3.Future<void> clear() =>
+  _i4.Future<void> clear() =>
       (super.noSuchMethod(
             Invocation.method(#clear, []),
-            returnValue: _i3.Future<void>.value(),
-            returnValueForMissingStub: _i3.Future<void>.value(),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
           )
-          as _i3.Future<void>);
+          as _i4.Future<void>);
+}
+
+/// A class which mocks [ApiServiceImpl].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockApiServiceImpl extends _i1.Mock implements _i3.ApiServiceImpl {
+  MockApiServiceImpl() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i2.Client get client =>
+      (super.noSuchMethod(
+            Invocation.getter(#client),
+            returnValue: _FakeClient_2(this, Invocation.getter(#client)),
+          )
+          as _i2.Client);
+
+  @override
+  _i3.LocalStorage get localStorage =>
+      (super.noSuchMethod(
+            Invocation.getter(#localStorage),
+            returnValue: _FakeLocalStorage_3(
+              this,
+              Invocation.getter(#localStorage),
+            ),
+          )
+          as _i3.LocalStorage);
+
+  @override
+  String get baseUrl =>
+      (super.noSuchMethod(
+            Invocation.getter(#baseUrl),
+            returnValue: _i6.dummyValue<String>(
+              this,
+              Invocation.getter(#baseUrl),
+            ),
+          )
+          as String);
+
+  @override
+  _i4.Future<_i2.Response> get(
+    String? endpoint, {
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #get,
+              [endpoint],
+              {#authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #get,
+                  [endpoint],
+                  {#authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> post(
+    String? endpoint, {
+    Map<String, dynamic>? body,
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #post,
+              [endpoint],
+              {#body: body, #authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #post,
+                  [endpoint],
+                  {#body: body, #authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> patch(
+    String? endpoint, {
+    Map<String, dynamic>? body,
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #patch,
+              [endpoint],
+              {#body: body, #authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #patch,
+                  [endpoint],
+                  {#body: body, #authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> delete(
+    String? endpoint, {
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #delete,
+              [endpoint],
+              {#authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #delete,
+                  [endpoint],
+                  {#authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> patchMultipart(
+    String? endpoint,
+    Map<String, String>? fields,
+    List<_i2.MultipartFile>? files, {
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #patchMultipart,
+              [endpoint, fields, files],
+              {#authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #patchMultipart,
+                  [endpoint, fields, files],
+                  {#authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> postMultipart(
+    String? endpoint,
+    Map<String, String>? fields,
+    List<_i2.MultipartFile>? files, {
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #postMultipart,
+              [endpoint, fields, files],
+              {#authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #postMultipart,
+                  [endpoint, fields, files],
+                  {#authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+}
+
+/// A class which mocks [ApiService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockApiService extends _i1.Mock implements _i3.ApiService {
+  MockApiService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Future<_i2.Response> get(
+    String? endpoint, {
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #get,
+              [endpoint],
+              {#authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #get,
+                  [endpoint],
+                  {#authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> post(
+    String? endpoint, {
+    Map<String, dynamic>? body,
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #post,
+              [endpoint],
+              {#body: body, #authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #post,
+                  [endpoint],
+                  {#body: body, #authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> patch(
+    String? endpoint, {
+    Map<String, dynamic>? body,
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #patch,
+              [endpoint],
+              {#body: body, #authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #patch,
+                  [endpoint],
+                  {#body: body, #authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> delete(
+    String? endpoint, {
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #delete,
+              [endpoint],
+              {#authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #delete,
+                  [endpoint],
+                  {#authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> patchMultipart(
+    String? endpoint,
+    Map<String, String>? fields,
+    List<_i2.MultipartFile>? files, {
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #patchMultipart,
+              [endpoint, fields, files],
+              {#authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #patchMultipart,
+                  [endpoint, fields, files],
+                  {#authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
+
+  @override
+  _i4.Future<_i2.Response> postMultipart(
+    String? endpoint,
+    Map<String, String>? fields,
+    List<_i2.MultipartFile>? files, {
+    bool? authenticated = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #postMultipart,
+              [endpoint, fields, files],
+              {#authenticated: authenticated},
+            ),
+            returnValue: _i4.Future<_i2.Response>.value(
+              _FakeResponse_0(
+                this,
+                Invocation.method(
+                  #postMultipart,
+                  [endpoint, fields, files],
+                  {#authenticated: authenticated},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response>);
 }
