@@ -1,20 +1,20 @@
 import 'dart:convert';
+
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/auth/auth.dart';
-import 'package:http/http.dart' as http;
 
 class TokensRepositoryAPI implements TokensRepository {
-  final http.Client client;
+  final ApiService apiService;
 
-  TokensRepositoryAPI({http.Client? client}) : client = client ?? http.Client();
+  TokensRepositoryAPI({required this.apiService});
 
   @override
   Future<AuthTokens> getTokens(String authProviderToken) async {
     try {
-      final response = await client.post(
-        Uri.parse('$API_BASE_URL/user/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'auth_token': authProviderToken}),
+      final response = await apiService.post(
+        '/user/auth/login',
+        body: {'auth_token': authProviderToken},
+        authenticated: false,
       );
 
       final data = jsonDecode(response.body);
@@ -28,10 +28,15 @@ class TokensRepositoryAPI implements TokensRepository {
         throw AuthException(data['message'] ?? 'Authentication failed');
       }
     } catch (e) {
+      if (e is AuthException) {
+        rethrow;
+      }
+
       if (e.toString().contains('Unauthorized')) {
         throw AuthException('Unauthorized access');
       }
-      throw AuthException('Unexpected error: $e');
+
+      throw AuthException('Unexpected error');
     }
   }
 }
