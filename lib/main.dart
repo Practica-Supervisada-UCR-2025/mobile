@@ -74,7 +74,8 @@ class MyApp extends StatelessWidget {
               ),
         ),
         RepositoryProvider<ProfileRepository>(
-          create: (context) => ProfileRepositoryAPI(apiService: ApiServiceImpl()),
+          create:
+              (context) => ProfileRepositoryAPI(apiService: ApiServiceImpl()),
         ),
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),
@@ -147,7 +148,9 @@ class MyApp extends StatelessWidget {
                 (context) => LoginBloc(
                   loginRepository: context.read<LoginRepository>(),
                   localStorage: LocalStorage(),
-                  tokensRepository: TokensRepositoryAPI(),
+                  tokensRepository: TokensRepositoryAPI(
+                    apiService: context.read<ApiService>(),
+                  ),
                   notificationsService: context.read<NotificationsService>(),
                 ),
           ),
