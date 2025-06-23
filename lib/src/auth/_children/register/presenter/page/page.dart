@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// Importante para regresar al Login
+import 'package:mobile/core/core.dart';
 import 'package:mobile/src/auth/auth.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -10,7 +10,8 @@ class RegisterPage extends StatefulWidget {
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderStateMixin {
+class _RegisterPageState extends State<RegisterPage>
+    with SingleTickerProviderStateMixin {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -53,7 +54,10 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.primary),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           onPressed: () {
             Navigator.pushReplacement(
               context,
@@ -77,18 +81,14 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                       ),
                     );
                   } else if (state is RegisterFailure) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.error)),
-                    );
+                    FeedbackSnackBar.showError(context, state.error);
                   }
                 },
               ),
               BlocListener<LoginBloc, LoginState>(
                 listener: (context, state) {
                   if (state is LoginFailure) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.error)),
-                    );
+                    FeedbackSnackBar.showError(context, state.error);
                   }
                 },
               ),
@@ -100,8 +100,9 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                 return FadeTransition(
                   opacity: _fadeAnimation!,
                   child: Stack(
-                   children: [
-                      if (state is! RegisterLoading && state is! RegisterSuccess)
+                    children: [
+                      if (state is! RegisterLoading &&
+                          state is! RegisterSuccess)
                         RegisterForm(
                           nameController: _nameController,
                           emailController: _emailController,
@@ -109,14 +110,20 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                           confirmPasswordController: _confirmPasswordController,
                           onRegister: (name, email, password) {
                             context.read<RegisterBloc>().add(
-                              RegisterSubmitted(name: name, email: email, password: password),
+                              RegisterSubmitted(
+                                name: name,
+                                email: email,
+                                password: password,
+                              ),
                             );
                           },
                         ),
                       if (state is RegisterLoading)
                         Container(
-                        color: Theme.of(context).colorScheme.surface,
-                          child: const Center(child: CircularProgressIndicator()),
+                          color: Theme.of(context).colorScheme.surface,
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
                         ),
                     ],
                   ),

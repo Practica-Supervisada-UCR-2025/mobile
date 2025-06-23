@@ -60,15 +60,9 @@ class ProfileImagePicker extends StatelessWidget {
                         onImageSelected(image);
                       } else if (errorMessage != null &&
                           navigatorContext.mounted) {
-                        ScaffoldMessenger.of(navigatorContext).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              errorMessage!,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor:
-                                Theme.of(navigatorContext).colorScheme.error,
-                          ),
+                        FeedbackSnackBar.showError(
+                          navigatorContext,
+                          errorMessage!,
                         );
                       }
                     },
@@ -97,15 +91,9 @@ class ProfileImagePicker extends StatelessWidget {
                         onImageSelected(photo);
                       } else if (errorMessage != null &&
                           navigatorContext.mounted) {
-                        ScaffoldMessenger.of(navigatorContext).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              errorMessage!,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor:
-                                Theme.of(navigatorContext).colorScheme.error,
-                          ),
+                        FeedbackSnackBar.showError(
+                          navigatorContext,
+                          errorMessage!,
                         );
                       }
                     },
