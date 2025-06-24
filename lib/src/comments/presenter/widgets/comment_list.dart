@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/globals/publications/domain/models/publication.dart';
+import 'package:mobile/core/globals/publications/presenter/widgets/image_page.dart';
 import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/src/comments/comments.dart';
 
@@ -44,8 +45,16 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   Widget _buildAttachment(String url) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+  return Padding(
+    padding: const EdgeInsets.only(top: 8.0),
+    child: GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ImagePreviewScreen(imageUrl: url),
+          ),
+        );
+      },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12.0),
         child: Image.network(
@@ -70,8 +79,10 @@ class _CommentsListState extends State<CommentsList> {
           },
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
