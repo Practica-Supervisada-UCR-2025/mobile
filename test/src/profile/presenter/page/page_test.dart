@@ -46,22 +46,30 @@ void main() {
 
   Widget buildTestableWidget() {
     final router = GoRouter(
+      initialLocation: '/',
       routes: [
         GoRoute(
           path: '/',
-          builder:
-              (context, state) => Provider<PublicationRepository>.value(
-                value: mockPublicationRepository,
-                child: MultiProvider(
-                  providers: [
-                    BlocProvider<ProfileBloc>.value(value: mockProfileBloc),
-                    BlocProvider<PublicationBloc>.value(
-                      value: mockPublicationBloc,
-                    ),
-                  ],
-                  child: const ProfileScreen(isFeed: false),
-                ),
-              ),
+          builder: (context, state) => Provider<PublicationRepository>.value(
+            value: mockPublicationRepository,
+            child: MultiProvider(
+              providers: [
+                BlocProvider<ProfileBloc>.value(value: mockProfileBloc),
+                BlocProvider<PublicationBloc>.value(value: mockPublicationBloc),
+              ],
+              child: const ProfileScreen(isFeed: false),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: Paths.editProfile,
+          builder: (context, state) {
+            final user = state.extra as User;
+            return Scaffold(
+              appBar: AppBar(title: const Text('Edit Profile')),
+              body: Text('Editing ${user.username}'),
+            );
+          },
         ),
       ],
     );
@@ -132,5 +140,27 @@ void main() {
 
       expect(find.byType(SizedBox), findsOneWidget);
     });
+
+    testWidgets('navigates to edit profile page on button tap', (
+      WidgetTester tester,
+      ) async {
+        whenListen(
+          mockProfileBloc,
+          Stream.fromIterable([ProfileSuccess(user: testUser)]),
+          initialState: ProfileSuccess(user: testUser),
+        );
+
+        await mockNetworkImagesFor(() async {
+          await tester.pumpWidget(buildTestableWidget());
+
+          final editButton = find.text('Edit Profile');
+          expect(editButton, findsOneWidget);
+
+          await tester.tap(editButton);
+          await tester.pumpAndSettle();
+
+          expect(find.text('Edit Profile'), findsOneWidget);
+        });
+      });
   });
 }

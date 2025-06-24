@@ -98,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                             );
                           },
                           child: Hero(
-                            tag: user.image, // para animación suave si ya usas Hero
+                            tag: user.image,
                             child: CircleAvatar(
                               radius: 35,
                               backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
