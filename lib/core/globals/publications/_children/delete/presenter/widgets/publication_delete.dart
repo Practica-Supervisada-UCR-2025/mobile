@@ -69,7 +69,7 @@ class _DeleteBottomSheetState extends State<DeleteBottomSheet> {
               ),
               Icon(
                 Icons.delete_outline,
-                color: theme.colorScheme.primary,
+                color: Colors.red,
                 size: 64,
               ),
               const SizedBox(height: 16),
@@ -102,6 +102,8 @@ class _DeleteBottomSheetState extends State<DeleteBottomSheet> {
                       ),
                     );
                   },
+                  backgroundColor:
+                      Colors.red,
                 ),
               ),
               const SizedBox(height: 8),
