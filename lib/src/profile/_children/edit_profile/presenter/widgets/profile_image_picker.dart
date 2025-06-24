@@ -36,7 +36,7 @@ class ProfileImagePicker extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   ListTile(
-                    leading: const Icon(Icons.photo_library),
+                    leading: const Icon(Icons.image_outlined),
                     title: const Text('Gallery'),
                     onTap: () async {
                       final navigatorContext = Navigator.of(context).context;
@@ -74,7 +74,7 @@ class ProfileImagePicker extends StatelessWidget {
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.camera_alt),
+                    leading: const Icon(Icons.camera_alt_outlined),
                     title: const Text('Camera'),
                     onTap: () async {
                       final navigatorContext = Navigator.of(context).context;
@@ -112,7 +112,7 @@ class ProfileImagePicker extends StatelessWidget {
                   ),
                   if (selectedImage != null || currentImage.isNotEmpty)
                     ListTile(
-                      leading: const Icon(Icons.delete, color: Colors.red),
+                      leading: const Icon(Icons.delete_outline, color: Colors.red),
                       title: const Text(
                         'Delete Image',
                         style: TextStyle(color: Colors.red),
@@ -165,7 +165,7 @@ class ProfileImagePicker extends StatelessWidget {
               ],
             ),
             child: const Icon(
-              Icons.add_a_photo_rounded,
+              Icons.add_a_photo_outlined,
               size: 18,
               color: Colors.white,
             ),
