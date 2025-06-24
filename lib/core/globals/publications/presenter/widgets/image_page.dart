@@ -52,7 +52,6 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
             ),
           ),
 
-          // 🔽 Circular progress in center
           if (_isDownloading)
             const Positioned.fill(
               child: Center(
@@ -60,7 +59,6 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
               ),
             ),
 
-          // 🔙 Back button
           Positioned(
             top: 40,
             left: 16,
@@ -73,7 +71,6 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
             ),
           ),
 
-          // ⬇️ Download button
           Positioned(
             top: 40,
             right: 16,
