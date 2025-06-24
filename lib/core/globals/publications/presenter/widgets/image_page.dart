@@ -55,7 +55,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
           if (_isDownloading)
             const Positioned.fill(
               child: Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: CircularProgressIndicator(),
               ),
             ),
 
