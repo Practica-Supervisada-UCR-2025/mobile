@@ -1,77 +1,78 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-class CancelConfirmation extends StatelessWidget {
-  const CancelConfirmation({super.key});
+class CancelBottomSheet extends StatelessWidget {
+  const CancelBottomSheet({super.key});
+
+  void _close(BuildContext context) {
+    if (context.mounted) {
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final dividerColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color.fromARGB(255, 85, 85, 85)
-        : const Color.fromARGB(255, 207, 207, 207);
+    final theme = Theme.of(context);
 
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Container(
-        width: 280, // Slightly narrower width
-        padding: const EdgeInsets.only(top: 20),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Discard this post?',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              textAlign: TextAlign.center,
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Icon(
+              Icons.delete_outline,
+              color: Colors.red,
+              size: 64,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Discard this post?",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
             ),
             const SizedBox(height: 8),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'If you discard now, all your changes will be lost.',
-                style: TextStyle(fontSize: 14),
-                textAlign: TextAlign.center,
+            Text(
+              "Any changes you made will be lost.",
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface,
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
-            Divider(height: 1, color: dividerColor),
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              child: TextButton(
-                onPressed: () {
-                  context.pop();
-                  if (context.mounted) {
-                    context.pop();
-                  }
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.red,
-                  alignment: Alignment.center,
+              child: ElevatedButton(
+                onPressed: () => _close(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.all(15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: const Text(
-                  'Discard post',
-                  style: TextStyle(fontSize: 14),
+                  "Discard",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-            Divider(height: 1, color: dividerColor),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue,
-                  alignment: Alignment.center,
-                ),
-                child: const Text(
-                  'Keep editing',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
+            const SizedBox(height: 8),
           ],
         ),
       ),

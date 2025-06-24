@@ -69,12 +69,12 @@ class _DeleteBottomSheetState extends State<DeleteBottomSheet> {
               ),
               Icon(
                 Icons.delete_outline,
-                color: theme.colorScheme.primary,
+                color: Colors.red,
                 size: 64,
               ),
               const SizedBox(height: 16),
               Text(
-                "Delete post?",
+                "Delete this post?",
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -82,7 +82,7 @@ class _DeleteBottomSheetState extends State<DeleteBottomSheet> {
               ),
               const SizedBox(height: 8),
               Text(
-                "Are you sure you want to delete this post?\nThis action cannot be undone.",
+                "This action is permanent and cannot be undone.",
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface,
                 ),
@@ -92,7 +92,7 @@ class _DeleteBottomSheetState extends State<DeleteBottomSheet> {
               SizedBox(
                 width: double.infinity,
                 child: PrimaryButton(
-                  text: "Confirm Delete",
+                  text: "Delete Post",
                   isLoading: isLoading,
                   isEnabled: !isLoading,
                   onPressed: () {
@@ -102,6 +102,8 @@ class _DeleteBottomSheetState extends State<DeleteBottomSheet> {
                       ),
                     );
                   },
+                  backgroundColor:
+                      Colors.red,
                 ),
               ),
               const SizedBox(height: 8),
