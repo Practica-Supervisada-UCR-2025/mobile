@@ -31,7 +31,7 @@ class CancelBottomSheet extends StatelessWidget {
             ),
             Icon(
               Icons.delete_outline,
-              color: theme.colorScheme.primary,
+              color: Colors.red,
               size: 64,
             ),
             const SizedBox(height: 16),
@@ -56,7 +56,7 @@ class CancelBottomSheet extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => _close(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
+                  backgroundColor: Colors.red,
                   padding: const EdgeInsets.all(15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
