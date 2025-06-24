@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/core/globals/publications/domain/models/publication.dart';
+import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/src/comments/comments.dart';
 
 class CommentsList extends StatefulWidget {
@@ -156,26 +158,34 @@ class _CommentsListState extends State<CommentsList> {
               
                return ListTile(
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-                  leading: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: comment.profileImageUrl != null
-                        ? NetworkImage(comment.profileImageUrl!)
-                        : null,
-                    child: comment.profileImageUrl == null
-                        ? const Icon(Icons.person, size: 22)
-                        : null,
+                  leading: GestureDetector(
+                    onTap: () {
+                      context.go(Paths.externProfile(comment.userId));
+                    },
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundImage: comment.profileImageUrl != null
+                          ? NetworkImage(comment.profileImageUrl!)
+                          : null,
+                      child: comment.profileImageUrl == null
+                          ? const Icon(Icons.person, size: 22)
+                          : null,
+                    ),
                   ),
-                  title: Text(
-                    comment.username, 
-                    style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)
+                  title: GestureDetector(
+                    onTap: () {
+                      context.go(Paths.externProfile(comment.userId));
+                    },
+                    child: Text(
+                      comment.username,
+                      style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                    ),
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(comment.content, style: textTheme.bodyMedium),
-                      
-                      if (comment.attachmentUrl != null)
-                        _buildAttachment(comment.attachmentUrl!),
+                      if (comment.attachmentUrl != null) _buildAttachment(comment.attachmentUrl!),
                     ],
                   ),
                   dense: true,
