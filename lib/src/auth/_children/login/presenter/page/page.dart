@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/core/core.dart';
 import 'package:mobile/src/auth/auth.dart';
 
 class LoginPage extends StatefulWidget {
@@ -31,7 +32,6 @@ class _LoginPageState extends State<LoginPage>
     );
 
     _animationController.forward();
-
   }
 
   @override
@@ -53,25 +53,8 @@ class _LoginPageState extends State<LoginPage>
       body: SafeArea(
         child: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
-
             if (state is LoginFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(Icons.error_outline, color: Colors.white),
-                      SizedBox(width: 8),
-                      Expanded(child: Text(state.error)),
-                    ],
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  behavior: SnackBarBehavior.floating,
-                  margin: EdgeInsets.all(16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
+              FeedbackSnackBar.showError(context, state.error);
             }
           },
           builder: (context, state) {
