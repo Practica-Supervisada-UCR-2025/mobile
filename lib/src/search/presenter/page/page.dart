@@ -249,8 +249,6 @@ class _UserTile extends StatelessWidget {
         ),
       ),
       onTap: () {
-        // todo: User profile navigation,
-        //todo: use user, it contains all necessary information
         context.go(Paths.externProfile(user.id));
       },
     );

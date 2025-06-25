@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
+import 'package:mobile/src/comments/presenter/page/comments_page.dart';
 import 'package:mobile/src/profile/_children/_children.dart';
 import 'package:mobile/src/search/presenter/page/page.dart';
 import '../../src/profile/domain/domain.dart';
@@ -62,6 +63,13 @@ final List<RouteBase> appRoutes = [
               child: const HomeScreen(isFeed: true),
             ),
           );
+        },
+      ),
+      GoRoute(
+        path: Paths.comments,
+        builder: (context, state) {
+          final publication = state.extra as Publication;
+          return CommentsPage(publication: publication);
         },
       ),
       GoRoute(

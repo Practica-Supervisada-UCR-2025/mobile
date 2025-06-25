@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/core/core.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileEditPage extends StatefulWidget {
@@ -160,42 +161,15 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         listener: (context, state) {
           if (state is EditProfileSuccess) {
             context.read<ProfileBloc>().add(ProfileRefreshed(state.user));
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.check_circle_outline, color: Colors.white),
-                    const SizedBox(width: 8),
-                    const Expanded(child: Text('Profile updated successfully')),
-                  ],
-                ),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.all(16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+            FeedbackSnackBar.showSuccess(
+              context,
+              'Profile updated successfully',
             );
             context.pop(true);
           } else if (state is EditProfileFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.error_outline, color: Colors.white),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text('Update failed: ${state.error}')),
-                  ],
-                ),
-                backgroundColor: Theme.of(context).colorScheme.error,
-                behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.all(16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+            FeedbackSnackBar.showError(
+              context,
+              'Failed to update profile: ${state.error}',
             );
           }
         },

@@ -117,7 +117,7 @@ class _PublicationsListState extends State<PublicationsList>
                 ElevatedButton(
                   onPressed:
                       () => context.read<PublicationBloc>().add(
-                        LoadPublications(),
+                        LoadPublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser),
                       ),
                   child: const Text('Retry'),
                 ),

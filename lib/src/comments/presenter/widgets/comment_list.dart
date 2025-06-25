@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/globals/publications/domain/models/publication.dart';
+import 'package:mobile/core/globals/widgets/feedback_snack_bar.dart';
 import 'package:mobile/src/comments/comments.dart';
 
 class CommentsList extends StatefulWidget {
@@ -13,7 +14,7 @@ class CommentsList extends StatefulWidget {
 
 class _CommentsListState extends State<CommentsList> {
   late final ScrollController _scrollController;
-
+  String? _lastErrorShown;
   @override
   void initState() {
     super.initState();
@@ -77,31 +78,44 @@ class _CommentsListState extends State<CommentsList> {
 
     return BlocBuilder<CommentsLoadBloc, CommentsLoadState>(
       builder: (context, state) {
-        if (state is CommentsLoadInitial || (state is CommentsLoading && state.isInitialFetch)) {
+        if (state is CommentsLoadInitial ||
+            (state is CommentsLoading && state.isInitialFetch)) {
           return Column(
             children: [
               PostPreview(publication: widget.publication),
-              const Expanded(
-                child: Center(child: CircularProgressIndicator()),
-              ),
+              const Expanded(child: Center(child: CircularProgressIndicator())),
             ],
           );
         }
 
         if (state is CommentsError) {
-          return Column(
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_lastErrorShown != state.message) {
+              FeedbackSnackBar.showError(context, state.message);
+              _lastErrorShown = state.message;
+            }
+          });
+
+          return ListView(
             children: [
               PostPreview(publication: widget.publication),
-              Expanded(
-                child: Center(child: Text('Error: ${state.message}')),
+              const Divider(height: 1),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 48),
+                child: Center(
+                  child: Text(
+                    'Failed to load comments',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ),
               ),
             ],
           );
         }
-        
+
         if (state is CommentsLoaded) {
           if (state.comments.isEmpty) {
-            return ListView( 
+            return ListView(
               children: [
                 PostPreview(publication: widget.publication),
                 const Divider(height: 1, thickness: 1),
@@ -109,7 +123,7 @@ class _CommentsListState extends State<CommentsList> {
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 48.0),
                     child: Text(
-                      'Aún no hay comentarios',
+                      'No comments yet',
                       style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   ),
@@ -122,17 +136,17 @@ class _CommentsListState extends State<CommentsList> {
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             itemCount: state.comments.length + (state.hasReachedEnd ? 1 : 2),
-            
+
             separatorBuilder: (context, index) {
               if (index == 0) return const SizedBox.shrink();
               return Divider(
-                height: 1, 
-                thickness: 1, 
+                height: 1,
+                thickness: 1,
                 indent: 16,
                 endIndent: 16,
               );
             },
-            
+
             itemBuilder: (_, index) {
               if (index == 0) {
                 return PostPreview(publication: widget.publication);
@@ -140,50 +154,54 @@ class _CommentsListState extends State<CommentsList> {
 
               final isLoaderIndex = index == state.comments.length + 1;
               if (isLoaderIndex && !state.hasReachedEnd) {
-                 return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 32),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
-              
+
               final commentIndex = index - 1;
 
-              if(commentIndex >= state.comments.length) {
-                return const SizedBox.shrink(); 
+              if (commentIndex >= state.comments.length) {
+                return const SizedBox.shrink();
               }
 
               final comment = commentsToDisplay[commentIndex];
-              
-               return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-                  leading: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: comment.profileImageUrl != null
-                        ? NetworkImage(comment.profileImageUrl!)
-                        : null,
-                    child: comment.profileImageUrl == null
-                        ? const Icon(Icons.person, size: 22)
-                        : null,
+
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                leading: CircleAvatar(
+                  radius: 20,
+                  backgroundImage:
+                      comment.profileImageUrl != null
+                          ? NetworkImage(comment.profileImageUrl!)
+                          : null,
+                  child:
+                      comment.profileImageUrl == null
+                          ? const Icon(Icons.person, size: 22)
+                          : null,
+                ),
+                title: Text(
+                  comment.username,
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                  title: Text(
-                    comment.username, 
-                    style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(comment.content, style: textTheme.bodyMedium),
-                      
-                      if (comment.attachmentUrl != null)
-                        _buildAttachment(comment.attachmentUrl!),
-                    ],
-                  ),
-                  dense: true,
-                );
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(comment.content, style: textTheme.bodyMedium),
+
+                    if (comment.attachmentUrl != null)
+                      _buildAttachment(comment.attachmentUrl!),
+                  ],
+                ),
+                dense: true,
+              );
             },
           );
         }
-        
+
         return const SizedBox.shrink();
       },
     );

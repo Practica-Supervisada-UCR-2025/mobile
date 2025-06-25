@@ -23,10 +23,11 @@ class TopActions extends StatelessWidget {
                 state.selectedGif != null;
 
             if (hasContent) {
-              showDialog(
+              showModalBottomSheet(
                 context: context,
+                isScrollControlled: true,
                 builder: (BuildContext context) {
-                  return const CancelConfirmation();
+                  return const CancelBottomSheet();
                 },
               );
             } else {
