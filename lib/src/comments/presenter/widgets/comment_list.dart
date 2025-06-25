@@ -42,6 +42,7 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   Widget _buildAttachment(String url) {
+    
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: ClipRRect(
@@ -117,7 +118,7 @@ class _CommentsListState extends State<CommentsList> {
               ],
             );
           }
-          final commentsToDisplay = state.comments.reversed.toList();
+
           return ListView.separated(
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -152,7 +153,7 @@ class _CommentsListState extends State<CommentsList> {
                 return const SizedBox.shrink(); 
               }
 
-              final comment = commentsToDisplay[commentIndex];
+              final comment = state.comments[commentIndex];
               
                return ListTile(
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
