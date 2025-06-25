@@ -17,10 +17,14 @@ class CommentsRepositoryImpl implements CommentsRepository {
     int? limit,
     required String postId,
     required DateTime startTime,
+    int? index,
   }) async {
     String endpoint = 'posts/$postId/comments?startTime=${startTime.toUtc().toIso8601String()}';
     if (limit != null) {
       endpoint += '&limit=$limit';
+    }
+    if (index != null) {
+      endpoint += '&index=$index';
     }
 
     final response = await apiService.get(endpoint);
