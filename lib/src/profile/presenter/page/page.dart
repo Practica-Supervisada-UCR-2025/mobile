@@ -45,74 +45,80 @@ class _ProfileScreenState extends State<ProfileScreen>
                 return const ProfileSkeleton();
               } else if (state is ProfileSuccess) {
                 final user = state.user;
-                return Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${user.firstName} ${user.lastName}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineMedium
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '@${user.username}',
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(fontWeight: FontWeight.w500),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                user.email,
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.outline,
+                return CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${user.firstName} ${user.lastName}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              const SizedBox(height: 18),
-                              if (isOwnProfile)
-                                Row(
-                                  children: [
-                                    Flexible(child: _buildCreatePostButton()),
-                                    const SizedBox(width: 8),
-                                    Flexible(child: _buildModifyButton(user)),
-                                  ],
+                                const SizedBox(height: 4),
+                                Text(
+                                  '@${user.username}',
+                                  style: Theme.of(context).textTheme.bodyLarge
+                                      ?.copyWith(fontWeight: FontWeight.w500),
                                 ),
-                            ],
+                                const SizedBox(height: 8),
+                                Text(
+                                  user.email,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                ),
+                                if (isOwnProfile) ...[
+                                  const SizedBox(height: 18),
+                                  Row(
+                                    children: [
+                                      Flexible(child: _buildCreatePostButton()),
+                                      const SizedBox(width: 8),
+                                      Flexible(child: _buildModifyButton(user)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                ],
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        CircleAvatar(
-                          radius: 35,
-                          backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
-                          foregroundImage: NetworkImage(user.image),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.onPrimary,
-                        ),
-                      ],
+                          const SizedBox(width: 16),
+                          CircleAvatar(
+                            radius: 35,
+                            backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
+                            foregroundImage: NetworkImage(user.image),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    Divider(color: Theme.of(context).colorScheme.outline),
-                    if(isOwnProfile)
-                      Expanded(
-                        child: ShowOwnPublicationsPage(
-                          isFeed: widget.isFeed,
-                        ),
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          Divider(color: Theme.of(context).colorScheme.outline),
+                        ],
                       ),
-                    if (!isOwnProfile)
-                      Expanded(
-                        child: ShowPostFromOthersPage(
-                          userId: widget.userId!,
-                          isFeed: widget.isFeed,
-                        ),
-                      ),
+                    ),
+                    SliverFillRemaining(
+                      child:
+                          isOwnProfile
+                              ? ShowOwnPublicationsPage(isFeed: widget.isFeed)
+                              : ShowPostFromOthersPage(
+                                userId: widget.userId!,
+                                isFeed: widget.isFeed,
+                              ),
+                    ),
                   ],
                 );
               } else if (state is ProfileFailure) {

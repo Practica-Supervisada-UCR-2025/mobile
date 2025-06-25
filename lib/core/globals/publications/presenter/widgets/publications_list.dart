@@ -8,7 +8,12 @@ class PublicationsList extends StatefulWidget {
   final String scrollKey;
   final bool isOtherUser;
 
-  const PublicationsList({super.key, required this.scrollKey, required this.isFeed, required this.isOtherUser});
+  const PublicationsList({
+    super.key,
+    required this.scrollKey,
+    required this.isFeed,
+    required this.isOtherUser,
+  });
 
   @override
   State<PublicationsList> createState() => _PublicationsListState();
@@ -49,7 +54,12 @@ class _PublicationsListState extends State<PublicationsList>
     if (thresholdReached &&
         state is PublicationSuccess &&
         !state.hasReachedMax) {
-      _bloc.add(LoadMorePublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
+      _bloc.add(
+        LoadMorePublications(
+          isFeed: widget.isFeed,
+          isOtherUser: widget.isOtherUser,
+        ),
+      );
     }
 
     final shouldShow = _scrollController.offset > 600;
@@ -64,7 +74,12 @@ class _PublicationsListState extends State<PublicationsList>
     setState(() {
       _showRefreshButton = false;
     });
-    _bloc.add(RefreshPublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
+    _bloc.add(
+      RefreshPublications(
+        isFeed: widget.isFeed,
+        isOtherUser: widget.isOtherUser,
+      ),
+    );
 
     await _bloc.stream.firstWhere(
       (state) => state is PublicationSuccess || state is PublicationFailure,

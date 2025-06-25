@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
+
 class ShowOwnPublicationsPage extends StatefulWidget {
   final bool isFeed;
   const ShowOwnPublicationsPage({super.key, this.isFeed = false});
@@ -9,6 +10,7 @@ class ShowOwnPublicationsPage extends StatefulWidget {
   State<ShowOwnPublicationsPage> createState() =>
       _ShowOwnPublicationsPageState();
 }
+
 class _ShowOwnPublicationsPageState extends State<ShowOwnPublicationsPage> {
   int? _lastRefreshTimestamp;
   late PublicationBloc _publicationBloc;
@@ -21,6 +23,7 @@ class _ShowOwnPublicationsPageState extends State<ShowOwnPublicationsPage> {
       ),
     )..add(LoadPublications());
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -35,16 +38,22 @@ class _ShowOwnPublicationsPageState extends State<ShowOwnPublicationsPage> {
       });
     }
   }
+
   @override
   void dispose() {
     _publicationBloc.close();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _publicationBloc,
-      child: const PublicationsList(scrollKey: "ownPosts", isFeed: true, isOtherUser: false),
+      child: const PublicationsList(
+        scrollKey: "ownPosts",
+        isFeed: true,
+        isOtherUser: false,
+      ),
     );
   }
 }

@@ -181,8 +181,13 @@ class _ReportBottomSheetState extends State<ReportBottomSheet> {
 
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-            child: content,
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 12,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            child: SingleChildScrollView(child: content),
           ),
         );
       },

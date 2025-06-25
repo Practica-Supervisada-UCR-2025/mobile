@@ -9,7 +9,11 @@ class PostsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).colorScheme.surface,
-      child: PublicationsList(scrollKey: "allPosts", isFeed: isFeed, isOtherUser: false),
+      child: PublicationsList(
+        scrollKey: "allPosts",
+        isFeed: isFeed,
+        isOtherUser: false,
+      ),
     );
   }
 }
