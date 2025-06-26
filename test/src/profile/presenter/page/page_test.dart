@@ -101,7 +101,7 @@ void main() {
         expect(find.text('@johndoe'), findsOneWidget);
         expect(find.text('user@ucr.ac.cr.com'), findsOneWidget);
         expect(find.byType(CircleAvatar), findsOneWidget);
-        expect(find.byType(SecondaryButton), findsNWidgets(2));
+        expect(find.byType(SecondaryButton), findsNWidgets(1));
       });
     });
 

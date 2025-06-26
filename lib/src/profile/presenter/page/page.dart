@@ -77,12 +77,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 ),
                               ),
                               const SizedBox(height: 18),
-                              if (isOwnProfile)
+                                if (isOwnProfile)
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Flexible(child: _buildCreatePostButton()),
-                                    const SizedBox(width: 8),
-                                    Flexible(child: _buildModifyButton(user)),
+                                  Flexible(child: _buildModifyButton(user)),
                                   ],
                                 ),
                             ],
@@ -145,21 +144,8 @@ class _ProfileScreenState extends State<ProfileScreen>
       isLoading: false,
       text: 'Edit Profile',
       isEnabled: true,
-      height: 32,
-      width: 160,
-    );
-  }
-
-  Widget _buildCreatePostButton() {
-    return SecondaryButton(
-      onPressed: () {
-        context.push(Paths.create);
-      },
-      isLoading: false,
-      text: 'New Post',
-      isEnabled: true,
-      height: 32,
-      width: 160,
+      height: 36,
+      width: 320,
     );
   }
 }

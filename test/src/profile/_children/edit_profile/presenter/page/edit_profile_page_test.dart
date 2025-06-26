@@ -188,7 +188,10 @@ void main() {
         editBloc.emit(EditProfileFailure(error: 'Test error'));
         await tester.pump();
 
-        expect(find.text('Update failed: Test error'), findsOneWidget);
+        expect(
+          find.text('Failed to update profile: Test error'),
+          findsOneWidget,
+        );
       });
     });
 
