@@ -1,5 +1,5 @@
 
-void main() {
+// void main() {
   // testWidgets('HomeScreen shows tabs "Posts" and "News" and switches between them',
   //     (WidgetTester tester) async {
   //   await tester.pumpWidget(
@@ -26,4 +26,4 @@ void main() {
   //   expect(find.byType(PostsPage), findsOneWidget);
   //   expect(find.byType(PublicationsList), findsOneWidget);
   // });
-}
+// }
