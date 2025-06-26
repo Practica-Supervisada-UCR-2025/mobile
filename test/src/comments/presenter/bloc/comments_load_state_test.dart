@@ -1,103 +1,172 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/src/comments/comments.dart';
 
+final tCommentModel1 = CommentModel(
+  id: '1',
+  content: 'Este es un comentario de prueba.',
+  username: 'testuser',
+  createdAt: DateTime.now(),
+);
+
+final tCommentModel2 = CommentModel(
+  id: '2',
+  content: 'Este es otro comentario.',
+  username: 'testuser2',
+  createdAt: DateTime.now(),
+);
+
+CommentModel createTestComment({
+  String id = '1',
+  String content = 'Comentario de prueba',
+  String username = 'testuser',
+  DateTime? createdAt,
+}) {
+  return CommentModel(
+    id: id,
+    content: content,
+    username: username,
+    createdAt: createdAt ?? DateTime.now(),
+  );
+}
+
 void main() {
-  group('CommentsLoadState', () {
-    final comment = CommentModel(
-      id: '1',
-      content: 'hola',
-      username: 'usuario',
-      createdAt: DateTime(2023, 1, 1),
-      profileImageUrl: 'url1',
-      attachmentUrl: 'url2',
-    );
 
-    test('CommentsLoadInitial props está vacío', () {
-      expect(const CommentsLoadInitial().props, []);
-    });
-
-    test('CommentsLoading props incluye isInitialFetch', () {
-      const loading = CommentsLoading(isInitialFetch: true);
-      expect(loading.props, [true]);
-    });
-
-    test('CommentsLoaded props y copyWith funcionan con nuevos campos', () {
-      const loaded = CommentsLoaded(
-        comments: [],
-        hasReachedEnd: false,
-        currentIndex: 0,
-      );
-
-      final copied = loaded.copyWith(
-        comments: [comment],
-        hasReachedEnd: true,
-        currentIndex: 1,
-      );
-
-      expect(copied.comments.length, 1);
-      expect(copied.comments.first, comment);
-      expect(copied.hasReachedEnd, true);
-      expect(copied.currentIndex, 1);
-    });
-
-    test('CommentsError props contiene mensaje', () {
-      const error = CommentsError(message: 'Fallo');
-      expect(error.props, ['Fallo']);
+  group('CommentsLoadInitial', () {
+    test('soporta comparación por valor', () {
+      expect(CommentsLoadInitial(), CommentsLoadInitial());
     });
   });
 
-  group('CommentsLoaded.copyWith', () {
-    final comment1 = CommentModel(
-      id: '1',
-      content: 'Prueba',
-      username: 'usuario',
-      createdAt: DateTime(2023, 1, 1),
-      profileImageUrl: 'url1',
-      attachmentUrl: 'url2',
-    );
+  group('CommentsLoading', () {
+    test('soporta comparación por valor', () {
+      expect(const CommentsLoading(isInitialFetch: true), const CommentsLoading(isInitialFetch: true));
+      expect(const CommentsLoading(), const CommentsLoading());
+    });
 
-    test('retorna una nueva instancia con campos actualizados', () {
-      final original = CommentsLoaded(
-        comments: [],
+    test('las instancias con diferentes valores no se consideran iguales', () {
+      expect(const CommentsLoading(isInitialFetch: true), isNot(const CommentsLoading(isInitialFetch: false)));
+    });
+
+    test('el valor por defecto de isInitialFetch es false', () {
+      expect(const CommentsLoading().isInitialFetch, isFalse);
+    });
+  });
+
+  group('CommentsLoaded', () {
+    late DateTime initialTime;
+    late CommentsLoaded initialState;
+
+    setUp(() {
+      initialTime = DateTime.now();
+      initialState = CommentsLoaded(
+        comments: [tCommentModel1],
         hasReachedEnd: false,
         currentIndex: 0,
+        initialFetchTime: initialTime,
       );
+    });
+    late List<CommentModel> initialComments;
 
-      final updated = original.copyWith(
-        comments: [comment1],
+    setUp(() {
+      initialTime = DateTime.now();
+      initialComments = [createTestComment()];
+      
+      initialState = CommentsLoaded(
+        comments: initialComments,
+        hasReachedEnd: false,
+        currentIndex: 0,
+        initialFetchTime: initialTime,
+      );
+    });
+
+    test('las instancias con diferentes valores no se consideran iguales', () {
+      final differentState = CommentsLoaded(
+        comments: initialComments,
         hasReachedEnd: true,
-        currentIndex: 5,
+        currentIndex: 0,
+        initialFetchTime: initialTime,
       );
-
-      expect(updated.comments, [comment1]);
-      expect(updated.hasReachedEnd, true);
-      expect(updated.currentIndex, 5);
+      expect(initialState, isNot(equals(differentState)));
     });
 
-    test('retorna una instancia idéntica si no se pasa ningún parámetro', () {
-      final original = CommentsLoaded(
-        comments: [comment1],
-        hasReachedEnd: false,
-        currentIndex: 1,
-      );
+    group('copyWith', () {
+      test('actualiza hasReachedEnd cuando se proporciona un nuevo valor', () {
+        final newState = initialState.copyWith(hasReachedEnd: true);
 
-      final copied = original.copyWith();
+        expect(newState.hasReachedEnd, true);
 
-      expect(copied, original);
+        expect(newState.comments, initialState.comments);
+        expect(newState.currentIndex, initialState.currentIndex);
+        expect(newState.initialFetchTime, initialState.initialFetchTime);
+        
+        expect(newState, isNot(equals(initialState)));
+      });
+
+      test('mantiene el valor original de hasReachedEnd si no se proporciona uno nuevo', () {
+        final newState = initialState.copyWith(currentIndex: 5);
+
+        expect(newState.hasReachedEnd, initialState.hasReachedEnd);
+        expect(newState.hasReachedEnd, false);
+
+        expect(newState.currentIndex, 5);
+      });
+
+      test('devuelve una instancia idéntica en valor si no se proporcionan argumentos', () {
+        final newState = initialState.copyWith();
+        
+        expect(identical(newState, initialState), isFalse);
+        
+        expect(newState, initialState);
+      });
+
+      test('actualiza múltiples propiedades correctamente', () {
+        final newTime = DateTime.now().add(const Duration(seconds: 10));
+        final List<CommentModel> newComments = []
+          ..add(createTestComment(id: '2', content: 'Nuevo comentario 1'))
+          ..add(createTestComment(id: '3', content: 'Nuevo comentario 2'));
+
+        final newState = initialState.copyWith(
+          comments: newComments,
+          hasReachedEnd: true,
+          initialFetchTime: newTime,
+        );
+
+        expect(newState.comments, newComments);
+        expect(newState.hasReachedEnd, true);
+        expect(newState.initialFetchTime, newTime);
+
+        expect(newState.currentIndex, initialState.currentIndex);
+      });
+    });
+  });
+
+  group('CommentsError', () {
+    const errorMessage = 'Ocurrió un error inesperado';
+
+    test('soporta comparación por valor', () {
+      expect(const CommentsError(message: errorMessage), const CommentsError(message: errorMessage));
     });
 
-    test('props incluye todos los campos', () {
-      final state = CommentsLoaded(
-        comments: [comment1],
-        hasReachedEnd: false,
-        currentIndex: 1,
-      );
+    test('las instancias con diferentes valores no se consideran iguales', () {
+      expect(const CommentsError(message: errorMessage), isNot(const CommentsError(message: 'Otro error')));
+    });
 
-      expect(state.props, [
-        [comment1],
-        false,
-        1,
-      ]);
+    test('asigna el mensaje correctamente', () {
+      expect(const CommentsError(message: errorMessage).message, errorMessage);
+    });
+  });
+
+  group('CommentsLoadEvent', () {
+    group('FetchInitialComments', () {
+      test('soporta comparación por valor', () {
+        expect(FetchInitialComments(), FetchInitialComments());
+      });
+    });
+
+    group('FetchMoreComments', () {
+      test('soporta comparación por valor', () {
+        expect(FetchMoreComments(), FetchMoreComments());
+      });
     });
   });
 }
