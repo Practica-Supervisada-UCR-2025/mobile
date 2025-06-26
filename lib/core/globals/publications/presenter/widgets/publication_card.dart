@@ -100,15 +100,14 @@ class PublicationCard extends StatelessWidget {
                     children: [
                       _InteractionButton(
                         icon: Icons.favorite_border,
-                        label: publication.likes.toString(),
+                        label: '',
                         onPressed: () {
-                          // Like logic here
                         },
                       ),
                       const SizedBox(width: 24),
                       _InteractionButton(
                         icon: Icons.chat_bubble_outline,
-                        label: publication.comments.toString(),
+                        label: '',
                         onPressed: () {
                           context.go(Paths.comments, extra: publication);
                         },
@@ -118,7 +117,6 @@ class PublicationCard extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.share, size: 20),
                     onPressed: () {
-                      // Share logic here
                     },
                   ),
                 ],
