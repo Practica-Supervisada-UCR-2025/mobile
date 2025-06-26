@@ -48,7 +48,7 @@ class MediaPickerRepositoryImpl implements MediaPickerRepository {
     if (hasPermission) {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
-        imageQuality: config.imageQuality,
+        imageQuality: null,
       );
 
       if (image != null) {
