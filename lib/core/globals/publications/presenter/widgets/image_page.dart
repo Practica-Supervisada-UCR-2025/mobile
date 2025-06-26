@@ -42,9 +42,9 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
       },
       onDownloadError: (String errorMessage) {
         setState(() => _isDownloading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Download failed: $errorMessage')),
-        );
+          FeedbackSnackBar.showError(context, 
+            'Failed to download image: $errorMessage',
+          );
       },
     );
   }

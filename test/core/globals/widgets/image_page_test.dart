@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/globals/publications/presenter/widgets/image_page.dart';
+import 'package:mobile/core/globals/widgets/feedback_snack_bar.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 import 'package:flutter/material.dart';
 
@@ -37,7 +38,7 @@ void main() {
       expect(downloadCalled, isTrue);
 
       await tester.pumpAndSettle();
-      expect(find.text('Image downloaded'), findsOneWidget);
+      expect(find.text('Image downloaded successfully'), findsOneWidget);
     });
   });
 }
