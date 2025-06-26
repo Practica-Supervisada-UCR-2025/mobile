@@ -59,7 +59,7 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest());
 
         expect(find.byType(CircleAvatar), findsOneWidget);
-        expect(find.byIcon(Icons.add_a_photo_rounded), findsOneWidget);
+        expect(find.byIcon(Icons.add_a_photo_outlined), findsOneWidget);
 
         final circleAvatar = tester.widget<CircleAvatar>(
           find.byType(CircleAvatar),
@@ -75,7 +75,7 @@ void main() {
           await tester.pumpWidget(createWidgetUnderTest(currentImage: ''));
 
           expect(find.byType(CircleAvatar), findsOneWidget);
-          expect(find.byIcon(Icons.add_a_photo_rounded), findsOneWidget);
+          expect(find.byIcon(Icons.add_a_photo_outlined), findsOneWidget);
 
           final circleAvatar = tester.widget<CircleAvatar>(
             find.byType(CircleAvatar),
@@ -96,7 +96,7 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest(selectedImg: mockFile));
 
         expect(find.byType(CircleAvatar), findsOneWidget);
-        expect(find.byIcon(Icons.add_a_photo_rounded), findsOneWidget);
+        expect(find.byIcon(Icons.add_a_photo_outlined), findsOneWidget);
 
         final circleAvatar = tester.widget<CircleAvatar>(
           find.byType(CircleAvatar),
