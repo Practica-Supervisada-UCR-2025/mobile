@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:mobile/core/globals/widgets/feedback_snack_bar.dart';
 
 typedef DownloadFunction = void Function({
   required String url,
@@ -34,8 +35,9 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
       url: url,
       onDownloadCompleted: (String path) {
         setState(() => _isDownloading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Image downloaded')),
+        FeedbackSnackBar.showSuccess(
+          context,
+          'Image downloaded successfully',
         );
       },
       onDownloadError: (String errorMessage) {
