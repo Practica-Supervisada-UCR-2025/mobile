@@ -1,22 +1,17 @@
-// test/src/comments/presenter/bloc/comments_load_bloc_test.dart
-
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/src/comments/comments.dart';
 import 'package:mocktail/mocktail.dart';
 
-// Clases Mock y Fake
 class MockCommentsRepository extends Mock implements CommentsRepository {}
 class FakeDateTime extends Fake implements DateTime {}
 
 void main() {
-  // --- Configuración ---
   late MockCommentsRepository mockRepository;
   late CommentsLoadBloc commentsLoadBloc;
   const postId = 'test-post-id';
   final tInitialFetchTime = DateTime.fromMillisecondsSinceEpoch(0);
 
-  // Función de ayuda para crear comentarios de prueba
   List<CommentModel> generateComments(int count, {int startId = 0}) {
     return List.generate(count, (i) {
       final id = startId + i;
@@ -30,7 +25,6 @@ void main() {
   }
 
   setUpAll(() {
-    // Registrar el fallback para cualquier DateTime que se pase como argumento
     registerFallbackValue(FakeDateTime());
   });
 
@@ -43,7 +37,6 @@ void main() {
     commentsLoadBloc.close();
   });
 
-  // --- Pruebas ---
   test('El estado inicial debe ser CommentsLoadInitial', () {
     expect(commentsLoadBloc.state, const CommentsLoadInitial());
   });
@@ -64,12 +57,11 @@ void main() {
         return commentsLoadBloc;
       },
       act: (bloc) => bloc.add(FetchInitialComments()),
-      // CORRECCIÓN: Ahora esperamos los estados correctos
       expect: () => <CommentsLoadState>[
         const CommentsLoading(isInitialFetch: true),
         CommentsLoaded(
           comments: mockComments,
-          hasReachedEnd: false, // 5 de 10
+          hasReachedEnd: false,
           currentIndex: 0,
           initialFetchTime: tInitialFetchTime,
         ),
@@ -143,11 +135,10 @@ void main() {
       build: () => commentsLoadBloc,
       seed: () => initialState,
       act: (bloc) => bloc.add(FetchMoreComments()),
-      // CORRECCIÓN: Esperamos un único estado `CommentsLoaded` con la lista actualizada.
       expect: () => <CommentsLoadState>[
         CommentsLoaded(
           comments: [...initialComments, ...moreComments],
-          hasReachedEnd: false, // 10 de 15
+          hasReachedEnd: false,
           currentIndex: 1,
           initialFetchTime: tInitialFetchTime,
         ),
@@ -169,11 +160,10 @@ void main() {
       build: () => commentsLoadBloc,
       seed: () => initialState,
       act: (bloc) => bloc.add(FetchMoreComments()),
-      // CORRECIÓN: Esperamos el estado final con hasReachedEnd = true
       expect: () => <CommentsLoadState>[
         CommentsLoaded(
           comments: [...initialComments, ...moreComments],
-          hasReachedEnd: true, // 10 de 10
+          hasReachedEnd: true,
           currentIndex: 1,
           initialFetchTime: tInitialFetchTime,
         ),
@@ -190,7 +180,6 @@ void main() {
       build: () => commentsLoadBloc,
       seed: () => initialState,
       act: (bloc) => bloc.add(FetchMoreComments()),
-      // CORRECCIÓN: Esperamos el estado con hasReachedEnd = true. La lista de comentarios no cambia.
       expect: () => <CommentsLoadState>[
         initialState.copyWith(hasReachedEnd: true),
       ],
@@ -211,7 +200,6 @@ void main() {
       ],
     );
 
-    // Estos dos últimos tests estaban correctos, ya que esperaban una lista vacía [] y nada se emitía.
     blocTest<CommentsLoadBloc, CommentsLoadState>(
       'No debe emitir estados si hasReachedEnd es true.',
       build: () => commentsLoadBloc,
