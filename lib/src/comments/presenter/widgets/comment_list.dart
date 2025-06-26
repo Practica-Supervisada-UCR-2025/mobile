@@ -125,13 +125,7 @@ class _CommentsListState extends State<CommentsList> {
             itemCount: state.comments.length + (state.hasReachedEnd ? 1 : 2),
             
             separatorBuilder: (context, index) {
-              if (index == 0) return const SizedBox.shrink();
-              return Divider(
-                height: 1, 
-                thickness: 1, 
-                indent: 16,
-                endIndent: 16,
-              );
+              return const SizedBox.shrink();
             },
             
             itemBuilder: (_, index) {
@@ -156,6 +150,7 @@ class _CommentsListState extends State<CommentsList> {
               final comment = state.comments[commentIndex];
               
                return ListTile(
+                  titleAlignment: ListTileTitleAlignment.top,
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
                   leading: CircleAvatar(
                     radius: 20,
