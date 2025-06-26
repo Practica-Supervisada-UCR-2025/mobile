@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 
+typedef DownloadFunction = void Function({
+  required String url,
+  Function(String)? onDownloadCompleted,
+  Function(String)? onDownloadError,
+});
+
 class ImagePreviewScreen extends StatefulWidget {
   final String imageUrl;
 
-  const ImagePreviewScreen({super.key, required this.imageUrl});
+  final DownloadFunction? downloadFn;
+
+  const ImagePreviewScreen({
+    super.key,
+    required this.imageUrl,
+    this.downloadFn,
+  });
 
   @override
   State<ImagePreviewScreen> createState() => _ImagePreviewScreenState();
@@ -16,12 +28,14 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
   void downloadImage(BuildContext context, String url) {
     setState(() => _isDownloading = true);
 
-    FileDownloader.downloadFile(
+    final downloadFunction = widget.downloadFn ?? FileDownloader.downloadFile;
+
+    downloadFunction(
       url: url,
       onDownloadCompleted: (String path) {
         setState(() => _isDownloading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Image downloaded')),
+          const SnackBar(content: Text('Image downloaded')),
         );
       },
       onDownloadError: (String errorMessage) {
@@ -51,14 +65,12 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
               ),
             ),
           ),
-
           if (_isDownloading)
             const Positioned.fill(
               child: Center(
                 child: CircularProgressIndicator(),
               ),
             ),
-
           Positioned(
             top: 40,
             left: 16,
@@ -70,7 +82,6 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
               ),
             ),
           ),
-
           Positioned(
             top: 40,
             right: 16,
