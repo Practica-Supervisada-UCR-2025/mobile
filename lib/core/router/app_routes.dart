@@ -5,7 +5,6 @@ import 'package:mobile/src/comments/presenter/page/comments_page.dart';
 import 'package:mobile/src/profile/_children/_children.dart';
 import 'package:mobile/src/search/presenter/page/page.dart';
 import '../../src/profile/domain/domain.dart';
-import '../../core/globals/main_scaffold.dart';
 import '../../src/auth/_children/login/presenter/presenter.dart';
 import '../../src/auth/_children/register/presenter/presenter.dart';
 import '../../src/auth/_children/forgot-password/presenter/presenter.dart';
