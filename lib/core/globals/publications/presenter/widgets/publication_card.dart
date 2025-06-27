@@ -104,7 +104,7 @@ class PublicationCard extends StatelessWidget {
                         onPressed: () {
                         },
                       ),
-                      const SizedBox(width: 24),
+                      const SizedBox(width: 5),
                       _InteractionButton(
                         icon: Icons.chat_bubble_outline,
                         label: '',

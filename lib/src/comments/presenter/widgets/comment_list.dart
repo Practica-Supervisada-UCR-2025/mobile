@@ -15,6 +15,7 @@ class CommentsList extends StatefulWidget {
 class _CommentsListState extends State<CommentsList> {
   late final ScrollController _scrollController;
   String? _lastErrorShown;
+
   @override
   void initState() {
     super.initState();
@@ -43,9 +44,8 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   Widget _buildAttachment(String url) {
-    
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+      padding: const EdgeInsets.only(top: 8.0, right: 14.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12.0),
         child: Image.network(
@@ -79,17 +79,17 @@ class _CommentsListState extends State<CommentsList> {
 
     return BlocBuilder<CommentsLoadBloc, CommentsLoadState>(
       builder: (context, state) {
+        Widget listContent;
+
         if (state is CommentsLoadInitial ||
             (state is CommentsLoading && state.isInitialFetch)) {
-          return Column(
+          listContent = Column(
             children: [
               PostPreview(publication: widget.publication),
               const Expanded(child: Center(child: CircularProgressIndicator())),
             ],
           );
-        }
-
-        if (state is CommentsError) {
+        } else if (state is CommentsError) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (_lastErrorShown != state.message) {
               FeedbackSnackBar.showError(context, state.message);
@@ -97,10 +97,9 @@ class _CommentsListState extends State<CommentsList> {
             }
           });
 
-          return ListView(
+          listContent = ListView(
             children: [
               PostPreview(publication: widget.publication),
-              const Divider(height: 1),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 48),
                 child: Center(
@@ -112,14 +111,13 @@ class _CommentsListState extends State<CommentsList> {
               ),
             ],
           );
-        }
+        } else if (state is CommentsLoaded) {
+          final comments = state.comments;
 
-        if (state is CommentsLoaded) {
-          if (state.comments.isEmpty) {
-            return ListView(
+          if (comments.isEmpty) {
+            listContent = ListView(
               children: [
                 PostPreview(publication: widget.publication),
-                const Divider(height: 1, thickness: 1),
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 48.0),
@@ -131,70 +129,83 @@ class _CommentsListState extends State<CommentsList> {
                 ),
               ],
             );
+          } else {
+            listContent = RefreshIndicator(
+              onRefresh: () async {
+                context.read<CommentsLoadBloc>().add(FetchInitialComments());
+              },
+              child: ListView.builder(
+                controller: _scrollController,
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: comments.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return PostPreview(publication: widget.publication);
+                  }
+
+                  if (index <= comments.length) {
+                    final comment = comments[index - 1];
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                            width: 0.3,
+                          ),
+                        ),
+                      ),
+                      child: ListTile(
+                        titleAlignment: ListTileTitleAlignment.top,
+                        contentPadding: const EdgeInsets.only(right: 14.0, top: 8.0, bottom: 8.0),
+                        leading: CircleAvatar(
+                          radius: 20,
+                          backgroundImage: comment.profileImageUrl != null
+                              ? NetworkImage(comment.profileImageUrl!)
+                              : null,
+                          child: comment.profileImageUrl == null
+                              ? const Icon(Icons.person, size: 22)
+                              : null,
+                        ),
+                        title: Text(
+                          comment.username,
+                          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(comment.content, style: textTheme.bodyMedium),
+                            if (comment.attachmentUrl != null)
+                              _buildAttachment(comment.attachmentUrl!),
+                          ],
+                        ),
+                        dense: true,
+                      ),
+                    );
+                  } else {
+                    return state.hasReachedEnd
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(child: Text('No more comments to show.')),
+                          )
+                        : const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                  }
+                },
+              ),
+            );
           }
-
-          return ListView.separated(
-            controller: _scrollController,
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            itemCount: state.comments.length + (state.hasReachedEnd ? 1 : 2),
-
-            separatorBuilder: (context, index) {
-              return const SizedBox.shrink();
-            },
-
-            itemBuilder: (_, index) {
-              if (index == 0) {
-                return PostPreview(publication: widget.publication);
-              }
-
-              final isLoaderIndex = index == state.comments.length + 1;
-              if (isLoaderIndex && !state.hasReachedEnd) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-
-              final commentIndex = index - 1;
-
-              if (commentIndex >= state.comments.length) {
-                return const SizedBox.shrink();
-              }
-
-              final comment = state.comments[commentIndex];
-              
-               return ListTile(
-                  titleAlignment: ListTileTitleAlignment.top,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-                  leading: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: comment.profileImageUrl != null
-                        ? NetworkImage(comment.profileImageUrl!)
-                        : null,
-                    child: comment.profileImageUrl == null
-                        ? const Icon(Icons.person, size: 22)
-                        : null,
-                  ),
-                  title: Text(
-                    comment.username, 
-                    style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(comment.content, style: textTheme.bodyMedium),
-                      
-                      if (comment.attachmentUrl != null)
-                        _buildAttachment(comment.attachmentUrl!),
-                    ],
-                  ),
-                  dense: true,
-                );
-            },
-          );
+        } else {
+          listContent = const SizedBox.shrink();
         }
-        
-        return const SizedBox.shrink();
+
+        return Stack(
+          children: [
+            Positioned.fill(child: listContent),
+          ],
+        );
       },
     );
   }
