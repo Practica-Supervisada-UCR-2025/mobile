@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 void main() {
   const imageUrl = 'https://example.com/image.jpg';
 
-  testWidgets('ImagePreviewScreen displays image and handles download',
-      (WidgetTester tester) async {
+  testWidgets('ImagePreviewScreen displays image and handles download', (
+    WidgetTester tester,
+  ) async {
     bool downloadCalled = false;
 
     mockDownload({

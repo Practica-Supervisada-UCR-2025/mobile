@@ -28,13 +28,11 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-
   flutter_file_downloader: ^2.1.0
 
   flutter:
     sdk: flutter
-    
-  
+
   shimmer: ^3.0.0
 
   flutter_dotenv: ^5.1.0
@@ -72,6 +70,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_launcher_icons: ^0.14.4
+
   test: ^1.25.15
   bloc_test: ^10.0.0
   mockito: ^5.4.6
@@ -93,6 +93,11 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/launch_icon.png"
+
 # The following section is specific to Flutter packages.
 flutter:
   # The following line ensures that the Material Icons font is
@@ -102,6 +107,7 @@ flutter:
 
   assets:
     - .env
+    - assets/icons/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
