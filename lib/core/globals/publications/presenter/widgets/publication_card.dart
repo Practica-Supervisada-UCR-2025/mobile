@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
+import 'package:mobile/core/globals/publications/presenter/widgets/image_page.dart';
 
 class PublicationCard extends StatelessWidget {
   final Publication publication;
@@ -81,13 +82,25 @@ class PublicationCard extends StatelessWidget {
 
               if (publication.attachment != null &&
                   publication.attachment!.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    publication.attachment!,
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ImagePreviewScreen(imageUrl: publication.attachment!),
+                      ),
+                    );
+                  },
+                  child: Hero(
+                    tag: publication.attachment!,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        publication.attachment!,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
 
