@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
-import 'package:mobile/src/comments/presenter/page/comments_page.dart';
+import 'package:mobile/core/globals/publications/presenter/widgets/image_page.dart';
 
 class PublicationCard extends StatelessWidget {
   final Publication publication;
@@ -28,28 +29,42 @@ class PublicationCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
-                    foregroundImage: NetworkImage(publication.profileImageUrl),
-                    radius: 18,
+                  GestureDetector(
+                    onTap: () {
+                      if(publication.userId != null){
+                        context.go(Paths.externProfile(publication.userId!));
+                      }
+                    },
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
+                      foregroundImage: NetworkImage(publication.profileImageUrl),
+                      radius: 18,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          publication.username,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          relativeDate(publication.createdAt),
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
+                    child: GestureDetector(
+                      onTap: () {
+                        if(publication.userId != null){
+                          context.go(Paths.externProfile(publication.userId!));
+                        }
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            publication.username,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ),
-                      ],
+                          Text(
+                            relativeDate(publication.createdAt),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   PublicationOptionsButton(
@@ -65,50 +80,100 @@ class PublicationCard extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              /// Attachment
               if (publication.attachment != null &&
                   publication.attachment!.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    publication.attachment!,
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ImagePreviewScreen(imageUrl: publication.attachment!),
+                      ),
+                    );
+                  },
+                  child: Hero(
+                    tag: publication.attachment!,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        publication.attachment!,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
 
               const SizedBox(height: 8),
 
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.favorite_border, size: 20),
-                    onPressed: () {},
+                  Row(
+                    children: [
+                      _InteractionButton(
+                        icon: Icons.favorite_border,
+                        label: publication.likes.toString(),
+                        onPressed: () {
+                          // Like logic here
+                        },
+                      ),
+                      const SizedBox(width: 24),
+                      _InteractionButton(
+                        icon: Icons.chat_bubble_outline,
+                        label: publication.comments.toString(),
+                        onPressed: () {
+                          context.go(Paths.comments, extra: publication);
+                        },
+                      ),
+                    ],
                   ),
-                  Text(publication.likes.toString()),
-                  const SizedBox(width: 16),
-                  IconButton(
-                    icon: const Icon(Icons.chat_bubble_outline, size: 20),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (_) => CommentsPage(publication: publication),
-                        ),
-                      );
-                    },
-                  ),
-                  Text(publication.comments.toString()),
-                  const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.share, size: 20),
-                    onPressed: () {},
+                    onPressed: () {
+                      // Share logic here
+                    },
                   ),
                 ],
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InteractionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  const _InteractionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(20),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurface),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
         ),
       ),
     );

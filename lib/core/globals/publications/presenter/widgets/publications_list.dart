@@ -4,9 +4,11 @@ import 'package:mobile/core/globals/publications/publications.dart';
 import 'package:mobile/core/storage/storage.dart';
 
 class PublicationsList extends StatefulWidget {
+  final bool isFeed;
   final String scrollKey;
+  final bool isOtherUser;
 
-  const PublicationsList({super.key, required this.scrollKey});
+  const PublicationsList({super.key, required this.scrollKey, required this.isFeed, required this.isOtherUser});
 
   @override
   State<PublicationsList> createState() => _PublicationsListState();
@@ -47,7 +49,7 @@ class _PublicationsListState extends State<PublicationsList>
     if (thresholdReached &&
         state is PublicationSuccess &&
         !state.hasReachedMax) {
-      _bloc.add(LoadMorePublications());
+      _bloc.add(LoadMorePublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
     }
 
     final shouldShow = _scrollController.offset > 600;
@@ -62,7 +64,7 @@ class _PublicationsListState extends State<PublicationsList>
     setState(() {
       _showRefreshButton = false;
     });
-    _bloc.add(RefreshPublications());
+    _bloc.add(RefreshPublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
 
     await _bloc.stream.firstWhere(
       (state) => state is PublicationSuccess || state is PublicationFailure,
@@ -100,7 +102,7 @@ class _PublicationsListState extends State<PublicationsList>
                 ElevatedButton(
                   onPressed:
                       () => context.read<PublicationBloc>().add(
-                        LoadPublications(),
+                        LoadPublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser),
                       ),
                   child: const Text('Retry'),
                 ),

@@ -5,12 +5,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i5;
 
-import 'package:http/http.dart' as _i3;
-import 'package:mobile/core/core.dart' as _i6;
+import 'package:mobile/core/core.dart' as _i3;
 import 'package:mobile/src/profile/domain/models/user.dart' as _i2;
 import 'package:mobile/src/profile/profile.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i7;
+import 'package:mockito/src/dummies.dart' as _i6;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -31,8 +30,8 @@ class _FakeUser_0 extends _i1.SmartFake implements _i2.User {
     : super(parent, parentInvocation);
 }
 
-class _FakeClient_1 extends _i1.SmartFake implements _i3.Client {
-  _FakeClient_1(Object parent, Invocation parentInvocation)
+class _FakeApiService_1 extends _i1.SmartFake implements _i3.ApiService {
+  _FakeApiService_1(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -53,12 +52,25 @@ class MockProfileRepository extends _i1.Mock implements _i4.ProfileRepository {
             ),
           )
           as _i5.Future<_i2.User>);
+
+  @override
+  _i5.Future<_i2.User> getUserProfile(String? userId, String? token) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserProfile, [userId, token]),
+            returnValue: _i5.Future<_i2.User>.value(
+              _FakeUser_0(
+                this,
+                Invocation.method(#getUserProfile, [userId, token]),
+              ),
+            ),
+          )
+          as _i5.Future<_i2.User>);
 }
 
 /// A class which mocks [LocalStorage].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
+class MockLocalStorage extends _i1.Mock implements _i3.LocalStorage {
   MockLocalStorage() {
     _i1.throwOnMissingStub(this);
   }
@@ -67,7 +79,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get accessToken =>
       (super.noSuchMethod(
             Invocation.getter(#accessToken),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#accessToken),
             ),
@@ -78,7 +90,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get refreshToken =>
       (super.noSuchMethod(
             Invocation.getter(#refreshToken),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#refreshToken),
             ),
@@ -89,7 +101,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get userId =>
       (super.noSuchMethod(
             Invocation.getter(#userId),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#userId),
             ),
@@ -100,7 +112,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get username =>
       (super.noSuchMethod(
             Invocation.getter(#username),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#username),
             ),
@@ -111,7 +123,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get userEmail =>
       (super.noSuchMethod(
             Invocation.getter(#userEmail),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#userEmail),
             ),
@@ -122,7 +134,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get userProfilePicture =>
       (super.noSuchMethod(
             Invocation.getter(#userProfilePicture),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#userProfilePicture),
             ),
@@ -138,7 +150,7 @@ class MockLocalStorage extends _i1.Mock implements _i6.LocalStorage {
   String get fcmToken =>
       (super.noSuchMethod(
             Invocation.getter(#fcmToken),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#fcmToken),
             ),
@@ -207,12 +219,15 @@ class MockProfileRepositoryAPI extends _i1.Mock
   }
 
   @override
-  _i3.Client get client =>
+  _i3.ApiService get apiService =>
       (super.noSuchMethod(
-            Invocation.getter(#client),
-            returnValue: _FakeClient_1(this, Invocation.getter(#client)),
+            Invocation.getter(#apiService),
+            returnValue: _FakeApiService_1(
+              this,
+              Invocation.getter(#apiService),
+            ),
           )
-          as _i3.Client);
+          as _i3.ApiService);
 
   @override
   _i5.Future<_i2.User> getCurrentUser(String? token) =>
@@ -220,6 +235,19 @@ class MockProfileRepositoryAPI extends _i1.Mock
             Invocation.method(#getCurrentUser, [token]),
             returnValue: _i5.Future<_i2.User>.value(
               _FakeUser_0(this, Invocation.method(#getCurrentUser, [token])),
+            ),
+          )
+          as _i5.Future<_i2.User>);
+
+  @override
+  _i5.Future<_i2.User> getUserProfile(String? userId, String? token) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserProfile, [userId, token]),
+            returnValue: _i5.Future<_i2.User>.value(
+              _FakeUser_0(
+                this,
+                Invocation.method(#getUserProfile, [userId, token]),
+              ),
             ),
           )
           as _i5.Future<_i2.User>);

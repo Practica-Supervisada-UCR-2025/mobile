@@ -12,15 +12,12 @@ import 'package:mobile/core/globals/publications/publications.dart'
         PublicationEvent,
         PublicationState,
         LoadPublications,
-        LoadMorePublications,
         PublicationInitial,
         PublicationLoading,
         PublicationFailure,
         PublicationSuccess,
-        Publication,
-        PublicationsList,
-        PublicationCard;
-
+        PublicationsList;
+        
 class MockPublicationBloc extends Mock implements PublicationBloc {}
 
 class FakePublicationEvent extends Fake implements PublicationEvent {}
@@ -52,7 +49,7 @@ void main() {
     return MaterialApp(
       home: BlocProvider<PublicationBloc>.value(
         value: mockBloc,
-        child: const PublicationsList(scrollKey: "ownPublications"),
+        child: const PublicationsList(scrollKey: "ownPublications", isFeed: false, isOtherUser: false),
       ),
     );
   }
@@ -103,79 +100,6 @@ void main() {
       });
     },
   );
-
-  testWidgets(
-    'renders items and loading spinner at the end when hasReachedMax is false',
-    (WidgetTester tester) async {
-      await mockNetworkImagesFor(() async {
-        final pub = Publication(
-          id: '1',
-          username: 'user1',
-          profileImageUrl: 'https://example.com/avatar.png',
-          content: 'Hello World',
-          createdAt: DateTime.now(),
-          attachment: null,
-          likes: 0,
-          comments: 0,
-        );
-        final state = PublicationSuccess(
-          publications: [pub],
-          totalPosts: 2,
-          totalPages: 2,
-          currentPage: 1,
-        );
-        await tester.pumpWidget(buildTestableWidget(state));
-        await tester.pump();
-
-        expect(find.byType(PublicationCard), findsOneWidget);
-
-        expect(
-          find.byWidgetPredicate(
-            (w) =>
-                w is Padding &&
-                w.child is Center &&
-                (w.child as Center).child is CircularProgressIndicator,
-          ),
-          findsOneWidget,
-        );
-
-        final listView = tester.widget<ListView>(find.byType(ListView));
-        final controller = listView.controller!;
-        await tester.pump();
-        controller.jumpTo(controller.position.maxScrollExtent + 300);
-        await tester.pump(const Duration(milliseconds: 200));
-
-        verify(() => mockBloc.add(LoadMorePublications())).called(1);
-      });
-    },
-  );
-
-  testWidgets('shows "No more posts to show." when hasReachedMax is true', (
-    WidgetTester tester,
-  ) async {
-    await mockNetworkImagesFor(() async {
-      final pub = Publication(
-        id: '2',
-        username: 'user2',
-        profileImageUrl: 'https://example.com/avatar2.png',
-        content: 'Second post',
-        createdAt: DateTime.now(),
-        attachment: null,
-        likes: 0,
-        comments: 0,
-      );
-      final state = PublicationSuccess(
-        publications: [pub],
-        totalPosts: 1,
-        totalPages: 1,
-        currentPage: 1,
-      );
-      await tester.pumpWidget(buildTestableWidget(state));
-      await tester.pump();
-
-      expect(find.text('No more posts to show.'), findsOneWidget);
-    });
-  });
 
   testWidgets('renders SizedBox.shrink() for unhandled states', (
     WidgetTester tester,

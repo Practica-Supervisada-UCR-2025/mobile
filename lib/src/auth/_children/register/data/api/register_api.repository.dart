@@ -1,25 +1,23 @@
 import 'dart:convert';
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/auth/auth.dart';
-import 'package:http/http.dart' as http;
 
 class RegisterAPIRepository {
-  final http.Client client;
+  final ApiService apiService;
 
-  RegisterAPIRepository({http.Client? client})
-      : client = client ?? http.Client();
+  RegisterAPIRepository({required this.apiService});
 
   Future<void> sendUserToBackend(AuthUserInfo user) async {
     try {
-      final response = await client.post(
-        Uri.parse('$API_BASE_URL/user/auth/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
+      final response = await apiService.post(
+        '/user/auth/register',
+        body: {
           'email': user.email,
           'full_name': user.name,
           'auth_id': user.id,
           'auth_token': user.authProviderToken,
-        }),
+        },
+        authenticated: false,
       );
 
       if (response.statusCode == 201) return;

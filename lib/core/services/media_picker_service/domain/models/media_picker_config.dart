@@ -1,7 +1,7 @@
 class MediaPickerConfig {
   final List<String> allowedExtensions;
   final int maxSizeInBytes;
-  final int imageQuality;
+  final int? imageQuality;
   final void Function(String message)? onInvalidFile;
 
   const MediaPickerConfig({

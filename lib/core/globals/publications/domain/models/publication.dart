@@ -7,6 +7,7 @@ class Publication {
   final String? attachment;
   final int likes;
   final int comments;
+  final String? userId;
 
   Publication({
     required this.id,
@@ -17,5 +18,6 @@ class Publication {
     this.attachment,
     required this.likes,
     required this.comments,
+    this.userId,
   });
 }

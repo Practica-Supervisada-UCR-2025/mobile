@@ -22,6 +22,12 @@ class FakeProfileRepository implements ProfileRepository {
       image: 'https://example.com/avatar.png',
     );
   }
+  
+  @override
+  Future<User> getUserProfile(String userId, String? token) {
+    // Todo: implement getUserProfile
+    throw UnimplementedError();
+  }
 }
 
 void main() {

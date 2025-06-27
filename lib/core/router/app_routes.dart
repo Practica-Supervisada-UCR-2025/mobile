@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
+import 'package:mobile/src/comments/presenter/page/comments_page.dart';
 import 'package:mobile/src/profile/_children/_children.dart';
 import 'package:mobile/src/search/presenter/page/page.dart';
 import '../../src/profile/domain/domain.dart';
-import '../../core/globals/main_scaffold.dart';
 import '../../src/auth/_children/login/presenter/presenter.dart';
 import '../../src/auth/_children/register/presenter/presenter.dart';
 import '../../src/auth/_children/forgot-password/presenter/presenter.dart';
@@ -45,20 +45,30 @@ final List<RouteBase> appRoutes = [
       GoRoute(
         path: Paths.home,
         builder: (context, state) {
+          //final isFeed = state.extra as bool? ?? false;
           return RepositoryProvider<PublicationRepository>(
-            create:
-                (context) => PublicationRepositoryAPI(
-                  endpoint: ENDPOINT_OWN_PUBLICATIONS,
-                ),
+            create: (context) => PublicationRepositoryAPI(
+              endpoint: ENDPOINT_FEED_PUBLICATIONS,
+            ),
             child: BlocProvider<PublicationBloc>(
-              create:
-                  (context) => PublicationBloc(
-                    publicationRepository:
-                        context.read<PublicationRepository>(),
-                  )..add(LoadPublications()),
-              child: const HomeScreen(),
+              create: (context) {
+                final bloc = PublicationBloc(
+                  publicationRepository: context.read<PublicationRepository>(),
+                );
+                bloc.add(LoadPublications(isFeed: true));
+                bloc.add(LoadMorePublications(isFeed: true));
+                return bloc;
+              },
+              child: const HomeScreen(isFeed: true),
             ),
           );
+        },
+      ),
+      GoRoute(
+        path: Paths.comments,
+        builder: (context, state) {
+          final publication = state.extra as Publication;
+          return CommentsPage(publication: publication);
         },
       ),
       GoRoute(
@@ -83,9 +93,16 @@ final List<RouteBase> appRoutes = [
                     publicationRepository:
                         context.read<PublicationRepository>(),
                   )..add(LoadPublications()),
-              child: const ProfileScreen(),
+              child: const ProfileScreen(isFeed: false),
             ),
           );
+        },
+      ),
+      GoRoute(
+        path: Paths.externProfile(':userId'),
+        builder: (context, state) {
+          final userId = state.pathParameters['userId'];
+          return ProfileScreen(userId: userId, isFeed: true);
         },
       ),
     ],

@@ -33,6 +33,7 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
           config: MediaPickerConfig(
             allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
             maxSizeInBytes: MAX_IMAGE_SIZE,
+            imageQuality: null,
             onInvalidFile: (error) {
               if (!mounted) return;
               ScaffoldMessenger.of(
@@ -139,18 +140,14 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
             BlocConsumer<CommentsCreateBloc, CommentsCreateState>(
               listener: (context, state) {
                 if (state is CommentFailure) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Something went wrong. Please try again.'),
-                      backgroundColor: Colors.red,
-                    ),
+                  FeedbackSnackBar.showError(
+                    context,
+                    'Something went wrong. Please try again.',
                   );
                 } else if (state is CommentSuccess) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Your comment was posted!'),
-                      backgroundColor: Colors.green,
-                    ),
+                  FeedbackSnackBar.showSuccess(
+                    context,
+                    'Your comment was posted!',
                   );
                 }
               },

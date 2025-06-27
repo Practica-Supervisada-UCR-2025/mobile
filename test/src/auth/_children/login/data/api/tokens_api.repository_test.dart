@@ -6,23 +6,22 @@ import 'package:mockito/mockito.dart';
 import 'package:mobile/core/core.dart';
 import 'package:mobile/src/auth/auth.dart';
 
-@GenerateMocks([http.Client])
 import 'tokens_api.repository_test.mocks.dart';
 
+@GenerateMocks([ApiService])
 void main() {
-  late MockClient mockClient;
+  late MockApiService mockApiService;
   late TokensRepositoryAPI repository;
 
   setUp(() {
-    mockClient = MockClient();
-    repository = TokensRepositoryAPI(client: mockClient);
+    mockApiService = MockApiService();
+    repository = TokensRepositoryAPI(apiService: mockApiService);
   });
 
   group('TokensRepositoryAPI', () {
     final authProviderToken = 'test-auth-provider-token';
-    final endpoint = Uri.parse('$API_BASE_URL/user/auth/login');
-    final requestHeaders = {'Content-Type': 'application/json'};
-    final requestBody = jsonEncode({'auth_token': authProviderToken});
+    final endpoint = '/user/auth/login';
+    final requestBody = {'auth_token': authProviderToken};
 
     test('should return AuthTokens when API call is successful', () async {
       final responseData = {
@@ -31,15 +30,16 @@ void main() {
       };
 
       when(
-        mockClient.post(endpoint, headers: requestHeaders, body: requestBody),
+        mockApiService.post(endpoint, body: requestBody, authenticated: false),
       ).thenAnswer((_) async => http.Response(jsonEncode(responseData), 200));
 
       final result = await repository.getTokens(authProviderToken);
 
       expect(result.accessToken, equals('test-access-token'));
       expect(result.refreshToken, equals('test-refresh-token'));
+
       verify(
-        mockClient.post(endpoint, headers: requestHeaders, body: requestBody),
+        mockApiService.post(endpoint, body: requestBody, authenticated: false),
       ).called(1);
     });
 
@@ -47,7 +47,7 @@ void main() {
       final responseData = {'access_token': 'test-access-token'};
 
       when(
-        mockClient.post(endpoint, headers: requestHeaders, body: requestBody),
+        mockApiService.post(endpoint, body: requestBody, authenticated: false),
       ).thenAnswer((_) async => http.Response(jsonEncode(responseData), 200));
 
       final result = await repository.getTokens(authProviderToken);
@@ -56,30 +56,43 @@ void main() {
       expect(result.refreshToken, equals(''));
     });
 
-    test('should throw AuthException when API returns error', () async {
-      final errorResponse = {'message': 'Invalid credentials'};
+    test(
+      'should throw AuthException when API returns error with message',
+      () async {
+        final errorResponse = {'message': 'Invalid credentials'};
 
-      when(
-        mockClient.post(endpoint, headers: requestHeaders, body: requestBody),
-      ).thenAnswer((_) async => http.Response(jsonEncode(errorResponse), 401));
-
-      expect(
-        () => repository.getTokens(authProviderToken),
-        throwsA(
-          isA<AuthException>().having(
-            (e) => e.message,
-            'message',
-            'Unexpected error: Invalid credentials',
+        when(
+          mockApiService.post(
+            endpoint,
+            body: requestBody,
+            authenticated: false,
           ),
-        ),
-      );
-    });
+        ).thenAnswer(
+          (_) async => http.Response(jsonEncode(errorResponse), 401),
+        );
+
+        expect(
+          () => repository.getTokens(authProviderToken),
+          throwsA(
+            isA<AuthException>().having(
+              (e) => e.message,
+              'message',
+              'Invalid credentials',
+            ),
+          ),
+        );
+      },
+    );
 
     test(
       'should use default error message when API error has no message',
       () async {
         when(
-          mockClient.post(endpoint, headers: requestHeaders, body: requestBody),
+          mockApiService.post(
+            endpoint,
+            body: requestBody,
+            authenticated: false,
+          ),
         ).thenAnswer((_) async => http.Response(jsonEncode({}), 500));
 
         expect(
@@ -88,7 +101,7 @@ void main() {
             isA<AuthException>().having(
               (e) => e.message,
               'message',
-              'Unexpected error: Authentication failed',
+              'Authentication failed',
             ),
           ),
         );
@@ -97,7 +110,7 @@ void main() {
 
     test('should handle "Unauthorized" exception', () async {
       when(
-        mockClient.post(endpoint, headers: requestHeaders, body: requestBody),
+        mockApiService.post(endpoint, body: requestBody, authenticated: false),
       ).thenThrow('Unauthorized');
 
       expect(
@@ -114,7 +127,7 @@ void main() {
 
     test('should handle unexpected exceptions', () async {
       when(
-        mockClient.post(endpoint, headers: requestHeaders, body: requestBody),
+        mockApiService.post(endpoint, body: requestBody, authenticated: false),
       ).thenThrow(Exception('Network error'));
 
       expect(

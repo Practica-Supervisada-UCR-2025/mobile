@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
+import 'package:mobile/core/globals/publications/presenter/widgets/image_page.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool isFeed;
+  final String? userId;
+
+  const ProfileScreen({super.key, required this.isFeed, this.userId});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -24,11 +28,12 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   void _loadProfile() {
-    context.read<ProfileBloc>().add(ProfileLoad());
+    context.read<ProfileBloc>().add(ProfileLoad(userId: widget.userId));
   }
 
   @override
   Widget build(BuildContext context) {
+    final isOwnProfile = widget.userId == null;
     super.build(context);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -73,30 +78,52 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 ),
                               ),
                               const SizedBox(height: 18),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Flexible(child: _buildCreatePostButton()),
-                                  const SizedBox(width: 8),
+                                if (isOwnProfile)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
                                   Flexible(child: _buildModifyButton(user)),
-                                ],
-                              ),
+                                  ],
+                                ),
                             ],
                           ),
                         ),
                         const SizedBox(width: 16),
-                        CircleAvatar(
-                          radius: 35,
-                          backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
-                          foregroundImage: NetworkImage(user.image),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.onPrimary,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => ImagePreviewScreen(imageUrl: user.image),
+                              ),
+                            );
+                          },
+                          child: Hero(
+                            tag: user.image,
+                            child: CircleAvatar(
+                              radius: 35,
+                              backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
+                              foregroundImage: NetworkImage(user.image),
+                              backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
                     Divider(color: Theme.of(context).colorScheme.outline),
-                    Expanded(child: ShowOwnPublicationsPage()),
+                    if(isOwnProfile)
+                      Expanded(
+                        child: ShowOwnPublicationsPage(
+                          isFeed: widget.isFeed,
+                        ),
+                      ),
+                    if (!isOwnProfile)
+                      Expanded(
+                        child: ShowPostFromOthersPage(
+                          userId: widget.userId!,
+                          isFeed: widget.isFeed,
+                        ),
+                      ),
                   ],
                 );
               } else if (state is ProfileFailure) {
@@ -129,21 +156,8 @@ class _ProfileScreenState extends State<ProfileScreen>
       isLoading: false,
       text: 'Edit Profile',
       isEnabled: true,
-      height: 32,
-      width: 160,
-    );
-  }
-
-  Widget _buildCreatePostButton() {
-    return SecondaryButton(
-      onPressed: () {
-        context.push(Paths.create);
-      },
-      isLoading: false,
-      text: 'New Post',
-      isEnabled: true,
-      height: 32,
-      width: 160,
+      height: 36,
+      width: 320,
     );
   }
 }

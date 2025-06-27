@@ -32,6 +32,7 @@ class MainScaffold extends StatelessWidget {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,10 +42,10 @@ class MainScaffold extends StatelessWidget {
         title: Text(
           'UCR Connect',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Theme.of(context).colorScheme.primary,
+              ),
         ),
         actions: [
           IconButton(

@@ -5,7 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
-import 'package:http/http.dart' as _i3;
+import 'package:mobile/core/core.dart' as _i3;
 import 'package:mobile/src/auth/auth.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -28,8 +28,8 @@ class _FakeAuthUserInfo_0 extends _i1.SmartFake implements _i2.AuthUserInfo {
     : super(parent, parentInvocation);
 }
 
-class _FakeClient_1 extends _i1.SmartFake implements _i3.Client {
-  _FakeClient_1(Object parent, Invocation parentInvocation)
+class _FakeApiService_1 extends _i1.SmartFake implements _i3.ApiService {
+  _FakeApiService_1(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -70,12 +70,15 @@ class MockRegisterAPIRepository extends _i1.Mock
   }
 
   @override
-  _i3.Client get client =>
+  _i3.ApiService get apiService =>
       (super.noSuchMethod(
-            Invocation.getter(#client),
-            returnValue: _FakeClient_1(this, Invocation.getter(#client)),
+            Invocation.getter(#apiService),
+            returnValue: _FakeApiService_1(
+              this,
+              Invocation.getter(#apiService),
+            ),
           )
-          as _i3.Client);
+          as _i3.ApiService);
 
   @override
   _i4.Future<void> sendUserToBackend(_i2.AuthUserInfo? user) =>

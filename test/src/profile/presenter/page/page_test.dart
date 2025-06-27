@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/core/globals/publications/presenter/widgets/image_page.dart';
 import 'package:mobile/src/profile/profile.dart';
 import 'package:mobile/core/core.dart';
 import 'package:network_image_mock/network_image_mock.dart';
@@ -46,22 +47,30 @@ void main() {
 
   Widget buildTestableWidget() {
     final router = GoRouter(
+      initialLocation: '/',
       routes: [
         GoRoute(
           path: '/',
-          builder:
-              (context, state) => Provider<PublicationRepository>.value(
-                value: mockPublicationRepository,
-                child: MultiProvider(
-                  providers: [
-                    BlocProvider<ProfileBloc>.value(value: mockProfileBloc),
-                    BlocProvider<PublicationBloc>.value(
-                      value: mockPublicationBloc,
-                    ),
-                  ],
-                  child: const ProfileScreen(),
-                ),
-              ),
+          builder: (context, state) => Provider<PublicationRepository>.value(
+            value: mockPublicationRepository,
+            child: MultiProvider(
+              providers: [
+                BlocProvider<ProfileBloc>.value(value: mockProfileBloc),
+                BlocProvider<PublicationBloc>.value(value: mockPublicationBloc),
+              ],
+              child: const ProfileScreen(isFeed: false),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: Paths.editProfile,
+          builder: (context, state) {
+            final user = state.extra as User;
+            return Scaffold(
+              appBar: AppBar(title: const Text('Edit Profile')),
+              body: Text('Editing ${user.username}'),
+            );
+          },
         ),
       ],
     );
@@ -101,7 +110,7 @@ void main() {
         expect(find.text('@johndoe'), findsOneWidget);
         expect(find.text('user@ucr.ac.cr.com'), findsOneWidget);
         expect(find.byType(CircleAvatar), findsOneWidget);
-        expect(find.byType(SecondaryButton), findsNWidgets(2));
+        expect(find.byType(SecondaryButton), findsNWidgets(1));
       });
     });
 
@@ -132,5 +141,90 @@ void main() {
 
       expect(find.byType(SizedBox), findsOneWidget);
     });
+
+    testWidgets('navigates to edit profile page on button tap', (
+      WidgetTester tester,
+      ) async {
+        whenListen(
+          mockProfileBloc,
+          Stream.fromIterable([ProfileSuccess(user: testUser)]),
+          initialState: ProfileSuccess(user: testUser),
+        );
+
+        await mockNetworkImagesFor(() async {
+          await tester.pumpWidget(buildTestableWidget());
+
+          final editButton = find.text('Edit Profile');
+          expect(editButton, findsOneWidget);
+
+          await tester.tap(editButton);
+          await tester.pumpAndSettle();
+
+          expect(find.text('Edit Profile'), findsOneWidget);
+        });
+     });
+
+     testWidgets('opens image preview on avatar tap', (WidgetTester tester) async {
+        whenListen(
+          mockProfileBloc,
+          Stream.fromIterable([ProfileSuccess(user: testUser)]),
+          initialState: ProfileSuccess(user: testUser),
+        );
+
+        await mockNetworkImagesFor(() async {
+          await tester.pumpWidget(buildTestableWidget());
+
+          final gesture = find.byWidgetPredicate((widget) =>
+              widget is GestureDetector &&
+              widget.child is Hero &&
+              (widget.child as Hero).tag == testUser.image);
+
+          expect(gesture, findsOneWidget);
+
+          await tester.tap(gesture);
+          await tester.pumpAndSettle();
+
+          expect(find.byType(ImagePreviewScreen), findsOneWidget);
+          expect(find.textContaining(testUser.image), findsNothing);
+        });
+      });
+
+      testWidgets('renders ShowPostFromOthersPage for other user', (WidgetTester tester) async {
+        const testUserId = '12345';
+
+        whenListen(
+          mockProfileBloc,
+          Stream.fromIterable([ProfileSuccess(user: testUser)]),
+          initialState: ProfileSuccess(user: testUser),
+        );
+
+        final router = GoRouter(
+          initialLocation: '/',
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) => Provider<PublicationRepository>.value(
+                value: mockPublicationRepository,
+                child: MultiProvider(
+                  providers: [
+                    BlocProvider<ProfileBloc>.value(value: mockProfileBloc),
+                    BlocProvider<PublicationBloc>.value(value: mockPublicationBloc),
+                  ],
+                  child: ProfileScreen(isFeed: false, userId: testUserId),
+                ),
+              ),
+            ),
+          ],
+        );
+
+        await mockNetworkImagesFor(() async {
+          await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+          await tester.pumpAndSettle();
+
+          expect(find.byType(ShowPostFromOthersPage), findsOneWidget);
+          expect(find.byType(ShowOwnPublicationsPage), findsNothing);
+        });
+      });
+
   });
 }

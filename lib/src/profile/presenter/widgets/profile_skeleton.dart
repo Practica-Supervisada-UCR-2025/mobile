@@ -29,8 +29,6 @@ class ProfileSkeleton extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(child: _buildButtonPlaceholder(context: context)),
-                        const SizedBox(width: 8),
-                        Expanded(child: _buildButtonPlaceholder(context: context)),
                       ],
                     ),
                   ],
@@ -70,7 +68,7 @@ class ProfileSkeleton extends StatelessWidget {
 
   Widget _buildButtonPlaceholder({required BuildContext context}) {
     return Container(
-      height: 32,
+      height: 36,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(8),

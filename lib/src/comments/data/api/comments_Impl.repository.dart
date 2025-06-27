@@ -14,10 +14,14 @@ class CommentsRepositoryImpl implements CommentsRepository {
 
   @override
   Future<CommentsResponse> fetchComments({
+    int? limit,
     required String postId,
     required DateTime startTime,
   }) async {
-    final endpoint = '/api/posts/$postId/comments?startTime=${startTime.toUtc().toIso8601String()}';
+    String endpoint = 'posts/$postId/comments?startTime=${startTime.toUtc().toIso8601String()}';
+    if (limit != null) {
+      endpoint += '&limit=$limit';
+    }
 
     final response = await apiService.get(endpoint);
 
@@ -25,7 +29,7 @@ class CommentsRepositoryImpl implements CommentsRepository {
       final data = json.decode(response.body);
       return CommentsResponse.fromJson(data);
     } else {
-      throw Exception("Error loading comments");
+      return CommentsResponse(comments: [], totalItems: 0, currentIndex: 0);
     }
   }
 

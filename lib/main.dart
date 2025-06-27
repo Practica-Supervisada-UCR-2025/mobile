@@ -51,6 +51,9 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
@@ -71,12 +74,15 @@ class MyApp extends StatelessWidget {
               ),
         ),
         RepositoryProvider<ProfileRepository>(
-          create: (context) => ProfileRepositoryAPI(),
+          create:
+              (context) => ProfileRepositoryAPI(apiService: ApiServiceImpl()),
         ),
         ChangeNotifierProvider<RouterRefreshNotifier>(
           create: (_) => RouterRefreshNotifier(),
         ),
-        RepositoryProvider<ApiService>(create: (_) => ApiServiceImpl()),
+        RepositoryProvider<ApiService>(
+          create: (_) => ApiServiceImpl(serviceLocator: ServiceLocator()),
+        ),
 
         RepositoryProvider<EditProfileRepository>(
           create:
@@ -111,7 +117,9 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider<SearchUsersRepository>(
           create:
-              (_) => SearchUsersRepositoryImpl(apiService: ApiServiceImpl()),
+              (context) => SearchUsersRepositoryImpl(
+                apiService: context.read<ApiService>(),
+              ),
         ),
         RepositoryProvider<CommentsRepository>(
           create:
@@ -132,7 +140,9 @@ class MyApp extends StatelessWidget {
             create:
                 (context) => RegisterBloc(
                   registerRepository: context.read<RegisterRepository>(),
-                  registerAPIRepository: RegisterAPIRepository(),
+                  registerAPIRepository: RegisterAPIRepository(
+                    apiService: context.read<ApiService>(),
+                  ),
                 ),
           ),
           BlocProvider<LoginBloc>(
@@ -140,15 +150,22 @@ class MyApp extends StatelessWidget {
                 (context) => LoginBloc(
                   loginRepository: context.read<LoginRepository>(),
                   localStorage: LocalStorage(),
-                  tokensRepository: TokensRepositoryAPI(),
+                  tokensRepository: TokensRepositoryAPI(
+                    apiService: context.read<ApiService>(),
+                  ),
                   notificationsService: context.read<NotificationsService>(),
                 ),
           ),
           BlocProvider<LogoutBloc>(
-            create:
-                (context) => LogoutBloc(
-                  logoutRepository: context.read<LogoutRepository>(),
-                ),
+            create: (context) {
+              final logoutBloc = LogoutBloc(
+                logoutRepository: context.read<LogoutRepository>(),
+              );
+              ServiceLocator().logoutBloc = logoutBloc;
+              ServiceLocator().scaffoldMessengerKey = scaffoldMessengerKey;
+
+              return logoutBloc;
+            },
           ),
           BlocProvider<ProfileBloc>(
             create:
@@ -195,11 +212,20 @@ class MyApp extends StatelessWidget {
             context.read<LoginBloc>().stream.listen((state) {
               notifier.refresh();
             });
+
+            final loginBloc = context.read<LoginBloc>();
+            context.read<LogoutBloc>().stream.listen((state) {
+              if (state is LogoutSuccess) {
+                loginBloc.add(LoginReset());
+              }
+            });
+
             return MaterialApp.router(
               title: 'UCR Connect',
               themeMode: ThemeMode.system,
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
+              scaffoldMessengerKey: scaffoldMessengerKey,
               routerConfig: createRouter(context),
             );
           },

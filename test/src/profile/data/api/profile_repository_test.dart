@@ -2,71 +2,154 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:mobile/core/constants/constants.dart';
-import 'package:mobile/core/storage/user_session.storage.dart';
+import 'package:mobile/src/profile/data/api/api.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:mobile/src/profile/profile.dart';
 
-@GenerateMocks([http.Client, LocalStorage])
-import 'profile_dummy_repository_test.mocks.dart';
+import 'package:mobile/core/services/api_service/domain/repository/api_service.dart';
 
-class MockFile extends Mock implements File {}
+import 'profile_repository_test.mocks.dart';
 
+@GenerateMocks([ApiService])
 void main() {
-  late MockClient mockClient;
+  late MockApiService mockApiService;
   late ProfileRepositoryAPI repository;
-  late MockLocalStorage mockLocalStorage;
 
   setUp(() {
-    mockClient = MockClient();
-    mockLocalStorage = MockLocalStorage();
-    when(mockLocalStorage.userId).thenReturn('1');
-    when(mockLocalStorage.accessToken).thenReturn('token');
-    when(mockLocalStorage.refreshToken).thenReturn('refreshToken');
-    when(mockLocalStorage.username).thenReturn('test');
-    repository = ProfileRepositoryAPI(client: mockClient);
+    mockApiService = MockApiService();
+    repository = ProfileRepositoryAPI(apiService: mockApiService);
   });
 
-  group('ProfileRepositoryAPI', () {
-    const token = '1';
-    final url = Uri.parse('$API_BASE_URL/user/auth/profile');
+  group('getCurrentUser', () {
+    const token = 'token';
+    const endpoint = '/user/auth/profile';
 
-    test('should return User when API call is successful', () async {
-      final mockUserData = {
-        'message': 'User profile retrieved successfully',
-        'data': {
-          'email': 'test@ucr.ac.cr',
-          'username': 'test',
-          'full_name': 'test',
-          'profile_picture': 'https://dummyjson.com/icon/emilys/128',
-        },
-      };
-      
-      when(
-        mockClient.get(
-          url,
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
+    test(
+      'should return User when API call is successful with status 201',
+      () async {
+        final mockResponseData = {
+          'message': 'User profile retrieved successfully',
+          'data': {
+            'email': 'test@ucr.ac.cr',
+            'username': 'test',
+            'full_name': 'Test User',
+            'profile_picture': 'https://dummyjson.com/icon/emilys/128',
           },
-        ),
-      ).thenAnswer((_) async => http.Response(jsonEncode(mockUserData), 201));
+        };
 
-      final result = await repository.getCurrentUser(token);
+        final response = http.Response(jsonEncode(mockResponseData), 201);
 
-      expect(result.email, equals('test@ucr.ac.cr'));
-      expect(result.username, equals('test'));
-      expect(result.firstName, equals('test'));
-      expect(result.image, equals('https://dummyjson.com/icon/emilys/128'));
-    });
+        when(
+          mockApiService.get(endpoint, authenticated: true),
+        ).thenAnswer((_) async => response);
 
-    test('should throw Exception when API call fails', () async {
+        final result = await repository.getCurrentUser(token);
+
+        expect(result.email, equals('test@ucr.ac.cr'));
+        expect(result.username, equals('test'));
+        expect(result.firstName, equals('Test'));
+        expect(result.image, equals('https://dummyjson.com/icon/emilys/128'));
+      },
+    );
+
+    test(
+      'should throw Exception when API call fails with status != 201',
+      () async {
+        final response = http.Response(
+          jsonEncode({'message': 'Unauthorized'}),
+          401,
+        );
+
+        when(
+          mockApiService.get(endpoint, authenticated: true),
+        ).thenAnswer((_) async => response);
+
+        expect(() => repository.getCurrentUser(token), throwsException);
+      },
+    );
+
+    test('should throw Exception on network error', () async {
       when(
-        mockClient.get(url),
-      ).thenAnswer((_) async => http.Response('Not found', 404));
+        mockApiService.get(endpoint, authenticated: true),
+      ).thenThrow(const SocketException('No Internet'));
 
-      expect(() => repository.getCurrentUser(token), throwsException);
+      expect(
+        () => repository.getCurrentUser(token),
+        throwsA(
+          predicate(
+            (e) =>
+                e is Exception &&
+                e.toString().contains('Error getting user profile'),
+          ),
+        ),
+      );
+    });
+  });
+
+  group('getUserProfile', () {
+    const userId = '123';
+    const token = 'token';
+    final endpoint = 'user/profile/$userId';
+
+    test(
+      'should return User when API call is successful with status 200',
+      () async {
+        final mockResponseData = {
+          'message': 'User profile retrieved successfully',
+          'data': {
+            'email': 'jane@ucr.ac.cr',
+            'username': 'jane',
+            'full_name': 'Jane Doe',
+            'profile_picture': 'https://dummyjson.com/icon/jane/128',
+          },
+        };
+
+        final response = http.Response(jsonEncode(mockResponseData), 200);
+
+        when(
+          mockApiService.get(endpoint, authenticated: true),
+        ).thenAnswer((_) async => response);
+
+        final result = await repository.getUserProfile(userId, token);
+
+        expect(result.email, equals('jane@ucr.ac.cr'));
+        expect(result.username, equals('jane'));
+        expect(result.firstName, equals('Jane'));
+        expect(result.image, equals('https://dummyjson.com/icon/jane/128'));
+      },
+    );
+
+    test(
+      'should throw Exception when API call fails with status != 200',
+      () async {
+        final response = http.Response(
+          jsonEncode({'message': 'User not found'}),
+          404,
+        );
+
+        when(
+          mockApiService.get(endpoint, authenticated: true),
+        ).thenAnswer((_) async => response);
+
+        expect(() => repository.getUserProfile(userId, token), throwsException);
+      },
+    );
+
+    test('should throw Exception on network error', () async {
+      when(
+        mockApiService.get(endpoint, authenticated: true),
+      ).thenThrow(const SocketException('No Internet'));
+
+      expect(
+        () => repository.getUserProfile(userId, token),
+        throwsA(
+          predicate(
+            (e) =>
+                e is Exception &&
+                e.toString().contains('Error getting user profile'),
+          ),
+        ),
+      );
     });
   });
 }
