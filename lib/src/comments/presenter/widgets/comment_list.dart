@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/core/constants/constants.dart';
 import 'package:mobile/core/globals/publications/domain/models/publication.dart';
 import 'package:mobile/core/globals/widgets/feedback_snack_bar.dart';
+import 'package:mobile/core/utils/dates.dart';
 import 'package:mobile/src/comments/comments.dart';
 
 class CommentsList extends StatefulWidget {
@@ -151,30 +153,47 @@ class _CommentsListState extends State<CommentsList> {
                         ListTile(
                           titleAlignment: ListTileTitleAlignment.top,
                           contentPadding: const EdgeInsets.only(
-                              top: 8.0, bottom: 8.0, left: 14.0),
+                              top: 8.0, bottom: 16.0, left: 14.0),
                           leading: CircleAvatar(
                             radius: 20,
                             backgroundImage: comment.profileImageUrl != null
                                 ? NetworkImage(comment.profileImageUrl!)
-                                : null,
+                                : NetworkImage(DEFAULT_PROFILE_PIC),
                             child: comment.profileImageUrl == null
                                 ? const Icon(Icons.person, size: 22)
                                 : null,
                           ),
-                          title: Text(
-                            comment.username,
-                            style: textTheme.titleSmall
-                                ?.copyWith(fontWeight: FontWeight.bold),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                comment.username,
+                                style: textTheme.titleSmall
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                relativeDate(comment.createdAt),
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(comment.content, style: textTheme.bodyMedium),
+                              if (comment.content.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 14.0),
+                                  child: Text(comment.content, style: textTheme.bodyMedium),
+                                ),
                               if (comment.attachmentUrl != null)
                                 _buildAttachment(comment.attachmentUrl!),
                             ],
                           ),
-                          dense: true,
                         ),
                         const Divider(
                           color: Colors.grey,
