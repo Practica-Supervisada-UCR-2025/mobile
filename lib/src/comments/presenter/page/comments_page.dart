@@ -75,7 +75,6 @@ class PostPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
     return Column(
@@ -87,21 +86,56 @@ class PostPreview extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(publication.profileImageUrl),
+                  GestureDetector(
+                    onTap: () {
+                      if (publication.userId != null) {
+                        context.go(Paths.externProfile(publication.userId!));
+                      }
+                    },
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
+                      foregroundImage: NetworkImage(publication.profileImageUrl),
+                      radius: 18,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(publication.username, style: textTheme.titleMedium),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (publication.userId != null) {
+                          context.go(Paths.externProfile(publication.userId!));
+                        }
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            publication.username,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            relativeDate(publication.createdAt),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                publication.content,
-                style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-              ),
+              const SizedBox(height: 16),
+              if (publication.content.trim().isNotEmpty)
+                Text(
+                  publication.content,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
               if (publication.attachment != null &&
                   publication.attachment!.isNotEmpty)
                 Padding(
