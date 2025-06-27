@@ -68,12 +68,13 @@ class PublicationCard extends StatelessWidget {
 
                 const SizedBox(height: 8),
 
-                _ExpandableText(content: publication.content),
+                if (publication.content.trim().isNotEmpty)
+                  _ExpandableText(content: publication.content),
 
                 const SizedBox(height: 8),
 
                 if (publication.attachment != null &&
-                    publication.attachment!.isNotEmpty)
+                    publication.attachment!.trim().isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
