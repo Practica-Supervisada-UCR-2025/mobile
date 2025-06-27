@@ -146,41 +146,42 @@ class _CommentsListState extends State<CommentsList> {
 
                   if (index <= comments.length) {
                     final comment = comments[index - 1];
-                    return Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Theme.of(context).colorScheme.outline,
-                            width: 0.3,
+                    return Column(
+                      children: [
+                        ListTile(
+                          titleAlignment: ListTileTitleAlignment.top,
+                          contentPadding: const EdgeInsets.only(
+                              top: 8.0, bottom: 8.0, left: 14.0),
+                          leading: CircleAvatar(
+                            radius: 20,
+                            backgroundImage: comment.profileImageUrl != null
+                                ? NetworkImage(comment.profileImageUrl!)
+                                : null,
+                            child: comment.profileImageUrl == null
+                                ? const Icon(Icons.person, size: 22)
+                                : null,
                           ),
+                          title: Text(
+                            comment.username,
+                            style: textTheme.titleSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(comment.content, style: textTheme.bodyMedium),
+                              if (comment.attachmentUrl != null)
+                                _buildAttachment(comment.attachmentUrl!),
+                            ],
+                          ),
+                          dense: true,
                         ),
-                      ),
-                      child: ListTile(
-                        titleAlignment: ListTileTitleAlignment.top,
-                        contentPadding: const EdgeInsets.only(right: 14.0, top: 8.0, bottom: 8.0),
-                        leading: CircleAvatar(
-                          radius: 20,
-                          backgroundImage: comment.profileImageUrl != null
-                              ? NetworkImage(comment.profileImageUrl!)
-                              : null,
-                          child: comment.profileImageUrl == null
-                              ? const Icon(Icons.person, size: 22)
-                              : null,
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 0.3,
+                          height: 0,
                         ),
-                        title: Text(
-                          comment.username,
-                          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(comment.content, style: textTheme.bodyMedium),
-                            if (comment.attachmentUrl != null)
-                              _buildAttachment(comment.attachmentUrl!),
-                          ],
-                        ),
-                        dense: true,
-                      ),
+                      ],
                     );
                   } else {
                     return state.hasReachedEnd

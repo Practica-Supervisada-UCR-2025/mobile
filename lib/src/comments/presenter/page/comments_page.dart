@@ -78,44 +78,85 @@ class PostPreview extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    return Container(
-      color: colorScheme.surface,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(publication.profileImageUrl),
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(publication.profileImageUrl),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(publication.username, style: textTheme.titleMedium),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(publication.username, style: textTheme.titleMedium),
+              const SizedBox(height: 8),
+              Text(
+                publication.content,
+                style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+              ),
+              if (publication.attachment != null &&
+                  publication.attachment!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      publication.attachment!,
+                      width: double.infinity,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        child: Icon(
+                          Icons.favorite_border, 
+                          size: 20, 
+                          color: Theme.of(context).colorScheme.onSurface
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        child: Icon(
+                          Icons.chat_bubble_outline, 
+                          size: 20, 
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.share, size: 20),
+                    onPressed: () {
+                    },
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            publication.content,
-            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-          ),
-          if (publication.attachment != null &&
-              publication.attachment!.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  publication.attachment!,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-        ],
-      ),
+        ),
+        const Divider(
+          color: Colors.grey,
+          thickness: 0.3,
+          height: 0,
+        ),
+      ],
     );
   }
 }
