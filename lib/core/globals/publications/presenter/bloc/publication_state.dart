@@ -21,14 +21,17 @@ class PublicationSuccess extends PublicationState {
 
   final int currentPage;
 
+  final bool hasReachedMax;
+
   const PublicationSuccess({
     required this.publications,
     required this.totalPosts,
     required this.totalPages,
     required this.currentPage,
+    this.hasReachedMax = false,
   });
 
-  bool get hasReachedMax => currentPage >= totalPages;
+  
 
   @override
   List<Object?> get props =>
