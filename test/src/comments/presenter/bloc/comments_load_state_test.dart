@@ -5,6 +5,7 @@ final tCommentModel1 = CommentModel(
   id: '1',
   content: 'Este es un comentario de prueba.',
   username: 'testuser',
+  userId: 'user-1',
   createdAt: DateTime.now(),
 );
 
@@ -12,6 +13,7 @@ final tCommentModel2 = CommentModel(
   id: '2',
   content: 'Este es otro comentario.',
   username: 'testuser2',
+  userId: 'user-2',
   createdAt: DateTime.now(),
 );
 
@@ -19,12 +21,14 @@ CommentModel createTestComment({
   String id = '1',
   String content = 'Comentario de prueba',
   String username = 'testuser',
+  String userId = 'default-user-id',
   DateTime? createdAt,
 }) {
   return CommentModel(
     id: id,
     content: content,
     username: username,
+    userId: userId,
     createdAt: createdAt ?? DateTime.now(),
   );
 }

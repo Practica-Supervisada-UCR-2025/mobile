@@ -12,13 +12,14 @@ void main() {
   const postId = 'test-post-id';
   final tInitialFetchTime = DateTime.fromMillisecondsSinceEpoch(0);
 
-  List<CommentModel> generateComments(int count, {int startId = 0}) {
+  List<CommentModel> generateComments(int count, {int startId = 0, String userId = 'default-user-id'}) {
     return List.generate(count, (i) {
       final id = startId + i;
       return CommentModel(
         id: 'comment-$id',
         content: 'Test comment $id',
         username: 'user-$id',
+        userId: userId,
         createdAt: DateTime.now().subtract(Duration(minutes: id)),
       );
     });
