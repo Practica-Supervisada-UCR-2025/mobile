@@ -33,6 +33,7 @@ class _CommentBottomBarState extends State<CommentBottomBar> {
           config: MediaPickerConfig(
             allowedExtensions: [...IMAGES_ALLOWED, 'gif'],
             maxSizeInBytes: MAX_IMAGE_SIZE,
+            imageQuality: null,
             onInvalidFile: (error) {
               if (!mounted) return;
               ScaffoldMessenger.of(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile/core/constants/constants.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/core/globals/publications/domain/models/publication.dart';
 import 'package:mobile/core/globals/widgets/feedback_snack_bar.dart';
+import 'package:mobile/core/globals/publications/presenter/widgets/image_page.dart';
+import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/core/utils/dates.dart';
 import 'package:mobile/src/comments/comments.dart';
 
@@ -46,8 +48,16 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   Widget _buildAttachment(String url) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0, right: 14.0),
+  return Padding(
+    padding: const EdgeInsets.only(top: 8.0, right: 14.0),
+    child: GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ImagePreviewScreen(imageUrl: url),
+          ),
+        );
+      },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12.0),
         child: Image.network(
@@ -72,8 +82,10 @@ class _CommentsListState extends State<CommentsList> {
           },
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -154,33 +166,44 @@ class _CommentsListState extends State<CommentsList> {
                           titleAlignment: ListTileTitleAlignment.top,
                           contentPadding: const EdgeInsets.only(
                               top: 8.0, bottom: 16.0, left: 14.0),
-                          leading: CircleAvatar(
-                            radius: 20,
-                            backgroundImage: comment.profileImageUrl != null
-                                ? NetworkImage(comment.profileImageUrl!)
-                                : NetworkImage(DEFAULT_PROFILE_PIC),
-                            child: comment.profileImageUrl == null
-                                ? const Icon(Icons.person, size: 22)
-                                : null,
+                          leading: GestureDetector(
+                            onTap: () {
+                              context.go(Paths.externProfile(comment.userId));
+                            },
+                            child: CircleAvatar(
+                              radius: 20,
+                              backgroundImage: comment.profileImageUrl != null
+                                  ? NetworkImage(comment.profileImageUrl!)
+                                  : null,
+                              child: comment.profileImageUrl == null
+                                  ? const Icon(Icons.person, size: 22)
+                                  : null,
+                            ),
                           ),
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                comment.username,
-                                style: textTheme.titleSmall
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                relativeDate(comment.createdAt),
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
+
+                          title: GestureDetector(
+                            onTap: () {
+                              context.go(Paths.externProfile(comment.userId));
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  comment.username,
+                                  style: textTheme.titleSmall
+                                      ?.copyWith(fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                                const SizedBox(width: 10),
+                                Text(
+                                  relativeDate(comment.createdAt),
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

@@ -4,6 +4,7 @@ class CommentModel extends Equatable {
   final String id;
   final String content;
   final String username;
+  final String userId;
   final DateTime createdAt;
   final String? profileImageUrl;
   final String? attachmentUrl;
@@ -13,6 +14,7 @@ class CommentModel extends Equatable {
     required this.content,
     required this.username,
     required this.createdAt,
+    required this.userId,
     this.profileImageUrl,
     this.attachmentUrl,
   });
@@ -22,6 +24,7 @@ class CommentModel extends Equatable {
       id: json['id'],
       content: json['content'],
       username: json['username'],
+      userId: json['user_id'],
       createdAt: DateTime.parse(json['created_at']),
       profileImageUrl: json['profile_picture'],
       attachmentUrl: json['file_url'],
@@ -32,6 +35,7 @@ class CommentModel extends Equatable {
     String? id,
     String? content,
     String? username,
+    String? userId,
     DateTime? createdAt,
     String? profileImageUrl,
     String? attachmentUrl,
@@ -40,6 +44,7 @@ class CommentModel extends Equatable {
       id: id ?? this.id,
       content: content ?? this.content,
       username: username ?? this.username,
+      userId: this.userId,
       createdAt: createdAt ?? this.createdAt,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       attachmentUrl: attachmentUrl ?? this.attachmentUrl,
@@ -51,6 +56,7 @@ class CommentModel extends Equatable {
         id,
         content,
         username,
+        userId,
         createdAt,
         profileImageUrl,
         attachmentUrl,

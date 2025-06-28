@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFF236BEB);
+  static const Color primary = Color(0xFF00AAEE);
 
   static const Color secondary = Color(0xFF42BD60);
 
@@ -26,7 +26,9 @@ class AppColors {
   static const Color buttonBackgroundDark = Color(0xFF33425C);
 
   static Color getSurfaceColor(Brightness brightness) {
-    return brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white;
+    return brightness == Brightness.dark
+        ? const Color(0xFF1E1E1E)
+        : Colors.white;
   }
 
   static Color getSecondarySurfaceColor(Brightness brightness) {
