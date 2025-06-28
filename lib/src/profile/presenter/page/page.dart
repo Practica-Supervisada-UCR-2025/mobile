@@ -39,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(0),
           child: BlocBuilder<ProfileBloc, ProfileState>(
             builder: (context, state) {
               if (state is ProfileLoading) {
@@ -48,82 +48,85 @@ class _ProfileScreenState extends State<ProfileScreen>
                 final user = state.user;
                 return Column(
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${user.firstName} ${user.lastName}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineMedium
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '@${user.username}',
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(fontWeight: FontWeight.w500),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                user.email,
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.outline,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${user.firstName} ${user.lastName}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              const SizedBox(height: 18),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '@${user.username}',
+                                  style: Theme.of(context).textTheme.bodyLarge
+                                      ?.copyWith(fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  user.email,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.outline,
+                                  ),
+                                ),
+                                const SizedBox(height: 18),
                                 if (isOwnProfile)
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                  Flexible(child: _buildModifyButton(user)),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => ImagePreviewScreen(imageUrl: user.image),
-                              ),
-                            );
-                          },
-                          child: Hero(
-                            tag: user.image,
-                            child: CircleAvatar(
-                              radius: 35,
-                              backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
-                              foregroundImage: NetworkImage(user.image),
-                              backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Flexible(child: _buildModifyButton(user)),
+                                    ],
+                                  ),
+                              ],
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 16),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => ImagePreviewScreen(imageUrl: user.image),
+                                ),
+                              );
+                            },
+                            child: Hero(
+                              tag: user.image,
+                              child: CircleAvatar(
+                                radius: 35,
+                                backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
+                                foregroundImage: NetworkImage(user.image),
+                                backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Divider(color: Theme.of(context).colorScheme.outline),
-                    if(isOwnProfile)
-                      Expanded(
-                        child: ShowOwnPublicationsPage(
-                          isFeed: widget.isFeed,
-                        ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 0),
+                        child: isOwnProfile
+                            ? ShowOwnPublicationsPage(
+                                isFeed: widget.isFeed,
+                              )
+                            : ShowPostFromOthersPage(
+                                userId: widget.userId!,
+                                isFeed: widget.isFeed,
+                              ),
                       ),
-                    if (!isOwnProfile)
-                      Expanded(
-                        child: ShowPostFromOthersPage(
-                          userId: widget.userId!,
-                          isFeed: widget.isFeed,
-                        ),
-                      ),
+                    ),
                   ],
                 );
               } else if (state is ProfileFailure) {
