@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,16 +10,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/storage/storage.dart';
 import 'package:mobile/core/globals/publications/publications.dart'
     show
-        PublicationBloc,
-        PublicationEvent,
-        PublicationState,
         LoadPublications,
+        Publication,
+        PublicationBloc,
+        PublicationCard,
+        PublicationEvent,
+        PublicationFailure,
         PublicationInitial,
         PublicationLoading,
-        PublicationFailure,
+        PublicationState,
         PublicationSuccess,
-        PublicationsList;
-        
+        PublicationsList,
+        PublicationsListState,
+        RefreshPublications;
+
 class MockPublicationBloc extends Mock implements PublicationBloc {}
 
 class FakePublicationEvent extends Fake implements PublicationEvent {}
@@ -38,18 +44,34 @@ void main() {
     mockBloc = MockPublicationBloc();
   });
 
-  Widget buildTestableWidget(PublicationState state) {
+  Widget buildTestableWidget(
+    PublicationState state, {
+    ScrollController? controller,
+  }) {
     when(() => mockBloc.state).thenReturn(state);
     whenListen(
       mockBloc,
       Stream<PublicationState>.fromIterable([state]),
       initialState: state,
     );
+    final scrollController = controller ?? ScrollController();
 
     return MaterialApp(
-      home: BlocProvider<PublicationBloc>.value(
-        value: mockBloc,
-        child: const PublicationsList(scrollKey: "ownPublications", isFeed: false, isOtherUser: false),
+      home: Scaffold(
+        body: BlocProvider<PublicationBloc>.value(
+          value: mockBloc,
+          child: CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              PublicationsList(
+                scrollKey: "ownPublications",
+                isFeed: false,
+                isOtherUser: false,
+                scrollController: scrollController,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -78,7 +100,10 @@ void main() {
 
         await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
         await tester.pump();
-        verify(() => mockBloc.add(LoadPublications())).called(1);
+        verify(
+          () =>
+              mockBloc.add(LoadPublications(isFeed: false, isOtherUser: false)),
+        ).called(1);
       });
     },
   );
@@ -101,14 +126,150 @@ void main() {
     },
   );
 
-  testWidgets('renders SizedBox.shrink() for unhandled states', (
+  testWidgets('renders list of publications and loading indicator at end', (
+    WidgetTester tester,
+  ) async {
+    await mockNetworkImagesFor(() async {
+      final state = PublicationSuccess(
+        publications: [
+          Publication(
+            id: '1',
+            content: 'test',
+            userId: 'u1',
+            username: 'user',
+            profileImageUrl: 'https://example.com/avatar.jpg',
+            createdAt: DateTime.now(),
+            likes: 5,
+            comments: 2,
+          ),
+        ],
+        totalPosts: 1,
+        totalPages: 1,
+        currentPage: 1,
+        hasReachedMax: false,
+      );
+      await tester.pumpWidget(buildTestableWidget(state));
+      await tester.pump();
+
+      expect(find.byType(PublicationCard), findsOneWidget);
+      expect(
+        find.byType(CircularProgressIndicator),
+        findsOneWidget,
+      ); // load more
+    });
+  });
+
+  testWidgets('renders "no more posts" text when hasReachedMax is true', (
+    WidgetTester tester,
+  ) async {
+    await mockNetworkImagesFor(() async {
+      final state = PublicationSuccess(
+        publications: [
+          Publication(
+            id: '1',
+            content: 'test',
+            userId: 'u1',
+            username: 'user',
+            profileImageUrl: 'https://example.com/avatar.jpg',
+            createdAt: DateTime.now(),
+            likes: 5,
+            comments: 2,
+          ),
+        ],
+        totalPosts: 1,
+        totalPages: 1,
+        currentPage: 1,
+        hasReachedMax: true,
+      );
+      await tester.pumpWidget(buildTestableWidget(state));
+      await tester.pump();
+
+      expect(find.text('No more posts to show.'), findsOneWidget);
+    });
+  });
+
+  testWidgets('renders fallback widget for unhandled state', (
     WidgetTester tester,
   ) async {
     await mockNetworkImagesFor(() async {
       final state = PublicationInitial();
       await tester.pumpWidget(buildTestableWidget(state));
       await tester.pump();
-      expect(find.byType(SizedBox), findsOneWidget);
+      expect(find.textContaining('Failed to load'), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.byType(PublicationCard), findsNothing);
+      expect(find.byType(SliverList), findsNothing);
     });
   });
+
+  testWidgets(
+    'refresh() triggers RefreshPublications and scrolls to top (without waiting)',
+    (WidgetTester tester) async {
+      await mockNetworkImagesFor(() async {
+        final scrollController = ScrollController(initialScrollOffset: 150);
+
+        final state = PublicationSuccess(
+          publications: [],
+          totalPosts: 0,
+          totalPages: 1,
+          currentPage: 1,
+        );
+
+        when(() => mockBloc.state).thenReturn(state);
+        when(() => mockBloc.stream).thenAnswer(
+          (_) => Stream.value(
+            PublicationSuccess(
+              publications: [],
+              totalPosts: 0,
+              totalPages: 1,
+              currentPage: 1,
+            ),
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: BlocProvider<PublicationBloc>.value(
+                value: mockBloc,
+                child: SizedBox.expand(
+                  child: CustomScrollView(
+                    controller: scrollController,
+                    slivers: [
+                      PublicationsList(
+                        scrollKey: "testKey",
+                        isFeed: false,
+                        isOtherUser: false,
+                        scrollController: scrollController,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final stateFinder = find.byType(PublicationsList);
+        expect(stateFinder, findsOneWidget);
+
+        final listState = tester.state<PublicationsListState>(stateFinder);
+
+        await listState.refresh();
+
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        verify(
+          () => mockBloc.add(
+            RefreshPublications(isFeed: false, isOtherUser: false),
+          ),
+        ).called(1);
+
+        expect(scrollController.offset, 0.0);
+      });
+    },
+  );
 }

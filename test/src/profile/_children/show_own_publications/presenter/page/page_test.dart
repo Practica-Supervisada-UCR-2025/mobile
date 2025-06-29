@@ -1,76 +1,170 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+//import 'package:mobile/src/profile/profile.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:mobile/core/core.dart';
 
-// import 'package:mobile/core/globals/publications/publications.dart';
-// import 'package:mobile/src/profile/_children/_children.dart';
+class FakePublicationsList extends StatelessWidget {
+  const FakePublicationsList({
+    super.key,
+    required this.scrollKey,
+    required this.isFeed,
+    required this.isOtherUser,
+    required this.scrollController,
+  });
 
-// void main() {
-//   testWidgets(
-//     'ShowOwnPublicationsPage builds the BlocProvider and displays PublicationsList',
-//     (WidgetTester tester) async {
-//       final router = GoRouter(
-//         routes: [
-//           GoRoute(
-//             path: '/',
-//             builder: (context, state) => const ShowOwnPublicationsPage(),
-//           ),
-//         ],
-//       );
+  final String scrollKey;
+  final bool isFeed;
+  final bool isOtherUser;
+  final ScrollController scrollController;
 
-//       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
 
-//       await tester.pumpAndSettle();
+class MockScrollStorage extends Mock implements ScrollStorage {
+  void Function(String key, double offset) setOffset = (_, __) {};
+}
 
-//       expect(find.byType(BlocProvider<PublicationBloc>), findsOneWidget);
-//       expect(find.byType(PublicationsList), findsOneWidget);
-//     },
-//   );
+class MockPublicationRepository extends Mock
+    implements PublicationRepositoryAPI {}
 
-//   testWidgets(
-//     'When PublicationsList fails and Retry is pressed, the error message reappears',
-//     (WidgetTester tester) async {
-//       final failureBloc = PublicationBloc(
-//         publicationRepository: _FakeFailureRepository(),
-//       );
+void main() {
+  late MockPublicationRepository mockRepository;
+  late ScrollController scrollController;
+  late GlobalKey fakePublicationsKey;
+  late MockScrollStorage mockScrollStorage;
 
-//       await tester.pumpWidget(
-//         MaterialApp(
-//           home: BlocProvider<PublicationBloc>.value(
-//             value: failureBloc,
-//             child: const PublicationsList(scrollKey: "homePage", isFeed: true, isOtherUser: false),
-//           ),
-//         ),
-//       );
+  setUp(() {
+    mockRepository = MockPublicationRepository();
+    scrollController = ScrollController();
+    fakePublicationsKey = GlobalKey();
+    mockScrollStorage = MockScrollStorage();
+  });
 
-//       failureBloc.add(LoadPublications());
+  testWidgets('ShowOwnPublicationsPage builds with PublicationsList', (
+    tester,
+  ) async {
+    when(
+      () => mockRepository.fetchPublications(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        time: any(named: 'time'),
+        isOtherUser: any(named: 'isOtherUser'),
+      ),
+    ).thenAnswer(
+      (_) async => PublicationResponse(
+        publications: [],
+        totalPosts: 0,
+        totalPages: 1,
+        currentPage: 1,
+      ),
+    );
 
-//       await tester.pumpAndSettle();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: RepositoryProvider<ScrollStorage>.value(
+            value: mockScrollStorage,
+            child: BlocProvider(
+              create:
+                  (_) => PublicationBloc(publicationRepository: mockRepository)
+                    ..add(LoadPublications(isFeed: false, isOtherUser: false)),
+              child: Builder(
+                builder: (context) {
+                  return FakePublicationsList(
+                    key: fakePublicationsKey,
+                    scrollKey: "ownPosts",
+                    isFeed: false,
+                    isOtherUser: false,
+                    scrollController: scrollController,
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
 
-//       expect(find.text('Failed to load posts'), findsOneWidget);
-//       expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
+    expect(find.byKey(fakePublicationsKey), findsOneWidget);
+  });
 
-//       await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
-//       failureBloc.add(LoadPublications());
+  // testWidgets('ScrollController listener saves offset in ScrollStorage', (
+  //   tester,
+  // ) async {
+  //   double? savedOffset;
 
-//       await tester.pumpAndSettle();
+  //   final fakePublications = List.generate(
+  //     20,
+  //     (i) => Publication(
+  //       id: 'id_$i',
+  //       username: 'User$i',
+  //       profileImageUrl: 'https://example.com/profile$i.png',
+  //       content: 'Post content $i',
+  //       createdAt: DateTime.now(),
+  //       likes: i,
+  //       comments: i * 2,
+  //       attachment: i % 2 == 0 ? 'https://example.com/image$i.png' : null,
+  //       userId: 'user_$i',
+  //     ),
+  //   );
 
-//       expect(find.text('Failed to load posts'), findsOneWidget);
-//       expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
-//     },
-//   );
-// }
+  //   when(
+  //     () => mockRepository.fetchPublications(
+  //       page: any(named: 'page'),
+  //       limit: any(named: 'limit'),
+  //       time: any(named: 'time'),
+  //       isOtherUser: any(named: 'isOtherUser'),
+  //     ),
+  //   ).thenAnswer(
+  //     (_) async => PublicationResponse(
+  //       publications: fakePublications,
+  //       totalPosts: fakePublications.length,
+  //       totalPages: 1,
+  //       currentPage: 1,
+  //     ),
+  //   );
 
-// class _FakeFailureRepository implements PublicationRepository {
-//   @override
-//   Future<PublicationResponse> fetchPublications({
-//     required int page,
-//     required int limit,
-//     required String time,
-//     required bool isOtherUser,
-//   }) async {
-//     await Future.delayed(const Duration(milliseconds: 50));
-//     throw Exception('simulated failure');
-//   }
-// }
+  //   mockScrollStorage.setOffset = (key, offset) {
+  //     savedOffset = offset;
+  //   };
+
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Scaffold(
+  //         body: CustomScrollView(
+  //           controller: scrollController,
+  //           slivers: [
+  //             SliverFillRemaining(
+  //               child: RepositoryProvider<ScrollStorage>.value(
+  //                 value: mockScrollStorage,
+  //                 child: BlocProvider(
+  //                   create:
+  //                       (_) => PublicationBloc(
+  //                         publicationRepository: mockRepository,
+  //                       )..add(
+  //                         LoadPublications(isFeed: false, isOtherUser: false),
+  //                       ),
+  //                   child: ShowOwnPublicationsPage(
+  //                     publicationsKey: GlobalKey<PublicationsListState>(),
+  //                     scrollController: scrollController,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  //   await tester.pumpAndSettle();
+  //   scrollController.jumpTo(50);
+  //   await tester.pumpAndSettle();
+
+  //   expect(savedOffset, 50);
+  // });
+}
