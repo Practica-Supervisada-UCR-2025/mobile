@@ -23,7 +23,7 @@ class CommentsPage extends StatelessWidget {
         title: const Text("Comments"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(Paths.home),
+          onPressed: () => context.pop(),
         ),
       ),
       body: MultiBlocProvider(
