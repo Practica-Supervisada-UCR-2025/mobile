@@ -123,7 +123,7 @@ class PublicationCard extends StatelessWidget {
                         icon: Icons.chat_bubble_outline,
                         label: publication.comments.toString(),
                         onPressed: () {
-                          context.go(Paths.comments, extra: publication);
+                          context.push(Paths.comments, extra: publication);
                         },
                       ),
                     ],
