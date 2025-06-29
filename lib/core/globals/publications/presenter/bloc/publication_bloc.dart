@@ -61,6 +61,7 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
         totalPosts: response.totalPosts,
         totalPages: response.totalPages,
         currentPage: response.currentPage,
+        hasReachedMax: response.publications.length < 10, // Adjust this logic using number of pages
       ));
     } catch (_) {
       emit(PublicationFailure());
@@ -98,6 +99,7 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
           totalPosts: response.totalPosts,
           totalPages: response.totalPages,
           currentPage: response.currentPage,
+          hasReachedMax: response.publications.length < 10, // todo: Adjust this logic using number of pages
         ),
       );
     } catch (_) {
