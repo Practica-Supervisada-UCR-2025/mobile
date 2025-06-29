@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/core/globals/publications/domain/models/publication.dart';
 import 'package:mobile/core/globals/widgets/feedback_snack_bar.dart';
+import 'package:mobile/core/globals/publications/presenter/widgets/image_page.dart';
+import 'package:mobile/core/router/paths.dart';
 import 'package:mobile/src/comments/comments.dart';
 
 class CommentsList extends StatefulWidget {
@@ -43,8 +46,16 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   Widget _buildAttachment(String url) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+  return Padding(
+    padding: const EdgeInsets.only(top: 8.0),
+    child: GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ImagePreviewScreen(imageUrl: url),
+          ),
+        );
+      },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12.0),
         child: Image.network(
@@ -69,8 +80,10 @@ class _CommentsListState extends State<CommentsList> {
           },
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -167,37 +180,41 @@ class _CommentsListState extends State<CommentsList> {
               }
 
               final comment = commentsToDisplay[commentIndex];
-
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-                leading: CircleAvatar(
-                  radius: 20,
-                  backgroundImage:
-                      comment.profileImageUrl != null
+              
+               return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                  leading: GestureDetector(
+                    onTap: () {
+                      context.go(Paths.externProfile(comment.userId));
+                    },
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundImage: comment.profileImageUrl != null
                           ? NetworkImage(comment.profileImageUrl!)
                           : null,
-                  child:
-                      comment.profileImageUrl == null
+                      child: comment.profileImageUrl == null
                           ? const Icon(Icons.person, size: 22)
                           : null,
-                ),
-                title: Text(
-                  comment.username,
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(comment.content, style: textTheme.bodyMedium),
-
-                    if (comment.attachmentUrl != null)
-                      _buildAttachment(comment.attachmentUrl!),
-                  ],
-                ),
-                dense: true,
-              );
+                  title: GestureDetector(
+                    onTap: () {
+                      context.go(Paths.externProfile(comment.userId));
+                    },
+                    child: Text(
+                      comment.username,
+                      style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(comment.content, style: textTheme.bodyMedium),
+                      if (comment.attachmentUrl != null) _buildAttachment(comment.attachmentUrl!),
+                    ],
+                  ),
+                  dense: true,
+                );
             },
           );
         }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
+import 'package:mobile/core/globals/publications/presenter/widgets/image_page.dart';
 import 'package:mobile/src/profile/profile.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -132,14 +133,29 @@ class _ProfileScreenState extends State<ProfileScreen>
                               ),
                             ),
                             const SizedBox(width: 16),
-                            CircleAvatar(
-                              radius: 35,
-                              backgroundImage: NetworkImage(
-                                DEFAULT_PROFILE_PIC,
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => ImagePreviewScreen(
+                                          imageUrl: user.image,
+                                        ),
+                                  ),
+                                );
+                              },
+                              child: Hero(
+                                tag: user.image,
+                                child: CircleAvatar(
+                                  radius: 35,
+                                  backgroundImage: NetworkImage(
+                                    DEFAULT_PROFILE_PIC,
+                                  ),
+                                  foregroundImage: NetworkImage(user.image),
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                ),
                               ),
-                              foregroundImage: NetworkImage(user.image),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.onPrimary,
                             ),
                           ],
                         ),

@@ -19,12 +19,14 @@ void main() {
   final comment1 = CommentModel(
     id: '1',
     username: 'user1',
+    userId: '9130bc4e-bf89-455f-a7cc-3a2f0a65bb79',
     content: 'Primer comentario',
     createdAt: DateTime(2025, 6, 15, 10, 0, 0),
   );
   final comment2 = CommentModel(
     id: '2',
     username: 'user2',
+    userId: '9130bc4e-bf89-455f-a7cc-3a2f0a65bb79',
     content: 'Segundo comentario',
     createdAt: DateTime(2025, 6, 15, 10, 5, 0),
   );
@@ -33,6 +35,7 @@ void main() {
   final comment3 = CommentModel(
     id: '3',
     username: 'user3',
+    userId: '9130bc4e-bf89-455f-a7cc-3a2f0a65bb79',
     content: 'Tercer comentario',
     createdAt: DateTime(2025, 6, 15, 10, 10, 0),
   );
