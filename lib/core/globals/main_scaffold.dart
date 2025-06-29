@@ -35,14 +35,13 @@ class MainScaffold extends StatelessWidget {
   bool _shouldShowFab(BuildContext context) {
     // Show FAB in every route except for Create and Settings
     final location = GoRouterState.of(context).uri.toString();
-    return !(
-      location.startsWith(Paths.login) || 
-      location.startsWith(Paths.register) || 
-      location.startsWith(Paths.forgot_password) ||
-      location.startsWith(Paths.create) || 
-      location.startsWith(Paths.settings) || 
-      location.startsWith(Paths.editProfile) ||
-      location.startsWith(Paths.comments));
+    return !(location.startsWith(Paths.login) ||
+        location.startsWith(Paths.register) ||
+        location.startsWith(Paths.forgot_password) ||
+        location.startsWith(Paths.create) ||
+        location.startsWith(Paths.settings) ||
+        location.startsWith(Paths.editProfile) ||
+        location.startsWith(Paths.comments));
   }
 
   @override
@@ -54,10 +53,10 @@ class MainScaffold extends StatelessWidget {
         title: Text(
           'UCR Connect',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
         actions: [
           IconButton(
@@ -69,31 +68,28 @@ class MainScaffold extends StatelessWidget {
           ),
         ],
         automaticallyImplyLeading: false,
-        shape: const Border(
-          bottom: BorderSide(color: Colors.black12),
-        ),
+        shape: const Border(bottom: BorderSide(color: Colors.black12)),
       ),
       body: child,
       floatingActionButton: AnimatedSwitcher(
         duration: const Duration(milliseconds: 200),
-        child: _shouldShowFab(context)
-            ? Padding(
-                padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
-                child: FloatingActionButton(
-                  key: const ValueKey('fab-visible'),
-                  onPressed: () => context.push(Paths.create),
-                  tooltip: 'Create new post',
-                  child: const Icon(Icons.add),
-                ),
-              )
-            : const SizedBox.shrink(key: ValueKey('fab-hidden')),
+        child:
+            _shouldShowFab(context)
+                ? Padding(
+                  padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
+                  child: FloatingActionButton(
+                    key: const ValueKey('fab-visible'),
+                    onPressed: () => context.push(Paths.create),
+                    tooltip: 'Create new post',
+                    child: const Icon(Icons.add),
+                  ),
+                )
+                : const SizedBox.shrink(key: ValueKey('fab-hidden')),
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          border: const Border(
-            top: BorderSide(color: Colors.black12),
-          ),
+          border: const Border(top: BorderSide(color: Colors.black12)),
         ),
         child: Theme(
           data: Theme.of(context).copyWith(

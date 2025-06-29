@@ -5,7 +5,6 @@ import 'package:mobile/src/comments/presenter/page/comments_page.dart';
 import 'package:mobile/src/profile/_children/_children.dart';
 import 'package:mobile/src/search/presenter/page/page.dart';
 import '../../src/profile/domain/domain.dart';
-import '../../core/globals/main_scaffold.dart';
 import '../../src/auth/_children/login/presenter/presenter.dart';
 import '../../src/auth/_children/register/presenter/presenter.dart';
 import '../../src/auth/_children/forgot-password/presenter/presenter.dart';
@@ -48,16 +47,19 @@ final List<RouteBase> appRoutes = [
         builder: (context, state) {
           //final isFeed = state.extra as bool? ?? false;
           return RepositoryProvider<PublicationRepository>(
-            create: (context) => PublicationRepositoryAPI(
-              endpoint: ENDPOINT_FEED_PUBLICATIONS,
-            ),
+            create:
+                (context) => PublicationRepositoryAPI(
+                  endpoint: ENDPOINT_FEED_PUBLICATIONS,
+                ),
             child: BlocProvider<PublicationBloc>(
               create: (context) {
                 final bloc = PublicationBloc(
                   publicationRepository: context.read<PublicationRepository>(),
                 );
-                bloc.add(LoadPublications(isFeed: true));
-                bloc.add(LoadMorePublications(isFeed: true));
+                bloc.add(LoadPublications(isFeed: true, isOtherUser: false));
+                bloc.add(
+                  LoadMorePublications(isFeed: true, isOtherUser: false),
+                );
                 return bloc;
               },
               child: const HomeScreen(isFeed: true),
@@ -83,20 +85,7 @@ final List<RouteBase> appRoutes = [
       GoRoute(
         path: Paths.profile,
         builder: (context, state) {
-          return RepositoryProvider<PublicationRepository>(
-            create:
-                (context) => PublicationRepositoryAPI(
-                  endpoint: ENDPOINT_OWN_PUBLICATIONS,
-                ),
-            child: BlocProvider<PublicationBloc>(
-              create:
-                  (context) => PublicationBloc(
-                    publicationRepository:
-                        context.read<PublicationRepository>(),
-                  )..add(LoadPublications()),
-              child: const ProfileScreen(isFeed: false),
-            ),
-          );
+          return ProfileScreen(isFeed: false);
         },
       ),
       GoRoute(
