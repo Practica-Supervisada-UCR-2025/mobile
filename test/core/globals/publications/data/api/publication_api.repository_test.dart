@@ -145,5 +145,168 @@ void main() {
       final result = await repository.fetchPublications(page: 1, limit: 10);
       expect(result.publications.first.createdAt, isA<DateTime>());
     });
+    test('fetches posts with time filter using "date" parameter', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'Post with date filter',
+            'created_at': '2024-01-01T12:00:00Z',
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          expect(request.url.query.contains('date=2024-01-01'), isTrue);
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(
+        page: 1,
+        limit: 10,
+        time: '2024-01-01',
+      );
+
+      expect(result.publications.length, 1);
+      expect(result.publications.first.content, 'Post with date filter');
+    });
+
+    // test(
+    //   'fetches posts with time filter using "time" parameter for other user',
+    //   () async {
+    //     final mockResponse = {
+    //       'posts': {
+    //         'data': [
+    //           {
+    //             'id': '1',
+    //             'content': 'Post from other user',
+    //             'created_at': '2024-01-01T12:00:00Z',
+    //             'user_id': 'user-123',
+    //           },
+    //         ],
+    //       },
+    //       'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+    //     };
+
+    //     repository = PublicationRepositoryAPI(
+    //       endpoint: ENDPOINT_FEED_PUBLICATIONS,
+    //       client: MockClient((request) async {
+    //         if (request.url.path.contains('/user/profile')) {
+    //           return http.Response(
+    //             jsonEncode({
+    //               'id': 'user-123',
+    //               'username': 'OtherUser',
+    //               'email': 'other@example.com',
+    //               'first_name': 'Other',
+    //               'last_name': 'User',
+    //               'profile_picture': '',
+    //             }),
+    //             200,
+    //           );
+    //         }
+
+    //         expect(request.url.query.contains('time=2024-01-01'), isTrue);
+    //         return http.Response(jsonEncode(mockResponse), 200);
+    //       }),
+    //     );
+
+    //     final result = await repository.fetchPublications(
+    //       page: 1,
+    //       limit: 10,
+    //       time: '2024-01-01',
+    //       isOtherUser: true,
+    //     );
+
+    //     expect(result.publications.length, 1);
+    //     expect(result.publications.first.content, 'Post from other user');
+    //     expect(result.publications.first.username, 'OtherUser');
+    //   },
+    // );
+
+    test('parses comment count from _count.comments', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'With comments',
+            'created_at': '2024-01-01T12:00:00Z',
+            '_count': {'comments': 7},
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 1, limit: 10);
+      expect(result.publications.first.comments, 7);
+    });
+
+    test('assigns userId when it is present in the response', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'Post with userId',
+            'created_at': '2024-01-01T12:00:00Z',
+            'user_id': 'user-456',
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 1, limit: 10);
+      expect(result.publications.first.userId, 'user-456');
+    });
+
+    // test(
+    //   'fallbacks to LocalStorage userId if user_id is missing and isOtherUser is true',
+    //   () async {
+    //     final mockResponse = {
+    //       'posts': {
+    //         'data': [
+    //           {
+    //             'id': '1',
+    //             'content': 'No userId in post',
+    //             'created_at': '2024-01-01T12:00:00Z',
+    //           },
+    //         ],
+    //       },
+    //       'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+    //     };
+
+    //     repository = PublicationRepositoryAPI(
+    //       endpoint: ENDPOINT_OWN_PUBLICATIONS,
+    //       client: MockClient((request) async {
+    //         return http.Response(jsonEncode(mockResponse), 200);
+    //       }),
+    //     );
+
+    //     final result = await repository.fetchPublications(
+    //       page: 1,
+    //       limit: 10,
+    //       time: '2024-01-01',
+    //       isOtherUser: true,
+    //     );
+
+    //     expect(result.publications.first.userId, isNotNull);
+    //   },
+    // );
   });
 }
