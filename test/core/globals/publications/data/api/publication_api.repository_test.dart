@@ -269,5 +269,141 @@ void main() {
 
       expect(result.publications.first.profileImageUrl.isNotEmpty, true);
     });
+    test('parses comment count from commentCount field directly', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '2',
+            'content': 'Direct comment count',
+            'created_at': '2024-01-01T12:00:00Z',
+            'commentCount': 4,
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 1, limit: 10);
+      expect(result.publications.first.comments, 4);
+    });
+
+    test('handles missing metadata keys gracefully', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'Post without full metadata',
+            'created_at': '2024-01-01T12:00:00Z',
+          },
+        ],
+        'metadata': {},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 5, limit: 10);
+      expect(result.totalPosts, 0);
+      expect(result.totalPages, 0);
+      expect(result.currentPage, 5);
+    });
+    test(
+      'fetches other user\'s post when isOtherUser is true and avoids profile load',
+      () async {
+        final postResponse = {
+          'posts': {
+            'data': [
+              {
+                'id': '1',
+                'content': 'Other user post',
+                'created_at': '2024-01-01T12:00:00Z',
+                'user_id': 'user-123',
+                'username': 'OtherUser',
+                'profile_picture': 'https://example.com/otheruser.jpg',
+                'likes': 2,
+                'commentCount': 1,
+              },
+            ],
+          },
+          'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+        };
+
+        final userProfileResponse = {
+          'message': 'User profile retrieved successfully',
+          'data': {
+            'email': 'mock@ucr.ac.cr',
+            'username': 'OtherUser',
+            'full_name': 'Mock Name',
+            'profile_picture': 'https://example.com/otheruser.jpg',
+          },
+        };
+
+        repository = PublicationRepositoryAPI(
+          endpoint: ENDPOINT_OWN_PUBLICATIONS,
+          client: MockClient((request) async {
+            final url = request.url.toString();
+
+            if (url.contains('/user/profile/')) {
+              // Respuesta mock para la llamada al perfil de usuario
+              final profileResponse = {
+                'message': 'User profile retrieved successfully',
+                'data': {
+                  'email': 'mock@ucr.ac.cr',
+                  'username': 'OtherUser',
+                  'full_name': 'Mock Name',
+                  'profile_picture': 'https://example.com/otheruser.jpg',
+                },
+              };
+              return http.Response(jsonEncode(profileResponse), 200);
+            }
+
+            // Respuesta mock para la llamada de publicaciones
+            final postResponse = {
+              'posts': {
+                'data': [
+                  {
+                    'id': '1',
+                    'content': 'Other user post',
+                    'created_at': '2024-01-01T12:00:00Z',
+                    'user_id': 'user-123',
+                    'username': 'OtherUser',
+                    'profile_picture': 'https://example.com/otheruser.jpg',
+                    'likes': 2,
+                    'commentCount': 1,
+                  },
+                ],
+              },
+              'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+            };
+            return http.Response(jsonEncode(postResponse), 200);
+          }),
+        );
+
+        final result = await repository.fetchPublications(
+          page: 1,
+          limit: 10,
+          time: '2024-01-01',
+          isOtherUser: true,
+        );
+
+        expect(result.publications.length, 1);
+        expect(result.publications.first.id, '1');
+        expect(result.publications.first.username, 'OtherUser');
+        expect(
+          result.publications.first.profileImageUrl,
+          'https://example.com/otheruser.jpg',
+        );
+      },
+    );
   });
 }
