@@ -111,10 +111,10 @@ class PublicationCard extends StatelessWidget {
                           onPressed: () {
                           },
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 24),
                         _InteractionButton(
                           icon: Icons.chat_bubble_outline,
-                          label: '',
+                          label: publication.comments.toString(),
                           onPressed: () {
                             context.go(Paths.comments, extra: publication);
                           },
@@ -163,6 +163,10 @@ class _InteractionButton extends StatelessWidget {
         child: Row(
           children: [
             Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurface),
+            if (label.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              Text(label, style: const TextStyle(fontSize: 14)),
+            ]
           ],
         ),
       ),
