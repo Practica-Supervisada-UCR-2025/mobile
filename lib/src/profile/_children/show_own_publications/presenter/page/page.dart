@@ -44,7 +44,7 @@ class _ShowOwnPublicationsPageState extends State<ShowOwnPublicationsPage> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _publicationBloc,
-      child: const PublicationsList(scrollKey: "ownPosts", isFeed: true, isOtherUser: false),
+      child: const PublicationsList(scrollKey: "ownPosts", isFeed: false, isOtherUser: false),
     );
   }
 }
