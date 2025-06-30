@@ -86,90 +86,101 @@ class _ProfileScreenState extends State<ProfileScreen>
                     controller: _scrollController,
                     slivers: [
                       SliverToBoxAdapter(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${user.firstName} ${user.lastName}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium
-                                        ?.copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '@${user.username}',
-                                    style: Theme.of(context).textTheme.bodyLarge
-                                        ?.copyWith(fontWeight: FontWeight.w500),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    user.email,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium?.copyWith(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${user.firstName} ${user.lastName}',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.headlineMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                  if (isOwnProfile) ...[
-                                    const SizedBox(height: 18),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Flexible(
-                                          child: _buildModifyButton(user),
-                                        ),
-                                      ],
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '@${user.username}',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                    const SizedBox(height: 20),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      user.email,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.copyWith(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.outline,
+                                      ),
+                                    ),
+                                    if (isOwnProfile) ...[
+                                      const SizedBox(height: 18),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Flexible(
+                                            child: _buildModifyButton(user),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 20),
+                                    ],
                                   ],
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => ImagePreviewScreen(
-                                          imageUrl: user.image,
-                                        ),
-                                  ),
-                                );
-                              },
-                              child: Hero(
-                                tag: user.image,
-                                child: CircleAvatar(
-                                  radius: 35,
-                                  backgroundImage: NetworkImage(
-                                    DEFAULT_PROFILE_PIC,
-                                  ),
-                                  foregroundImage: NetworkImage(user.image),
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.onPrimary,
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 16),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) => ImagePreviewScreen(
+                                            imageUrl: user.image,
+                                          ),
+                                    ),
+                                  );
+                                },
+                                child: Hero(
+                                  tag: user.image,
+                                  child: CircleAvatar(
+                                    radius: 35,
+                                    backgroundImage: NetworkImage(
+                                      DEFAULT_PROFILE_PIC,
+                                    ),
+                                    foregroundImage: NetworkImage(user.image),
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       SliverToBoxAdapter(
-                        child: Column(
-                          children: [
-                            Divider(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            children: [
+                              Divider(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-
                       isOwnProfile
                           ? ShowOwnPublicationsPage(
                             isFeed: widget.isFeed,
