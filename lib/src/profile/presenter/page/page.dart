@@ -75,7 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(0),
             child: BlocBuilder<ProfileBloc, ProfileState>(
               builder: (context, state) {
                 if (state is ProfileLoading) {

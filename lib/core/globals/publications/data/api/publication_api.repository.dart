@@ -114,10 +114,8 @@ class PublicationRepositoryAPI implements PublicationRepository {
             fileUrl != null && fileUrl.isNotEmpty ? fileUrl : null;
 
         int commentCount = 0;
-        if (raw['commentCount'] is int) {
-          commentCount = raw['commentCount'] as int;
-        } else if (raw['_count'] is Map && raw['_count']['comments'] is int) {
-          commentCount = raw['_count']['comments'] as int;
+        if (raw['comments_count'] is String) {
+          commentCount = int.tryParse(raw['comments_count'] as String) ?? 0;
         }
 
         publications.add(
@@ -128,7 +126,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
             content: content,
             createdAt: createdAt,
             attachment: attachment,
-            likes: raw['likes'] is int ? raw['likes'] as int : 0,
+            likes: 0,
             comments: commentCount,
             userId: raw['user_id'] is String ? raw['user_id'] as String : null,
           ),
