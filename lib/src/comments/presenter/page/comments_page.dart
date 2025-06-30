@@ -23,7 +23,7 @@ class CommentsPage extends StatelessWidget {
         title: const Text("Comments"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(Paths.home),
+          onPressed: () => context.pop(),
         ),
       ),
       body: MultiBlocProvider(
@@ -75,47 +75,122 @@ class PostPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    return Container(
-      color: colorScheme.surface,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(publication.profileImageUrl),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (publication.userId != null) {
+                        context.go(Paths.externProfile(publication.userId!));
+                      }
+                    },
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
+                      foregroundImage: NetworkImage(publication.profileImageUrl),
+                      radius: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (publication.userId != null) {
+                          context.go(Paths.externProfile(publication.userId!));
+                        }
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            publication.username,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            relativeDate(publication.createdAt),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(publication.username, style: textTheme.titleMedium),
+              const SizedBox(height: 16),
+              if (publication.content.trim().isNotEmpty)
+                Text(
+                  publication.content,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              if (publication.attachment != null &&
+                  publication.attachment!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      publication.attachment!,
+                      width: double.infinity,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        child: Icon(
+                          Icons.favorite_border, 
+                          size: 20, 
+                          color: Theme.of(context).colorScheme.onSurface
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        child: Icon(
+                          Icons.chat_bubble_outline, 
+                          size: 20, 
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.share, size: 20),
+                    onPressed: () {
+                    },
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            publication.content,
-            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-          ),
-          if (publication.attachment != null &&
-              publication.attachment!.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  publication.attachment!,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-        ],
-      ),
+        ),
+        const Divider(
+          color: Colors.grey,
+          thickness: 0.3,
+          height: 0,
+        ),
+      ],
     );
   }
 }
