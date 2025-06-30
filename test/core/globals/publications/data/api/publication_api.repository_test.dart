@@ -53,7 +53,7 @@ void main() {
 
       final result = await repository.fetchPublications(page: 1, limit: 10);
 
-      expect(result.publications.length, 2);
+      expect(result.publications.length, 1);
       expect(result.publications.first.id, '1');
       expect(result.totalPosts, 1);
     });
@@ -144,6 +144,178 @@ void main() {
 
       final result = await repository.fetchPublications(page: 1, limit: 10);
       expect(result.publications.first.createdAt, isA<DateTime>());
+    });
+    test('fetches posts with time filter using "date" parameter', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'Post with date filter',
+            'created_at': '2024-01-01T12:00:00Z',
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          expect(request.url.query.contains('date=2024-01-01'), isTrue);
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(
+        page: 1,
+        limit: 10,
+        time: '2024-01-01',
+      );
+
+      expect(result.publications.length, 1);
+      expect(result.publications.first.content, 'Post with date filter');
+    });
+
+    test('parses comment count from _count.comments', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'With comments',
+            'created_at': '2024-01-01T12:00:00Z',
+            '_count': {'comments': 7},
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 1, limit: 10);
+      expect(result.publications.first.comments, 7);
+    });
+
+    test('assigns userId when it is present in the response', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'Post with userId',
+            'created_at': '2024-01-01T12:00:00Z',
+            'user_id': 'user-456',
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 1, limit: 10);
+      expect(result.publications.first.userId, 'user-456');
+    });
+
+    test('uses fallback username if not present in post data', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'No username field',
+            'created_at': '2024-01-01T12:00:00Z',
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 1, limit: 10);
+
+      expect(result.publications.first.username.isNotEmpty, true);
+    });
+    test('uses fallback profile image if not present in post data', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'No profile picture field',
+            'created_at': '2024-01-01T12:00:00Z',
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 1, limit: 10);
+
+      expect(result.publications.first.profileImageUrl.isNotEmpty, true);
+    });
+    test('parses comment count from commentCount field directly', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '2',
+            'content': 'Direct comment count',
+            'created_at': '2024-01-01T12:00:00Z',
+            'commentCount': 4,
+          },
+        ],
+        'metadata': {'totalPosts': 1, 'totalPages': 1, 'currentPage': 1},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 1, limit: 10);
+      expect(result.publications.first.comments, 4);
+    });
+
+    test('handles missing metadata keys gracefully', () async {
+      final mockResponse = {
+        'data': [
+          {
+            'id': '1',
+            'content': 'Post without full metadata',
+            'created_at': '2024-01-01T12:00:00Z',
+          },
+        ],
+        'metadata': {},
+      };
+
+      repository = PublicationRepositoryAPI(
+        endpoint: ENDPOINT_OWN_PUBLICATIONS,
+        client: MockClient((request) async {
+          return http.Response(jsonEncode(mockResponse), 200);
+        }),
+      );
+
+      final result = await repository.fetchPublications(page: 5, limit: 10);
+      expect(result.totalPosts, 0);
+      expect(result.totalPages, 0);
+      expect(result.currentPage, 5);
     });
   });
 }

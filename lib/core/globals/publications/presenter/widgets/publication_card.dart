@@ -10,136 +10,134 @@ class PublicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Theme.of(context).colorScheme.outline,
-              width: 0.3,
-            ),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      if(publication.userId != null){
-                        context.go(Paths.externProfile(publication.userId!));
-                      }
-                    },
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
-                      foregroundImage: NetworkImage(publication.profileImageUrl),
-                      radius: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: GestureDetector(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
                       onTap: () {
-                        if(publication.userId != null){
+                        if (publication.userId != null) {
                           context.go(Paths.externProfile(publication.userId!));
                         }
                       },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            publication.username,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            relativeDate(publication.createdAt),
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(DEFAULT_PROFILE_PIC),
+                        foregroundImage: NetworkImage(publication.profileImageUrl),
+                        radius: 18,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          if (publication.userId != null) {
+                            context.go(Paths.externProfile(publication.userId!));
+                          }
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              publication.username,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                          ),
-                        ],
+                            Text(
+                              relativeDate(publication.createdAt),
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  PublicationOptionsButton(
-                    publicationId: publication.id,
-                    publicationUsername: publication.username,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-
-              _ExpandableText(content: publication.content),
-
-              const SizedBox(height: 8),
-
-              if (publication.attachment != null &&
-                  publication.attachment!.isNotEmpty)
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ImagePreviewScreen(imageUrl: publication.attachment!),
-                      ),
-                    );
-                  },
-                  child: Hero(
-                    tag: publication.attachment!,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        publication.attachment!,
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
+                    PublicationOptionsButton(
+                      publicationId: publication.id,
+                      publicationUsername: publication.username,
                     ),
-                  ),
+                  ],
                 ),
 
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      _InteractionButton(
-                        icon: Icons.favorite_border,
-                        label: publication.likes.toString(),
-                        onPressed: () {
-                          // Like logic here
-                        },
-                      ),
-                      const SizedBox(width: 24),
-                      _InteractionButton(
-                        icon: Icons.chat_bubble_outline,
-                        label: publication.comments.toString(),
-                        onPressed: () {
-                          context.go(Paths.comments, extra: publication);
-                        },
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.share, size: 20),
-                    onPressed: () {
-                      // Share logic here
+                if (publication.content.trim().isNotEmpty)
+                  _ExpandableText(content: publication.content),
+
+                const SizedBox(height: 8),
+
+                if (publication.attachment != null &&
+                    publication.attachment!.trim().isNotEmpty)
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ImagePreviewScreen(imageUrl: publication.attachment!),
+                        ),
+                      );
                     },
+                    child: Hero(
+                      tag: publication.attachment!,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          publication.attachment!,
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                   ),
-                ],
-              ),
-            ],
+
+                const SizedBox(height: 8),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        _InteractionButton(
+                          icon: Icons.favorite_border,
+                          label: '',
+                          onPressed: () {
+                          },
+                        ),
+                        const SizedBox(width: 24),
+                        _InteractionButton(
+                          icon: Icons.chat_bubble_outline,
+                          label: publication.comments.toString(),
+                          onPressed: () {
+                            context.push(Paths.comments, extra: publication);
+                          },
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.share, size: 20),
+                      onPressed: () {
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+        const Divider(
+          color: Colors.grey,
+          thickness: 0.3,
+          height: 0,
+        ),
+      ],
     );
   }
 }
@@ -165,14 +163,10 @@ class _InteractionButton extends StatelessWidget {
         child: Row(
           children: [
             Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurface),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
+            if (label.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              Text(label, style: const TextStyle(fontSize: 14)),
+            ]
           ],
         ),
       ),

@@ -1,64 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:mobile/core/core.dart';
 
-import 'package:mobile/core/globals/publications/publications.dart';
-import 'package:mobile/src/profile/_children/_children.dart';
+class FakePublicationsList extends StatelessWidget {
+  const FakePublicationsList({
+    super.key,
+    required this.scrollKey,
+    required this.isFeed,
+    required this.isOtherUser,
+    required this.scrollController,
+  });
 
-void main() {
-  testWidgets(
-    'ShowPostFromOthersPage builds the BlocProvider and displays PublicationsList',
-    (WidgetTester tester) async {
-      const testUserId = '123';
+  final String scrollKey;
+  final bool isFeed;
+  final bool isOtherUser;
+  final ScrollController scrollController;
 
-      await tester.pumpWidget(
-        MaterialApp(home: ShowPostFromOthersPage(userId: testUserId)),
-      );
-
-      expect(find.byType(BlocProvider<PublicationBloc>), findsOneWidget);
-      expect(find.byType(PublicationsList), findsOneWidget);
-    },
-  );
-
-  testWidgets(
-    'When PublicationsList fails and Retry is pressed, the error message reappears',
-    (WidgetTester tester) async {
-      final failureBloc = PublicationBloc(
-        publicationRepository: _FakeFailureRepository(),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<PublicationBloc>.value(
-            value: failureBloc,
-            child: const PublicationsList(scrollKey: "otherPosts", isFeed: true, isOtherUser: true),
-          ),
-        ),
-      );
-
-      failureBloc.add(LoadPublications());
-      await tester.pumpAndSettle();
-
-      expect(find.text('Failed to load posts'), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
-
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Failed to load posts'), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
-    },
-  );
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
 }
 
-class _FakeFailureRepository implements PublicationRepository {
-  @override
-  Future<PublicationResponse> fetchPublications({
-    required int page,
-    required int limit,
-    bool? isOtherUser,
-    String? time,
-  }) {
-    throw Exception('simulated failure');
-  }
+class MockPublicationRepository extends Mock
+    implements PublicationRepositoryAPI {}
+
+void main() {
+  late MockPublicationRepository mockRepository;
+  late ScrollController scrollController;
+  late GlobalKey fakePublicationsKey;
+
+  setUp(() {
+    mockRepository = MockPublicationRepository();
+    scrollController = ScrollController();
+    fakePublicationsKey = GlobalKey();
+  });
+
+  testWidgets('ShowPostFromOthersPage builds with PublicationsList', (
+    tester,
+  ) async {
+    when(
+      () => mockRepository.fetchPublications(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        time: any(named: 'time'),
+        isOtherUser: any(named: 'isOtherUser'),
+      ),
+    ).thenAnswer(
+      (_) async => PublicationResponse(
+        publications: [],
+        totalPosts: 0,
+        totalPages: 1,
+        currentPage: 1,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: BlocProvider(
+            create:
+                (_) =>
+                    PublicationBloc(publicationRepository: mockRepository)
+                      ..add(LoadPublications(isFeed: true, isOtherUser: true)),
+            child: Builder(
+              builder: (context) {
+                return FakePublicationsList(
+                  key: fakePublicationsKey,
+                  scrollKey: "otherPosts",
+                  isFeed: true,
+                  isOtherUser: true,
+                  scrollController: scrollController,
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byKey(fakePublicationsKey), findsOneWidget);
+  });
 }

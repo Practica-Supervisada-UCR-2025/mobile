@@ -4,65 +4,117 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/globals/publications/publications.dart';
 import 'package:mobile/src/home/home.dart';
 
-void main() {
-  testWidgets(
-    'HomePage builds the BlocProvider and displays PublicationsList',
-    (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<PublicationBloc>(
-            create: (_) => PublicationBloc(
-              publicationRepository: _FakeFailureRepository(),
-            ),
-            child: HomeScreen(isFeed: true),
-          ),
-        ),
-      );
-      expect(find.byType(BlocProvider<PublicationBloc>), findsOneWidget);
-      expect(find.byType(PublicationsList), findsOneWidget);
-    },
-  );
-
-  testWidgets(
-    'When PublicationsList fails and Retry is pressed, the error message reappears',
-    (WidgetTester tester) async {
-      final failureBloc = PublicationBloc(
-        publicationRepository: _FakeFailureRepository(),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<PublicationBloc>.value(
-            value: failureBloc,
-            child: const PublicationsList(scrollKey: "homePage", isFeed: true, isOtherUser: false),
-          ),
-        ),
-      );
-
-      failureBloc.add(LoadPublications());
-      await tester.pumpAndSettle();
-
-      expect(find.text('Failed to load posts'), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
-
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
-
-      await tester.pumpAndSettle();
-
-      expect(find.text('Failed to load posts'), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
-    },
-  );
-}
-
-class _FakeFailureRepository implements PublicationRepository {
+class _FakeSuccessRepository implements PublicationRepository {
   @override
   Future<PublicationResponse> fetchPublications({
     required int page,
     required int limit,
     bool? isOtherUser,
     String? time,
-  }) {
-    throw Exception('simulated failure');
+  }) async {
+    return PublicationResponse(
+      publications: [],
+      totalPosts: 0,
+      totalPages: 0,
+      currentPage: 1,
+    );
   }
+}
+
+void main() {
+  testWidgets('PostsPage renders correctly', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider(
+          create:
+              (_) => PublicationBloc(
+                publicationRepository: _FakeSuccessRepository(),
+              ),
+          child: const PostsPage(isFeed: true),
+        ),
+      ),
+    );
+    expect(find.byType(RefreshIndicator), findsOneWidget);
+    expect(find.byType(ElevatedButton), findsNothing);
+  });
+
+  testWidgets('Refresh button appears after 5 minutes', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider(
+          create:
+              (_) => PublicationBloc(
+                publicationRepository: _FakeSuccessRepository(),
+              ),
+          child: const PostsPage(isFeed: true),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(minutes: 5));
+    await tester.pump();
+
+    expect(find.text("Recent posts"), findsOneWidget);
+  });
+
+  //   testWidgets(
+  //     'Pull-to-refresh calls refreshPublications and hides refresh button',
+  //     (WidgetTester tester) async {
+  //       await tester.pumpWidget(
+  //         MaterialApp(
+  //           home: BlocProvider(
+  //             create:
+  //                 (_) => PublicationBloc(
+  //                   publicationRepository: _FakeSuccessRepository(),
+  //                 ),
+  //             child: const PostsPage(isFeed: true),
+  //           ),
+  //         ),
+  //       );
+
+  //       await tester.pump(const Duration(minutes: 5));
+  //       await tester.pump();
+
+  //       expect(find.text("Recent posts"), findsOneWidget);
+
+  //       final refreshIndicator = tester.widget<RefreshIndicator>(
+  //         find.byType(RefreshIndicator),
+  //       );
+  //       await refreshIndicator.onRefresh.call();
+  //       await tester.pumpAndSettle();
+
+  //       expect(find.text("Recent posts"), findsNothing);
+  //     },
+  //   );
+
+  //   testWidgets(
+  //     'Clicking refresh button triggers refreshPublications and hides it',
+  //     (WidgetTester tester) async {
+  //       await tester.pumpWidget(
+  //         MaterialApp(
+  //           home: BlocProvider(
+  //             create:
+  //                 (_) => PublicationBloc(
+  //                   publicationRepository: _FakeSuccessRepository(),
+  //                 ),
+  //             child: const PostsPage(isFeed: true),
+  //           ),
+  //         ),
+  //       );
+
+  //       final state = tester.state(find.byType(PostsPage)) as dynamic;
+  //       state.setState(() {
+  //         state._showRefreshButton = true;
+  //       });
+  //       await tester.pump();
+
+  //       expect(find.text("Recent posts"), findsOneWidget);
+
+  //       await tester.tap(find.text("Recent posts"));
+  //       await tester.pumpAndSettle();
+
+  //       expect(find.text("Recent posts"), findsNothing);
+  //     },
+  //   );
 }

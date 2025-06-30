@@ -24,22 +24,26 @@ class CommentsLoaded extends CommentsLoadState {
   final List<CommentModel> comments;
   final bool hasReachedEnd;
   final int currentIndex;
+  final DateTime initialFetchTime;
 
   const CommentsLoaded({
     required this.comments,
     required this.hasReachedEnd,
     required this.currentIndex,
+    required this.initialFetchTime,
   });
 
   CommentsLoaded copyWith({
     List<CommentModel>? comments,
     bool? hasReachedEnd,
     int? currentIndex,
+    DateTime? initialFetchTime,
   }) {
     return CommentsLoaded(
       comments: comments ?? this.comments,
       hasReachedEnd: hasReachedEnd ?? this.hasReachedEnd,
       currentIndex: currentIndex ?? this.currentIndex,
+      initialFetchTime: initialFetchTime?? this.initialFetchTime,
     );
   }
 

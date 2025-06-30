@@ -7,6 +7,7 @@ abstract class CommentsRepository {
     required String postId,
     required DateTime startTime,
     int? limit,
+    int? index,
   });
 
   Future<void> sendComment({
