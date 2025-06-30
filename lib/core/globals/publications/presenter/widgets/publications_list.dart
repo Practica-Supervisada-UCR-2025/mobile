@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/core/globals/publications/publications.dart';
@@ -7,73 +8,76 @@ class PublicationsList extends StatefulWidget {
   final bool isFeed;
   final String scrollKey;
   final bool isOtherUser;
+  final ScrollController scrollController;
 
-  const PublicationsList({super.key, required this.scrollKey, required this.isFeed, required this.isOtherUser});
+  const PublicationsList({
+    super.key,
+    required this.scrollKey,
+    required this.isFeed,
+    required this.isOtherUser,
+    required this.scrollController,
+  });
 
   @override
-  State<PublicationsList> createState() => _PublicationsListState();
+  State<PublicationsList> createState() => PublicationsListState();
 }
 
-class _PublicationsListState extends State<PublicationsList>
+class PublicationsListState extends State<PublicationsList>
     with AutomaticKeepAliveClientMixin {
-  late final ScrollController _scrollController;
   late final PublicationBloc _bloc;
-  bool _showRefreshButton = false;
 
   @override
   void initState() {
     super.initState();
     _bloc = context.read<PublicationBloc>();
-    _scrollController = ScrollController(
-      initialScrollOffset: ScrollStorage.getOffset(widget.scrollKey),
-    );
-    _scrollController.addListener(_onScroll);
+    widget.scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
+    widget.scrollController.removeListener(_onScroll);
     super.dispose();
   }
 
   void _onScroll() {
-    ScrollStorage.setOffset(widget.scrollKey, _scrollController.offset);
-    if (!_scrollController.hasClients) return;
-
+    final scrollController = widget.scrollController;
+    if (!scrollController.hasClients) return;
     final thresholdReached =
-        _scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 300;
-
+        scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 300;
     final state = _bloc.state;
+    if (state is PublicationSuccess) {}
     if (thresholdReached &&
         state is PublicationSuccess &&
         !state.hasReachedMax) {
-      _bloc.add(LoadMorePublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
-    }
-
-    final shouldShow = _scrollController.offset > 600;
-    if (_showRefreshButton != shouldShow) {
-      setState(() {
-        _showRefreshButton = shouldShow;
-      });
+      _bloc.add(
+        LoadMorePublications(
+          isFeed: widget.isFeed,
+          isOtherUser: widget.isOtherUser,
+        ),
+      );
     }
   }
 
-  Future<void> _onRefresh() async {
-    setState(() {
-      _showRefreshButton = false;
-    });
-    _bloc.add(RefreshPublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser));
+  Future<void> refresh() async {
+    await _onRefresh();
+  }
 
+  Future<void> _onRefresh() async {
+    final scrollController = widget.scrollController;
+    _bloc.add(
+      RefreshPublications(
+        isFeed: widget.isFeed,
+        isOtherUser: widget.isOtherUser,
+      ),
+    );
     await _bloc.stream.firstWhere(
       (state) => state is PublicationSuccess || state is PublicationFailure,
     );
-
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
           0.0,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
@@ -85,98 +89,76 @@ class _PublicationsListState extends State<PublicationsList>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     return BlocBuilder<PublicationBloc, PublicationState>(
       builder: (context, state) {
-        Widget listContent;
-
         if (state is PublicationLoading) {
-          listContent = const Center(child: CircularProgressIndicator());
+          return const SliverToBoxAdapter(
+            child: Center(child: CircularProgressIndicator()),
+          );
         } else if (state is PublicationFailure) {
-          listContent = Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Failed to load posts'),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed:
-                      () => context.read<PublicationBloc>().add(
-                        LoadPublications(isFeed: widget.isFeed, isOtherUser: widget.isOtherUser),
-                      ),
-                  child: const Text('Retry'),
-                ),
-              ],
+          return SliverToBoxAdapter(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Failed to load posts'),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      _bloc.add(
+                        LoadPublications(
+                          isFeed: widget.isFeed,
+                          isOtherUser: widget.isOtherUser,
+                        ),
+                      );
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
             ),
           );
         } else if (state is PublicationSuccess) {
-          final publications = state.publications;
-
-          if (publications.isEmpty) {
-            listContent = const Center(
-              child: Text(
-                "You haven’t posted anything yet.",
-                style: TextStyle(fontSize: 16),
-              ),
-            );
-          } else {
-            listContent = RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: ListView.builder(
-                controller: _scrollController,
-                shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: publications.length + 1,
-                itemBuilder: (context, index) {
-                  if (index < publications.length) {
-                    return PublicationCard(publication: publications[index]);
-                  } else {
-                    return state.hasReachedMax
-                        ? const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Center(child: Text('No more posts to show.')),
-                        )
-                        : const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                  }
-                },
+          if (state.publications.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final savedOffset = ScrollStorage.getOffset(widget.scrollKey);
+              if (savedOffset > 0 && widget.scrollController.hasClients) {
+                widget.scrollController.jumpTo(savedOffset);
+                debugPrint(
+                  '[PublicationsList] Offset restaurado en PublicationSuccess: $savedOffset',
+                );
+              }
+            });
+          }
+          if (state.publications.isEmpty) {
+            return const SliverToBoxAdapter(
+              child: Center(
+                child: Text(
+                  "You haven’t posted anything yet.",
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             );
           }
-        } else {
-          listContent = const SizedBox.shrink();
-        }
-
-        return Stack(
-          children: [
-            Positioned.fill(child: listContent),
-            if (_showRefreshButton)
-              Positioned(
-                top: 16,
-                left: MediaQuery.of(context).size.width * 0.25,
-                right: MediaQuery.of(context).size.width * 0.25,
-                child: Center(
-                  child: ElevatedButton.icon(
-                    onPressed: _onRefresh,
-                    icon: const Icon(Icons.arrow_upward),
-                    label:
-                        (state is PublicationLoading)
-                            ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                            : const Text("Recent posts"),
+          return SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
+              if (index >= state.publications.length) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Center(
+                    child:
+                        state.hasReachedMax
+                            ? const Text('No more posts to show.')
+                            : const CircularProgressIndicator(),
                   ),
-                ),
-              ),
-          ],
-        );
+                );
+              }
+              return PublicationCard(publication: state.publications[index]);
+            }, childCount: state.publications.length + 1),
+          );
+        } else {
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
+        }
       },
     );
   }

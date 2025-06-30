@@ -198,6 +198,7 @@ void main() {
         totalPosts: 2,
         totalPages: 2,
         currentPage: 1,
+        hasReachedMax: false,
       );
       expect(state.hasReachedMax, false);
     });

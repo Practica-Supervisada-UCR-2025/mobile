@@ -56,13 +56,17 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
           limit: _limit,
         );
       }
-      emit(PublicationSuccess(
-        publications: response.publications,
-        totalPosts: response.totalPosts,
-        totalPages: response.totalPages,
-        currentPage: response.currentPage,
-        hasReachedMax: response.publications.length < 10, // Adjust this logic using number of pages
-      ));
+      emit(
+        PublicationSuccess(
+          publications: response.publications,
+          totalPosts: response.totalPosts,
+          totalPages: response.totalPages,
+          currentPage: response.currentPage,
+          hasReachedMax:
+              response.publications.length <
+              10, // Adjust this logic using number of pages
+        ),
+      );
     } catch (_) {
       emit(PublicationFailure());
     }
@@ -99,7 +103,9 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
           totalPosts: response.totalPosts,
           totalPages: response.totalPages,
           currentPage: response.currentPage,
-          hasReachedMax: response.publications.length < 10, // todo: Adjust this logic using number of pages
+          hasReachedMax:
+              response.publications.length <
+              10, // todo: Adjust this logic using number of pages
         ),
       );
     } catch (_) {
@@ -112,7 +118,6 @@ class PublicationBloc extends Bloc<PublicationEvent, PublicationState> {
     Emitter<PublicationState> emit,
   ) async {
     if (state is PublicationLoading) return;
-    emit(PublicationLoading());
     _currentPage = 1;
     try {
       emit(PublicationLoading());

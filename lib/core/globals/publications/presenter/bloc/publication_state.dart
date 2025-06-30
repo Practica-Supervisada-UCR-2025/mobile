@@ -31,9 +31,11 @@ class PublicationSuccess extends PublicationState {
     this.hasReachedMax = false,
   });
 
-  
-
   @override
-  List<Object?> get props =>
-      [publications, totalPosts, totalPages, currentPage];
+  List<Object?> get props => [
+    publications,
+    totalPosts,
+    totalPages,
+    currentPage,
+  ];
 }

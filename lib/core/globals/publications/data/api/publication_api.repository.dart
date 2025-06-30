@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile/src/profile/profile.dart';
 import 'package:mobile/core/core.dart';
+
 class PublicationRepositoryAPI implements PublicationRepository {
   final http.Client client;
   static const _baseUrl = API_POST_BASE_URL;
@@ -26,7 +27,6 @@ class PublicationRepositoryAPI implements PublicationRepository {
       throw Exception('No JWT token found');
     }
 
-    
     late final Uri uri;
     if (time != null && time.isNotEmpty) {
       if (isOtherUser == true) {
@@ -34,8 +34,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
       } else {
         uri = Uri.parse('$_baseUrl$endpoint?limit=$limit&date=$time');
       }
-    }
-    else {
+    } else {
       uri = Uri.parse('$_baseUrl$endpoint?page=$page&limit=$limit');
     }
     final resp = await client.get(
@@ -55,10 +54,6 @@ class PublicationRepositoryAPI implements PublicationRepository {
       if (body.containsKey('posts') && body['posts']['data'] is List) {
         postsJson.addAll(body['posts']['data'] as List<dynamic>);
       }
-    } else {
-      if (body.containsKey('data') && body['data'] is List) {
-        postsJson.addAll(body['data'] as List<dynamic>);
-      }
     }
     if (body.containsKey('data') && body['data'] is List) {
       postsJson.addAll(body['data'] as List<dynamic>);
@@ -67,18 +62,24 @@ class PublicationRepositoryAPI implements PublicationRepository {
     final List<Publication> publications = [];
 
     User user;
-    if (isOtherUser == true){
-      final userId = postsJson[0]['user_id'] is String
-          ? postsJson[0]['user_id'] as String
-          : LocalStorage().userId;
+    if (isOtherUser == true) {
+      final userId =
+          postsJson[0]['user_id'] is String
+              ? postsJson[0]['user_id'] as String
+              : LocalStorage().userId;
       final profileRepo = ProfileRepositoryAPI(apiService: ApiServiceImpl());
-      user = await profileRepo.getUserProfile(userId, LocalStorage().accessToken);
-    } else{
-      user = User(email: "",
-                  username: LocalStorage().username,
-                  image: LocalStorage().userProfilePicture,
-                  firstName: "",
-                  lastName: "");
+      user = await profileRepo.getUserProfile(
+        userId,
+        LocalStorage().accessToken,
+      );
+    } else {
+      user = User(
+        email: "",
+        username: LocalStorage().username,
+        image: LocalStorage().userProfilePicture,
+        firstName: "",
+        lastName: "",
+      );
     }
     for (final raw in postsJson) {
       if (raw is Map<String, dynamic>) {
@@ -90,13 +91,15 @@ class PublicationRepositoryAPI implements PublicationRepository {
         final String createdAtStr =
             raw['created_at'] is String ? raw['created_at'] as String : '';
         final String username =
-            raw['username'] is String ? raw['username'] 
-            : LocalStorage().username.isNotEmpty
+            raw['username'] is String
+                ? raw['username']
+                : LocalStorage().username.isNotEmpty
                 ? user.username
                 : 'User';
         final imageUrl =
-            raw['profile_picture'] is String ? raw['profile_picture'] 
-            : LocalStorage().userProfilePicture.isNotEmpty
+            raw['profile_picture'] is String
+                ? raw['profile_picture']
+                : LocalStorage().userProfilePicture.isNotEmpty
                 ? user.image
                 : DEFAULT_PROFILE_PIC;
 
@@ -124,7 +127,7 @@ class PublicationRepositoryAPI implements PublicationRepository {
             createdAt: createdAt,
             attachment: attachment,
             likes: 0,
-            comments: commentCount, 
+            comments: commentCount,
             userId: raw['user_id'] is String ? raw['user_id'] as String : null,
           ),
         );
