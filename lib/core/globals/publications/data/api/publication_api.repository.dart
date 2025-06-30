@@ -116,6 +116,10 @@ class PublicationRepositoryAPI implements PublicationRepository {
         int commentCount = 0;
         if (raw['comments_count'] is String) {
           commentCount = int.tryParse(raw['comments_count'] as String) ?? 0;
+        } else if (raw['_count'] is Map<String, dynamic> && raw['_count']['comments'] is int) {
+          commentCount = raw['_count']['comments'] as int;
+        } else if (raw['commentCount'] is int) {
+          commentCount = raw['commentCount'] as int;
         }
 
         publications.add(
