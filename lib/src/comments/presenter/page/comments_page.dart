@@ -156,28 +156,27 @@ class PostPreview extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                        child: Icon(
-                          Icons.favorite_border, 
-                          size: 20, 
-                          color: Theme.of(context).colorScheme.onSurface
-                        ),
+                      _InteractionButton(
+                        icon: Icons.favorite_border,
+                        label: publication.likes > 0 ? publication.likes.toString() : '',
+                        onPressed: () {
+                          // Like functionality
+                        },
                       ),
-                      const SizedBox(width: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                        child: Icon(
-                          Icons.chat_bubble_outline, 
-                          size: 20, 
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
+                      const SizedBox(width: 24),
+                      _InteractionButton(
+                        icon: Icons.chat_bubble_outline,
+                        label: publication.comments.toString(),
+                        onPressed: () {
+                          // Comment functionality
+                        },
                       ),
                     ],
                   ),
                   IconButton(
                     icon: const Icon(Icons.share, size: 20),
                     onPressed: () {
+                      // Share functionality
                     },
                   ),
                 ],
@@ -191,6 +190,38 @@ class PostPreview extends StatelessWidget {
           height: 0,
         ),
       ],
+    );
+  }
+}
+
+class _InteractionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  const _InteractionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(20),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurface),
+            if (label.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              Text(label, style: const TextStyle(fontSize: 14)),
+            ]
+          ],
+        ),
+      ),
     );
   }
 }
