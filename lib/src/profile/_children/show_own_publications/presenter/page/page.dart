@@ -1,50 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mobile/core/core.dart';
-class ShowOwnPublicationsPage extends StatefulWidget {
+
+class ShowOwnPublicationsPage extends StatelessWidget {
   final bool isFeed;
-  const ShowOwnPublicationsPage({super.key, this.isFeed = false});
-  @override
-  State<ShowOwnPublicationsPage> createState() =>
-      _ShowOwnPublicationsPageState();
-}
-class _ShowOwnPublicationsPageState extends State<ShowOwnPublicationsPage> {
-  int? _lastRefreshTimestamp;
-  late PublicationBloc _publicationBloc;
-  @override
-  void initState() {
-    super.initState();
-    _publicationBloc = PublicationBloc(
-      publicationRepository: PublicationRepositoryAPI(
-        endpoint: ENDPOINT_OWN_PUBLICATIONS,
-      ),
-    )..add(LoadPublications());
-  }
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final extra = GoRouterState.of(context).extra;
-    final currentRefresh = extra is Map ? extra['refresh'] as int? : null;
-    if (_lastRefreshTimestamp != currentRefresh && currentRefresh != null) {
-      _lastRefreshTimestamp = currentRefresh;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _publicationBloc.add(RefreshPublications());
-        }
-      });
-    }
-  }
-  @override
-  void dispose() {
-    _publicationBloc.close();
-    super.dispose();
-  }
+  final GlobalKey<PublicationsListState> publicationsKey;
+  final ScrollController scrollController;
+  final scrollKey = "ownPosts";
+
+  const ShowOwnPublicationsPage({
+    super.key,
+    this.isFeed = false,
+    required this.publicationsKey,
+    required this.scrollController,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _publicationBloc,
-      child: const PublicationsList(scrollKey: "ownPosts", isFeed: true, isOtherUser: false),
+    scrollController.addListener(() {
+      if (scrollController.hasClients) {
+        final currentOffset = scrollController.offset;
+        ScrollStorage.setOffset(scrollKey, currentOffset);
+      }
+    });
+
+    return BlocProvider(
+      create:
+          (_) => PublicationBloc(
+            publicationRepository: PublicationRepositoryAPI(
+              endpoint: ENDPOINT_OWN_PUBLICATIONS,
+            ),
+          )..add(LoadPublications(isFeed: false, isOtherUser: false)),
+      child: PublicationsList(
+        key: publicationsKey,
+        scrollKey: scrollKey,
+        isFeed: false,
+        isOtherUser: false,
+        scrollController: scrollController,
+      ),
     );
   }
 }

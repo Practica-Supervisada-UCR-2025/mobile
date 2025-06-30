@@ -32,7 +32,6 @@ class MainScaffold extends StatelessWidget {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,10 +41,10 @@ class MainScaffold extends StatelessWidget {
         title: Text(
           'UCR Connect',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
         actions: [
           IconButton(
@@ -57,17 +56,13 @@ class MainScaffold extends StatelessWidget {
           ),
         ],
         automaticallyImplyLeading: false,
-        shape: const Border(
-          bottom: BorderSide(color: Colors.black12),
-        ),
+        shape: const Border(bottom: BorderSide(color: Colors.black12)),
       ),
       body: child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          border: const Border(
-            top: BorderSide(color: Colors.black12),
-          ),
+          border: const Border(top: BorderSide(color: Colors.black12)),
         ),
         child: Theme(
           data: Theme.of(context).copyWith(

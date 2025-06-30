@@ -103,6 +103,7 @@ void main() {
             totalPosts: 1,
             totalPages: 1,
             currentPage: 1,
+            hasReachedMax: true,
           ),
       act: (b) => b.add(LoadMorePublications()),
       wait: const Duration(milliseconds: 350),
@@ -181,22 +182,23 @@ void main() {
   });
 
   group('PublicationSuccess hasReachedMax', () {
-    test('returns true when currentPage >= totalPages', () {
+    test('returns true when publication count < post requested', () {
       final state = PublicationSuccess(
         publications: [samplePub1],
-        totalPosts: 1,
-        totalPages: 1,
-        currentPage: 1,
+        totalPosts: 2,
+        totalPages: 2,
+        currentPage: 2,
+        hasReachedMax: true,
       );
       expect(state.hasReachedMax, true);
     });
-
     test('returns false when currentPage < totalPages', () {
       final state = PublicationSuccess(
         publications: [samplePub1],
         totalPosts: 2,
         totalPages: 2,
         currentPage: 1,
+        hasReachedMax: false,
       );
       expect(state.hasReachedMax, false);
     });

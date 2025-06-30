@@ -47,16 +47,19 @@ final List<RouteBase> appRoutes = [
         builder: (context, state) {
           //final isFeed = state.extra as bool? ?? false;
           return RepositoryProvider<PublicationRepository>(
-            create: (context) => PublicationRepositoryAPI(
-              endpoint: ENDPOINT_FEED_PUBLICATIONS,
-            ),
+            create:
+                (context) => PublicationRepositoryAPI(
+                  endpoint: ENDPOINT_FEED_PUBLICATIONS,
+                ),
             child: BlocProvider<PublicationBloc>(
               create: (context) {
                 final bloc = PublicationBloc(
                   publicationRepository: context.read<PublicationRepository>(),
                 );
-                bloc.add(LoadPublications(isFeed: true));
-                bloc.add(LoadMorePublications(isFeed: true));
+                bloc.add(LoadPublications(isFeed: true, isOtherUser: false));
+                bloc.add(
+                  LoadMorePublications(isFeed: true, isOtherUser: false),
+                );
                 return bloc;
               },
               child: const HomeScreen(isFeed: true),
@@ -82,20 +85,7 @@ final List<RouteBase> appRoutes = [
       GoRoute(
         path: Paths.profile,
         builder: (context, state) {
-          return RepositoryProvider<PublicationRepository>(
-            create:
-                (context) => PublicationRepositoryAPI(
-                  endpoint: ENDPOINT_OWN_PUBLICATIONS,
-                ),
-            child: BlocProvider<PublicationBloc>(
-              create:
-                  (context) => PublicationBloc(
-                    publicationRepository:
-                        context.read<PublicationRepository>(),
-                  )..add(LoadPublications()),
-              child: const ProfileScreen(isFeed: false),
-            ),
-          );
+          return ProfileScreen(isFeed: false);
         },
       ),
       GoRoute(
